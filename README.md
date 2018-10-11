@@ -6,7 +6,7 @@ This tool is a work in progress and is intended for developers to use to quickly
 
 If you aren't comfortable digging into code, this tool probably isn't for you, as you're very likely going to need to do some customizations.
 
-Please refer to the project documentation for usage.
+Please refer to the project [documentation](http://thelastpickle.com/tlp-cluster/) for usage instructions.
 
 
 
