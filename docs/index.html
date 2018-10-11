@@ -461,17 +461,16 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_installation">Installation</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The cluster provisioning tool is somewhat self explanatory (hopefully).
-It launches Cassandra clusters in AWS. In addition to Cassandra, the
-tool can also launch stress nodes (soon) and a prometheus node to gather
-all the metrics.</p>
+<p>The cluster provisioning tool is somewhat self explanatory (hopefully).</p>
+</div>
+<div class="paragraph">
+<p>It launches Cassandra clusters in AWS. In addition to Cassandra, the tool can also launch stress nodes (soon) and a prometheus node to gather all the metrics.</p>
 </div>
 <div class="paragraph">
 <p>The tool itself is a simple bash script wrapping a lot of docker fun.</p>
 </div>
 <div class="paragraph">
-<p>To get started, add the bin directory in tlp-cluster to your $PATH.
-example:</p>
+<p>To get started, add the bin directory in tlp-cluster to your $PATH.  For example:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -496,10 +495,7 @@ example:</p>
 <p>The rest of this doc will refer to the profile <code>tlp</code>.</p>
 </div>
 <div class="paragraph">
-<p>Second, run the tool without any parameters. It’ll tell you that it’s
-set up a configuration file at <code>~/.tlp-cluster/user.tfvars</code>. Open that
-file with your editor and fill in the variables. They all coorespond to
-the same vocabulary in AWS.</p>
+<p>Second, run the tool without any parameters. It’ll tell you that it’s set up a configuration file at <code>~/.tlp-cluster/user.tfvars</code>. Open that file with your editor and fill in the variables. They all coorespond to the same vocabulary in AWS.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -527,9 +523,7 @@ We currently only support the ubuntu 16 ami in us-west-2.  We&#8217;d love a pul
 <h2 id="_initialize_a_cluster">Initialize a Cluster</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The tool uses the current working directory as a project, of sorts. To
-get started, run the following, substituting your customer, ticket and
-purpose (as per TLP way):</p>
+<p>The tool uses the current working directory as a project, of sorts. To get started, run the following, substituting your customer, ticket and purpose.  This is an artifact of how we work on projects at TLP.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -537,10 +531,7 @@ purpose (as per TLP way):</p>
 </div>
 </div>
 <div class="paragraph">
-<p>This will initialize the current directory with a variables file,
-<code>terraform.tfvars</code>. Open it up in an editor. Here you can change the
-number of nodes in the cluster, as well as configure the number of
-stress nodes you want. You can also change the instance type.</p>
+<p>This will initialize the current directory with a variables file, <code>terraform.tfvars</code>. Open it up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.</p>
 </div>
 <div class="paragraph">
 <p>Certain instances types may not work with the ami that&#8217;s hard coded.</p>
@@ -562,12 +553,7 @@ stress nodes you want. You can also change the instance type.</p>
 <p>This will ask you to confirm the changes and fire up your instances.</p>
 </div>
 <div class="paragraph">
-<p>The <code>provisioning</code> directory contains a number of files that can be used
-to set up your instances. Being realistic, since we do so much
-non-standard work (EBS vs instance store, LVM vs FS directly on a
-device, caches, etc) we need the ability to run arbitrary commands. This
-isn’t a great use case for puppet / chef / salt / ansible (yet), so
-we’ll just use easy to modify scripts for now.</p>
+<p>The <code>provisioning</code> directory contains a number of files that can be used to set up your instances. Being realistic, since we do so much non-standard work (EBS vs instance store, LVM vs FS directly on a device, caches, etc) we need the ability to run arbitrary commands. This isn’t a great use case for puppet / chef / salt / ansible (yet), so we’ll just use easy to modify scripts for now.</p>
 </div>
 <div class="paragraph">
 <p>You can run arbitrary commands on all hosts:</p>
@@ -582,7 +568,7 @@ we’ll just use easy to modify scripts for now.</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-10-11 23:11:22 UTC
+Last updated 2018-10-11 23:54:26 UTC
 </div>
 </div>
 </body>

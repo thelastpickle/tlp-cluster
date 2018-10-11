@@ -8,14 +8,12 @@ This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra des
 == Installation
 
 The cluster provisioning tool is somewhat self explanatory (hopefully).
-It launches Cassandra clusters in AWS. In addition to Cassandra, the
-tool can also launch stress nodes (soon) and a prometheus node to gather
-all the metrics.
+
+It launches Cassandra clusters in AWS. In addition to Cassandra, the tool can also launch stress nodes (soon) and a prometheus node to gather all the metrics.
 
 The tool itself is a simple bash script wrapping a lot of docker fun.
 
-To get started, add the bin directory in tlp-cluster to your $PATH.
-example:
+To get started, add the bin directory in tlp-cluster to your $PATH.  For example:
 
 [source,bash]
 ----
@@ -33,10 +31,7 @@ First, make sure you’ve set up an AWS profile https://docs.aws.amazon.com/cli/
 
 The rest of this doc will refer to the profile `tlp`.
 
-Second, run the tool without any parameters. It’ll tell you that it’s
-set up a configuration file at `~/.tlp-cluster/user.tfvars`. Open that
-file with your editor and fill in the variables. They all coorespond to
-the same vocabulary in AWS.
+Second, run the tool without any parameters. It’ll tell you that it’s set up a configuration file at `~/.tlp-cluster/user.tfvars`. Open that file with your editor and fill in the variables. They all coorespond to the same vocabulary in AWS.
 
 IMPORTANT: We currently only support the ubuntu 16 ami in us-west-2.  We'd love a pull request to improve this!
 
@@ -52,19 +47,14 @@ tlp-tools
 
 == Initialize a Cluster
 
-The tool uses the current working directory as a project, of sorts. To
-get started, run the following, substituting your customer, ticket and
-purpose (as per TLP way):
+The tool uses the current working directory as a project, of sorts. To get started, run the following, substituting your customer, ticket and purpose.  This is an artifact of how we work on projects at TLP.
 
 [source,bash]
 ----
 tlp-cluster init Customer TICKET-ID "Reason for cluster"
 ----
 
-This will initialize the current directory with a variables file,
-`terraform.tfvars`. Open it up in an editor. Here you can change the
-number of nodes in the cluster, as well as configure the number of
-stress nodes you want. You can also change the instance type.
+This will initialize the current directory with a variables file, `terraform.tfvars`. Open it up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.
 
 Certain instances types may not work with the ami that's hard coded.
 
@@ -80,12 +70,7 @@ tlp-cluster provision
 
 This will ask you to confirm the changes and fire up your instances.
 
-The `provisioning` directory contains a number of files that can be used
-to set up your instances. Being realistic, since we do so much
-non-standard work (EBS vs instance store, LVM vs FS directly on a
-device, caches, etc) we need the ability to run arbitrary commands. This
-isn’t a great use case for puppet / chef / salt / ansible (yet), so
-we’ll just use easy to modify scripts for now.
+The `provisioning` directory contains a number of files that can be used to set up your instances. Being realistic, since we do so much non-standard work (EBS vs instance store, LVM vs FS directly on a device, caches, etc) we need the ability to run arbitrary commands. This isn’t a great use case for puppet / chef / salt / ansible (yet), so we’ll just use easy to modify scripts for now.
 
 You can run arbitrary commands on all hosts:
 
