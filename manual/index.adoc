@@ -1,0 +1,95 @@
+= tlp-cluster
+Jon Haddad <jon@thelastpickle.com>
+:toc: left
+:icons: font
+
+This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra designed for developers looking to both benchmark and test the correctness of Apache Cassandra.  It assists with builds and starting instances on AWS.
+
+== Installation
+
+The cluster provisioning tool is somewhat self explanatory (hopefully).
+It launches Cassandra clusters in AWS. In addition to Cassandra, the
+tool can also launch stress nodes (soon) and a prometheus node to gather
+all the metrics.
+
+The tool itself is a simple bash script wrapping a lot of docker fun.
+
+To get started, add the bin directory in tlp-cluster to your $PATH.
+example:
+
+[source,bash]
+----
+export PATH="$PATH:/path/to/tlp-cluster/bin"
+----
+
+Now you can use the tool, yay.
+
+
+== Setup
+
+This tool requires a bit of bash and docker.  I don't know if will run on Windows.  We assume most people doing any serious Cassandra development will have access to a Linux box or virtual machine.
+
+First, make sure you’ve set up an AWS profile https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html[profile].
+
+The rest of this doc will refer to the profile `tlp`.
+
+Second, run the tool without any parameters. It’ll tell you that it’s
+set up a configuration file at `~/.tlp-cluster/user.tfvars`. Open that
+file with your editor and fill in the variables. They all coorespond to
+the same vocabulary in AWS.
+
+IMPORTANT: We currently only support the ubuntu 16 ami in us-west-2.  We'd love a pull request to improve this!
+
+
+Running the command without any arguments will print out the usage:
+
+[source,bash]
+----
+tlp-tools
+----
+
+
+
+== Initialize a Cluster
+
+The tool uses the current working directory as a project, of sorts. To
+get started, run the following, substituting your customer, ticket and
+purpose (as per TLP way):
+
+[source,bash]
+----
+tlp-cluster init Customer TICKET-ID "Reason for cluster"
+----
+
+This will initialize the current directory with a variables file,
+`terraform.tfvars`. Open it up in an editor. Here you can change the
+number of nodes in the cluster, as well as configure the number of
+stress nodes you want. You can also change the instance type.
+
+Certain instances types may not work with the ami that's hard coded.
+
+
+== Launch Instances
+
+Launch your instances with the following:
+
+[source,bash]
+----
+tlp-cluster provision
+----
+
+This will ask you to confirm the changes and fire up your instances.
+
+The `provisioning` directory contains a number of files that can be used
+to set up your instances. Being realistic, since we do so much
+non-standard work (EBS vs instance store, LVM vs FS directly on a
+device, caches, etc) we need the ability to run arbitrary commands. This
+isn’t a great use case for puppet / chef / salt / ansible (yet), so
+we’ll just use easy to modify scripts for now.
+
+You can run arbitrary commands on all hosts:
+
+[source,bash]
+----
+tlp-cluster cs ls
+----

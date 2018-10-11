@@ -1,0 +1,24 @@
+FROM ubuntu
+
+RUN apt-get update && \
+   apt-get -y install \
+   ant \
+   build-essential \
+   curl \
+   devscripts \
+   git \
+   openjdk-8-jdk \
+   debhelper \
+   python-dev \
+   dpatch \
+   bash-completion \
+   quilt
+
+
+RUN mkdir /cassandra
+
+COPY bin/build_cassandra.sh /usr/bin/build_cassandra.sh
+
+RUN chmod 755 /usr/bin/build_cassandra.sh
+
+ENTRYPOINT ["/usr/bin/build_cassandra.sh"]
