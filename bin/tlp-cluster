@@ -84,8 +84,6 @@ Debugging (less useful) commands:
 
     rebuild                                     Rebuilds docker images
     copy-provisioning-scripts                   Copies the provisioning scripts to nodes.  Does not execute.
-    copy-keys                                   Copies authorized keys file
-    copy-all                                    Runs copy-provisioning-scripts + copy-keys.
     pssh-shell                                  Drops into a shell via docker-compose with all directories mounted.
     cassandra-ssh [command]                     Run ssh command on all Cassandra instances (sc)
 

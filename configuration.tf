@@ -41,6 +41,11 @@ variable region {
     default = "us-west-2"
 }
 
+variable zones {
+  type = "list"
+    default = ["us-west-2a", "us-west-2b", "us-west-2c"]
+}
+
 resource "aws_instance" "cassandra" {
     ami = "ami-51537029"
     instance_type = "m5d.xlarge"
@@ -54,6 +59,7 @@ resource "aws_instance" "cassandra" {
     security_groups = "${var.security_groups}"
     key_name = "${var.key_name}"
     count = "${var.cassandra_count}"
+    availability_zone = "${element(var.zones, count.index)}"
 }
 
 resource "aws_instance" "stress" {
