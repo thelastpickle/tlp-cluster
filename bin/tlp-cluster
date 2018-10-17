@@ -12,6 +12,8 @@ COMPOSE_FILE="$BASE_DIR/docker-compose.yml"
 PSSH_COMMON_OPTIONS="-i -v -l ubuntu -O StrictHostKeyChecking=no -O UserKnownHostsFile=/local/known_hosts"
 PSCP_COMMON_OPTIONS="-v -l ubuntu -O StrictHostKeyChecking=no -O UserKnownHostsFile=/local/known_hosts"
 
+PSSH_PARALLELISM="10"
+
 # directory setup
 TLP_CLUSTER_USER_DATA=~/.tlp-cluster/
 TLP_CLUSTER_BUILD_DIR=$TLP_CLUSTER_USER_DATA/builds
@@ -29,6 +31,7 @@ install_cassandra() {
 
     echo "Installing"
     # install all deb packages
+    echo "Using parallelism $PSSH_PARALLELISM"
     docker_c run pssh /usr/bin/parallel-ssh $PSSH_COMMON_OPTIONS -h /local/hosts.txt 'cd provisioning; sudo sh install.sh'
 
 }
@@ -110,7 +113,7 @@ provision() {
 }
 
 cassandra_ssh() {
-    docker_c run pssh /usr/bin/parallel-ssh $PSSH_COMMON_OPTIONS -h /local/hosts.txt $@
+    docker_c run pssh /usr/bin/parallel-ssh $PSSH_COMMON_OPTIONS -p $PSSH_PARALLELISM -h /local/hosts.txt $@
 }
 
 
@@ -220,7 +223,6 @@ EOF
 
 
     "install" )
-        copy_keys
         copy_provisioning_scripts
         install_cassandra
         echo "Keys, provisioning scripts, and packages have been pushed to the nodes and installed.  Use tlp-cluster start to fire up the cluster."
@@ -228,7 +230,8 @@ EOF
 
     "start" )
         echo "Starting all nodes"
-        cassandra_ssh "sudo service cassandra start"
+        PSSH_PARALLELISM="1"
+        cassandra_ssh "sudo service cassandra start && sleep 5"
         ;;
 
     "stop" )
