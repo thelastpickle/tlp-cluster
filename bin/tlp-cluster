@@ -31,7 +31,6 @@ install_cassandra() {
 
     echo "Installing"
     # install all deb packages
-    echo "Using parallelism $PSSH_PARALLELISM"
     docker_c run pssh /usr/bin/parallel-ssh $PSSH_COMMON_OPTIONS -h /local/hosts.txt 'cd provisioning; sudo sh install.sh'
 
 }
@@ -40,10 +39,7 @@ install_stress() {
     echo "installing stress"
 }
 
-copy_keys() {
-    docker_c run pssh parallel-scp -h /local/hosts.txt $PSCP_COMMON_OPTIONS /tlp/config/authorized_keys /home/ubuntu/.ssh/authorized_keys
-    docker_c run pssh parallel-scp -h /local/stress.txt $PSCP_COMMON_OPTIONS /tlp/config/authorized_keys /home/ubuntu/.ssh/authorized_keys
-
+copy_extras() {
     docker_c run pssh parallel-scp -h /local/hosts.txt $PSCP_COMMON_OPTIONS /tlp/config/bash_profile /home/ubuntu/.bash_profile
     docker_c run pssh parallel-scp -h /local/stress.txt $PSCP_COMMON_OPTIONS /tlp/config/bash_profile /home/ubuntu/.bash_profile
 }
@@ -266,24 +262,11 @@ EOF
 #        docker_c run pssh /usr/bin/parallel-ssh $PSSH_COMMON_OPTIONS -h /local/hosts.txt $@
         ;;
 
-    # debugging
-    "copy-keys" )
-        copy_keys
-        ;;
 
     "rebuild" )
         rebuild
         ;;
     "copy-provisioning-scripts" )
-        copy_provisioning_scripts
-        ;;
-
-    "copy-keys" )
-        copy_keys
-        ;;
-
-    "copy-all" )
-        copy_keys
         copy_provisioning_scripts
         ;;
 
@@ -353,10 +336,14 @@ EOF
         SEED_LIST=$(python -c "fp = open('seeds.txt', 'r'); lines = fp.readlines(); tmp = ','.join([x.strip() for x in lines]); print(tmp)")
 
         CASSANDRA_YAML="provisioning/cassandra/cassandra.yaml"
+        CASSANDRA_ENV="provisioning/cassandra/cassandra-env.sh"
 
         sed -i -e "s/\(.*\)- seeds.*/\1- seeds: \"$SEED_LIST\"/g" $CASSANDRA_YAML
         sed -i -e 's/^endpoint_snitch:.*/endpoint_snitch: Ec2Snitch/' $CASSANDRA_YAML
 
+        # let it violate range movements, this is desired in almost every case
+        echo "Disabling consistent range moviement"
+        printf '\nJVM_OPTS="$JVM_OPTS -Dcassandra.consistent.rangemovement=false" \n'  >> $CASSANDRA_ENV
 
         echo "Cassandra deb and config copied to provisioning/.  Config files are located in provisioning/cassandra.  Use tlp-cluster install to push the artifacts to the nodes."
         ;;
