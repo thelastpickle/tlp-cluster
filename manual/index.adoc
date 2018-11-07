@@ -5,6 +5,13 @@ Jon Haddad <jon@thelastpickle.com>
 
 This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra designed for developers looking to both benchmark and test the correctness of Apache Cassandra.  It assists with builds and starting instances on AWS.
 
+== Prerequisites
+
+There are some AWS resources tlp-cluster expects to exist:
+
+- A security group that allows inbound SSH traffic.
+- A key pair, private part of which should be present in your `~/.ssh` with `chmod 400` on it.
+
 == Installation
 
 The cluster provisioning tool is somewhat self explanatory (hopefully).
@@ -68,7 +75,24 @@ Launch your instances with the following:
 tlp-cluster provision
 ----
 
-This will ask you to confirm the changes and fire up your instances.
+There are a few things Terraform will ask for if they are not present in `terraform.tfvars`:
+
+[source,bash]
+----
+name = "Your Name"
+email = "your@email.com"
+
+# AWS profile from your ~/.aws/credentials
+profile = "default"
+
+# name of the key you intend to use for connecting to the instance
+key_name = "yourkey"
+
+# securty group the nodes should belong to
+security_groups = ["yourgroup"]
+----
+
+Whether you pass these values is on the fly, or place them in the file, Terraform should eventually ask you to type `yes` and fire up your instances.
 
 The `provisioning` directory contains a number of files that can be used to set up your instances. Being realistic, since we do so much non-standard work (EBS vs instance store, LVM vs FS directly on a device, caches, etc) we need the ability to run arbitrary commands. This isn’t a great use case for puppet / chef / salt / ansible (yet), so we’ll just use easy to modify scripts for now.
 
