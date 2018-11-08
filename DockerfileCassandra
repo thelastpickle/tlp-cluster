@@ -12,7 +12,8 @@ RUN apt-get update && \
    python-dev \
    dpatch \
    bash-completion \
-   quilt
+   quilt \
+   rsync
 
 
 RUN mkdir /cassandra
