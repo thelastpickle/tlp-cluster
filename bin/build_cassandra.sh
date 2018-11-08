@@ -11,14 +11,13 @@ rsync -av /cassandra/ /build/
 
 cd /build
 
-ant
-
 export JAVA8_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 
+ant
 
 # Install build dependencies and build package
-echo "y" | sudo mk-build-deps --install
+echo "y" | mk-build-deps --install
 dpkg-buildpackage -uc -us
 
 
