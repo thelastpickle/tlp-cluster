@@ -10,7 +10,7 @@ This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra des
 There are some AWS resources tlp-cluster expects to exist:
 
 - A security group that allows inbound SSH traffic.
-- A key pair, private part of which should be present in your `~/.ssh` with `chmod 400` on it.
+- A key pair, private part of which should be present in your `~/.ssh` with `chmod 400` on it. The key needs to be named `id_rsa`, otherwise `pssh` won't see it.
 
 == Installation
 
