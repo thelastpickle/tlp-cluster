@@ -41,6 +41,8 @@ echo "Done with shell scripts"
 
 echo "Installing all deb packages"
 
+apt-get update
+
 for d in $(ls *.deb)
 do
     apt-get install -y ./${d}
