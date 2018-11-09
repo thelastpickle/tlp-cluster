@@ -102,3 +102,44 @@ You can run arbitrary commands on all hosts:
 ----
 tlp-cluster cs ls
 ----
+
+
+== Build Cassandra
+
+Prepare a Cassandra package for installation on the machines:
+
+
+[source,bash]
+----
+tlp-cluster build-cassandra trunk trunk
+----
+
+This command will build a Debian package straight from the latest Cassandra sources. If all goes well, a brand new `.deb` file should appear in `~/.tlp-cluster/builds/trunk/deb/`
+
+
+== Install Casandra
+
+The following command will take a built Debian package and copy it to the local `provisioning` folder:
+
+[source,bash]
+----
+tlp-cluster use trunk
+----
+
+Now it's also a good time to edit Cassandra settings. In the `provisioning/cassandra` folder you'll find both `cassandra.yaml` and `cassandra-env.sh` files.
+
+When you're ready to actually install Cassandra, just run the following:
+
+[source,bash]
+----
+tlp-cluster install
+----
+
+Ultimately, you should get your Cassandra cluster up, which should allow you to run commands like:
+
+[source,bash]
+----
+tlp-cluster cs nodetool status
+----
+
+For connecting to the cluster with CQL, see the content of `seeds.txt` for contact points.
