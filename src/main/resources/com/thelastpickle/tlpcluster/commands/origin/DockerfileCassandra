@@ -20,8 +20,7 @@ RUN apt-get update && \
 
 RUN mkdir /cassandra
 
-COPY bin/build_cassandra.sh /usr/bin/build_cassandra.sh
-
+COPY build_cassandra.sh /usr/bin/build_cassandra.sh
 RUN chmod 755 /usr/bin/build_cassandra.sh
 
 ENTRYPOINT ["/usr/bin/build_cassandra.sh"]

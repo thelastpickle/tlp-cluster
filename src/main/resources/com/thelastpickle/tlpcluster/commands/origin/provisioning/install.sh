@@ -2,7 +2,15 @@
 
 # pass either cassandra or stress to execute all files
 
-# Create this policy to stop Cassandra from automatically starting when installed
+echo "Updating local apt database"
+apt-get update
+
+if [[ "$1" == "" ]]; then
+echo "Pass a provisioning argument please"
+exit 1
+fi
+
+
 echo "Setting up policy to disable Cassandra starting automatically"
 
 cat > ./policy-rc.d << EOF
@@ -17,21 +25,12 @@ sudo mv policy-rc.d ${POLICY_RC_PATH}
 sudo chown root:root ${POLICY_RC_PATH}
 sudo chmod 755 ${POLICY_RC_PATH}
 
-echo "Adding host entry to make no IP set work"
-
-
-# nevermind this...
-#if grep -q "TLP-CLUSTER" /etc/hosts; then
-#    echo "Hosts already set up"
-#else
-#    HOSTENTRY="$(curl http://169.254.169.254/latest/meta-data/local-ipv4) $(hostname)"
-#    printf "\n$HOSTENTRY # TLP-CLUSTER \n\n" | sudo tee -a /etc/hosts
-#fi
-
-
 
 echo "Running all shell scripts"
 
+# subshell
+(
+cd $1
 for f in $(ls [0-9]*.sh)
 do
     sh ${f}
@@ -45,10 +44,11 @@ for d in $(ls *.deb)
 do
     apt-get install -y ./${d}
 done
+)
 
 echo "Finished installing deb packages, deploying cassandra configs files"
 
-sudo cp cassandra/* /etc/cassandra/
+sudo cp cassandra/conf/* /etc/cassandra/
 
 export PRIVATE_IP="$(curl http://169.254.169.254/latest/meta-data/local-ipv4)"
 

@@ -2,12 +2,11 @@ version: "3.0"
 
 services:
   terraform:
-    build: ./
+    build: .
     volumes:
-      - "${HOME}/.aws/credentials:/credentials"
-      - "./:/tlp:ro"
-      - "${PWD}/:/local"
+      - "./:/local"
       - "${HOME}/.tlp-cluster/:/user/"
+      - "${HOME}/.aws/credentials:/credentials"
 
     working_dir: "/local"
 
@@ -18,7 +17,6 @@ services:
     volumes:
       - "${HOME}/.ssh:/root/.ssh:ro"
       - "${PWD}:/local"
-      - "./:/tlp:ro"
     working_dir: "/local"
 
   build-cassandra:
@@ -34,12 +32,4 @@ services:
     environment:
       - BUILD_NAME
 
-  docs:
-    image: asciidoctor/docker-asciidoctor
-
-    volumes:
-    - ./manual:/documents
-    - ./docs:/html
-
-    command: asciidoctor -o /html/index.html  index.adoc
 
