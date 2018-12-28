@@ -15,6 +15,7 @@ class Configuration(val tags: Map<String, String> = mapOf()) {
 
     // stress
     val numStressInstances = 0
+    val stressAMI = "ami-51537029"
     var stressInstanceType = "c5d.2xlarge"
 
     val region = "us-west-2"
@@ -69,6 +70,7 @@ class Configuration(val tags: Map<String, String> = mapOf()) {
 
 
         setResource("cassandra", cassandraAMI, cassandraInstanceType)
+        setResource("stress", stressAMI, stressInstanceType)
 
         return this
     }
