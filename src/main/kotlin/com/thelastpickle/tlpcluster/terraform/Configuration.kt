@@ -18,11 +18,14 @@ class Configuration {
     // no way of enabling this right now
     val monitoring = false
 
+
+
     private val config  = TerraformConfig()
     val mapper = ObjectMapper()
 
     init {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+        mapper.enable(SerializationFeature.INDENT_OUTPUT)
     }
 
     fun setVariable(key: String, default: String) : Configuration {
@@ -30,9 +33,13 @@ class Configuration {
         return this
     }
 
+    private fun build() : Configuration {
+        // set all the configuration variables
+        return this
+    }
+
     fun toJSON() : String {
-
-
+        build()
         return mapper.writeValueAsString(config)
     }
 
@@ -40,13 +47,13 @@ class Configuration {
 }
 
 class TerraformConfig {
-    var provider = mapOf<String, Provider>()
     var variable = mutableMapOf<String, Variable>()
+    val provider = mapOf("aws" to Provider("\${var.region}", "/credentials", "\${var.profile}"))
 }
 
 data class ServerTypeConfiguration(val ami: String = "ami-5153702")
 
-data class Provider(val region: String)
+data class Provider(val region: String, val shared_credentials_file: String, val profile: String)
 
 data class Variable(val default: String)
 
@@ -54,3 +61,5 @@ data class Resource(val ami: String = "ami-5153702",
                     val instance_type: String = "m5d.xlarge",
                     val tags: Map<String, String> = mapOf()
 )
+
+
