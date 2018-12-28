@@ -36,14 +36,19 @@ class Configuration {
         return this
     }
 
+    fun setVariable(key: String, variable: Variable) : Configuration {
+        config.variable[key] = variable
+        return this
+    }
+
+
     private fun build() : Configuration {
         // set all the configuration variables
 
         setVariable("cassandra_instance_type", cassandraInstanceType)
         setVariable("stress_instance_type", stressInstanceType)
         setVariable("email", email)
-
-
+        setVariable("security_groups", Variable(null, "list"))
 
         return this
     }
@@ -65,7 +70,7 @@ data class ServerTypeConfiguration(val ami: String = "ami-5153702")
 
 data class Provider(val region: String, val shared_credentials_file: String, val profile: String)
 
-data class Variable(val default: String)
+data class Variable(val default: Any?, val type: String? = null)
 
 data class Resource(val ami: String = "ami-5153702",
                     val instance_type: String = "m5d.xlarge",
