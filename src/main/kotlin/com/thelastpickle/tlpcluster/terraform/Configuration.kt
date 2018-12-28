@@ -31,7 +31,7 @@ class Configuration {
         mapper.enable(SerializationFeature.INDENT_OUTPUT)
     }
 
-    fun setVariable(key: String, default: String) : Configuration {
+    fun setVariable(key: String, default: String?) : Configuration {
         config.variable[key] = Variable(default)
         return this
     }
@@ -42,6 +42,7 @@ class Configuration {
     }
 
 
+
     private fun build() : Configuration {
         // set all the configuration variables
 
@@ -49,6 +50,18 @@ class Configuration {
         setVariable("stress_instance_type", stressInstanceType)
         setVariable("email", email)
         setVariable("security_groups", Variable(null, "list"))
+        setVariable("purpose", null)
+        setVariable("ticket", null)
+        setVariable("client", null)
+        setVariable("key_name", null)
+        setVariable("cassandra_count", "$numCassandraInstances")
+        setVariable("cassandra_instance_name", "cassandra-node")
+        setVariable("stress_count", "$numStressInstances")
+        setVariable("stress_instance_name", "stress-instance")
+        setVariable("profile", null)
+        setVariable("region", region)
+        setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
+
 
         return this
     }

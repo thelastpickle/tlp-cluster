@@ -10,7 +10,6 @@ internal class ConfigurationTest {
 
     @Test
     fun ensureSetVariableWorks() {
-        c.setVariable("ami", "testami")
         println(c.toJSON())
     }
 }
