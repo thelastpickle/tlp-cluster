@@ -11,7 +11,7 @@ internal class ConfigurationTest {
             "purpose" to "Testing tags",
             "email" to "test@test.com")
 
-    val c = Configuration(tags)
+    private val c = Configuration(tags)
 
     @Test
     fun ensureSetVariableWorks() {

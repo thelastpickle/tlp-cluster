@@ -10,7 +10,6 @@ class Configuration(val tags: Map<String, String> = mapOf()) {
     var email = ""
 
 
-    val cassandraSpec = ServerTypeConfiguration("m5d.xlarge")
     val cassandraInstanceType = "m5d.xlarge"
     val cassandraAMI = "ami-51537029"
 
@@ -88,7 +87,6 @@ class TerraformConfig {
     val resource = AWSResource()
 }
 
-data class ServerTypeConfiguration(val ami: String = "ami-5153702")
 
 data class Provider(val region: String, val shared_credentials_file: String, val profile: String)
 
