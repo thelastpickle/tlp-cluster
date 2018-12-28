@@ -49,6 +49,11 @@ class Configuration(val tags: Map<String, String> = mapOf()) {
         return this
     }
 
+    fun setOutput(name: String, value: String) : Configuration {
+        config.output[name] = Output.create(value)
+        return this
+    }
+
     private fun build() : Configuration {
         // set all the configuration variables
 
@@ -68,9 +73,12 @@ class Configuration(val tags: Map<String, String> = mapOf()) {
         setVariable("region", region)
         setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
 
-
         setResource("cassandra", cassandraAMI, cassandraInstanceType)
         setResource("stress", stressAMI, stressInstanceType)
+
+        setOutput("cassandra_ips", "\${aws_instance.cassandra.*.public_ip}")
+        setOutput("cassandra_internal_ips", "\${aws_instance.cassandra.*.private_ip}")
+        setOutput("stress_ips", "\${aws_instance.stress.*.public_ip}")
 
         return this
     }
@@ -87,6 +95,7 @@ class TerraformConfig {
     var variable = mutableMapOf<String, Variable>()
     val provider = mutableMapOf("aws" to Provider("\${var.region}", "/credentials", "\${var.profile}"))
     val resource = AWSResource()
+    val output = mutableMapOf<String, Output>()
 }
 
 
@@ -105,3 +114,10 @@ data class Resource(val ami: String = "ami-5153702",
 data class AWSResource(var aws_instance : MutableMap<String, Resource> = mutableMapOf() )
 
 
+data class Output(val value: List<String>) {
+    companion object {
+        fun create(value: String) : Output {
+            return Output(listOf(value))
+        }
+    }
+}
