@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 
-class Configuration(val tags: Map<String, String> = mapOf()) {
+class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
     val numCassandraInstances = 3
     val usEebs = false
     var email = ""
