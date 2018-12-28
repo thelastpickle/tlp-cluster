@@ -56,6 +56,12 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
 
     private fun build() : Configuration {
         // set all the configuration variables
+        // update tags
+        // Name = "${var.email} {$var.ticket} stress"
+
+        val name = "${tags.getOrDefault("email", "")} ${tags.getOrDefault("ticket", "")}"
+
+        tags["Name"] = name
 
         setVariable("cassandra_instance_type", cassandraInstanceType)
         setVariable("stress_instance_type", stressInstanceType)
