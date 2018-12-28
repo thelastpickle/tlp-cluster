@@ -7,17 +7,20 @@ import com.fasterxml.jackson.databind.SerializationFeature
 class Configuration {
     val numCassandraInstances = 3
     val usEebs = false
+    var email = ""
 
-    val cassandraSpec = ServerTypeConfiguration()
+
+    val cassandraSpec = ServerTypeConfiguration("m5d.xlarge")
+    val cassandraInstanceType = "m5d.xlarge"
 
     // stress
     val numStressInstances = 0
+    var stressInstanceType = "c5d.2xlarge"
 
     val region = "us-west-2"
 
     // no way of enabling this right now
     val monitoring = false
-
 
 
     private val config  = TerraformConfig()
@@ -35,6 +38,13 @@ class Configuration {
 
     private fun build() : Configuration {
         // set all the configuration variables
+
+        setVariable("cassandra_instance_type", cassandraInstanceType)
+        setVariable("stress_instance_type", stressInstanceType)
+        setVariable("email", email)
+
+
+
         return this
     }
 
