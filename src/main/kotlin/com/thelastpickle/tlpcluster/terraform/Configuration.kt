@@ -3,6 +3,7 @@ package com.thelastpickle.tlpcluster.terraform
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import java.io.File
 
 class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
     val numCassandraInstances = 3
@@ -92,6 +93,10 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
     fun toJSON() : String {
         build()
         return mapper.writeValueAsString(config)
+    }
+
+    fun write(f: File) {
+        mapper.writeValue(f, config)
     }
 
 

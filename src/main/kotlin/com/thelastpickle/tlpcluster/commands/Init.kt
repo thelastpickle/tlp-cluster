@@ -8,7 +8,7 @@ import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import java.io.File
 import org.apache.commons.io.FileUtils
-
+import com.thelastpickle.tlpcluster.terraform.Configuration
 
 sealed class CopyResourceResult {
     class Created(val fp: File) : CopyResourceResult()
@@ -58,6 +58,14 @@ class Init : ICommand {
             output.absoluteFile.parentFile.mkdirs()
             FileUtils.copyInputStreamToFile(input, output)
         }
+
+        val configTags = mutableMapOf("ticket" to ticket,
+                    "client" to client,
+                    "purpose" to purpose)
+        val config = Configuration(configTags)
+        val configOutput = File("terraform.tf.json")
+        config.write(configOutput)
+
 
         // add required tags to variable file
         val terraform = File("terraform.tfvars")
