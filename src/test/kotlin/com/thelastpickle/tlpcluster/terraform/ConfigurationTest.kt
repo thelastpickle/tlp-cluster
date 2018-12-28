@@ -9,7 +9,8 @@ internal class ConfigurationTest {
     val c = Configuration()
 
     @Test
-    fun ensureBasicSerializationWorks() {
+    fun ensureSetVariableWorks() {
+        c.setVariable("ami", "testami")
         println(c.toJSON())
     }
 }
