@@ -96,6 +96,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
     }
 
     fun write(f: File) {
+        build()
         mapper.writeValue(f, config)
     }
 
