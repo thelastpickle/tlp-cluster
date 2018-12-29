@@ -42,10 +42,8 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
         return this
     }
 
-    fun setResource(key: String, ami: String, instanceType: String) : Configuration {
-        val conf = Resource(ami, instanceType, tags)
-
-
+    fun setResource(key: String, ami: String, instanceType: String, count: Int) : Configuration {
+        val conf = Resource(ami, instanceType, tags, count = count)
         config.resource.aws_instance[key] = conf
         return this
     }
@@ -72,16 +70,14 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
         setVariable("ticket", null)
         setVariable("client", null)
         setVariable("key_name", null)
-        setVariable("cassandra_count", "$numCassandraInstances")
         setVariable("cassandra_instance_name", "cassandra-node")
-        setVariable("stress_count", "$numStressInstances")
         setVariable("stress_instance_name", "stress-instance")
         setVariable("profile", null)
         setVariable("region", region)
         setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
 
-        setResource("cassandra", cassandraAMI, cassandraInstanceType)
-        setResource("stress", stressAMI, stressInstanceType)
+        setResource("cassandra", cassandraAMI, cassandraInstanceType, numCassandraInstances)
+        setResource("stress", stressAMI, stressInstanceType, numStressInstances)
 
         setOutput("cassandra_ips", "\${aws_instance.cassandra.*.public_ip}")
         setOutput("cassandra_internal_ips", "\${aws_instance.cassandra.*.private_ip}")
@@ -120,7 +116,7 @@ data class Resource(val ami: String = "ami-5153702",
                     val tags: Map<String, String> = mapOf(),
                     val security_groups : String = "\${var.security_groups}",
                     val key_name : String = "\${var.key_name}",
-                    val count : String = "\${var.stress_count}"
+                    val count : Int
 )
 
 data class AWSResource(var aws_instance : MutableMap<String, Resource> = mutableMapOf() )
