@@ -63,6 +63,10 @@ class Init : ICommand {
                     "client" to client,
                     "purpose" to purpose)
         val config = Configuration(configTags)
+
+        config.numCassandraInstances = cassandraInstances
+        config.numStressInstances = stressInstances
+
         val configOutput = File("terraform.tf.json")
         config.write(configOutput)
 

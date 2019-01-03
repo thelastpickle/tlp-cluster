@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import java.io.File
 
 class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
-    val numCassandraInstances = 3
+    var numCassandraInstances = 3
     val usEebs = false
     var email = ""
 
@@ -15,7 +15,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
     val cassandraAMI = "ami-51537029"
 
     // stress
-    val numStressInstances = 0
+    var numStressInstances = 0
     val stressAMI = "ami-51537029"
     var stressInstanceType = "c5d.2xlarge"
 
