@@ -16,10 +16,10 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
 
     // stress
     var numStressInstances = 0
-    val stressAMI = "ami-51537029"
+    var stressAMI = "ami-51537029"
     var stressInstanceType = "c5d.2xlarge"
 
-    val region = "us-west-2"
+    var region = "us-west-2"
 
     // no way of enabling this right now
     val monitoring = false

@@ -30,6 +30,15 @@ class Init : ICommand {
     @Parameter(description = "Start instances automatically", names = ["--up"])
     var start = false
 
+    @Parameter(description = "AMI", names = ["--ami"])
+    var ami = "ami-51537029"
+
+    @Parameter(description = "Region", names = ["--region"])
+    var region = "us-west-2"
+
+    @Parameter(description = "Instance Type", names = ["--instance"])
+    var instanceType =  "c5d.2xlarge"
+
     override fun execute() {
         println("Initializing directory")
 
@@ -66,6 +75,10 @@ class Init : ICommand {
 
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
+
+        config.region = region
+        config.stressAMI = "ami-51537029"
+        config.stressInstanceType = instanceType
 
         val configOutput = File("terraform.tf.json")
         config.write(configOutput)
