@@ -28,6 +28,7 @@ class BuildCassandra(val context: Context)  : ICommand {
             tmp
         } else {
             // not a dir, must be a tag
+            println("Directory not found, attempting to build ref $pathOrVersion")
             context.cassandraRepo.checkoutVersion(pathOrVersion)
             context.cassandraRepo.gitLocation
         }
