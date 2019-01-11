@@ -24,3 +24,4 @@
 /terraform.tf.json
 /terraform.tfstate
 /terraform.tfvars
+/terraform.tfstate.backup
