@@ -25,7 +25,7 @@ class Init : ICommand {
     var cassandraInstances = 3
 
     @Parameter(description = "Number of stress instances", names = ["--stress", "-s"])
-    var stressInstances = 0
+    var stressInstances = 1
 
     @Parameter(description = "Start instances automatically", names = ["--up"])
     var start = false
@@ -77,9 +77,10 @@ class Init : ICommand {
         config.numStressInstances = stressInstances
 
         config.region = region
-        config.stressAMI = "ami-51537029"
+        config.stressAMI = ami
         config.stressInstanceType = instanceType
         config.cassandraInstanceType = instanceType
+        config.cassandraAMI = ami
 
         val configOutput = File("terraform.tf.json")
         config.write(configOutput)

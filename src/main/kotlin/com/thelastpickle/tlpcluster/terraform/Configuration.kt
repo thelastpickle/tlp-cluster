@@ -12,7 +12,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
 
 
     var cassandraInstanceType = "m5d.xlarge"
-    val cassandraAMI = "ami-51537029"
+    var cassandraAMI = "ami-51537029"
 
     // stress
     var numStressInstances = 0

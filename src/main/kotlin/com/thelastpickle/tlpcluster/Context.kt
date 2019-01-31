@@ -14,4 +14,9 @@ data class Context(val tlpclusterUserDirectory: File,
         File(buildLocation, "deb").mkdirs()
     }
 
+    val stress : Stress by lazy {
+        val stressLocation = File(System.getProperty("user.home"), "/.tlp-cluster/tlp-stress")
+        Stress(stressLocation)
+    }
+
 }
