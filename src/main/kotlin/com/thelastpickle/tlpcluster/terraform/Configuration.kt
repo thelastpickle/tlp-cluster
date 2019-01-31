@@ -11,7 +11,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
     var email = ""
 
 
-    val cassandraInstanceType = "m5d.xlarge"
+    var cassandraInstanceType = "m5d.xlarge"
     val cassandraAMI = "ami-51537029"
 
     // stress

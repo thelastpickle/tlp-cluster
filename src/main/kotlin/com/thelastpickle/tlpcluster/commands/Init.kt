@@ -79,6 +79,7 @@ class Init : ICommand {
         config.region = region
         config.stressAMI = "ami-51537029"
         config.stressInstanceType = instanceType
+        config.cassandraInstanceType = instanceType
 
         val configOutput = File("terraform.tf.json")
         config.write(configOutput)
