@@ -38,7 +38,7 @@ fun main(arguments: Array<String>) {
     val args = MainArgs()
     jcommander.addObject(args)
 
-    val commands = mapOf("init" to Init(),
+    val commands = mapOf("init" to Init(context),
                          "up" to Up(),
                          "start" to Start(),
                          "stop" to Stop(),

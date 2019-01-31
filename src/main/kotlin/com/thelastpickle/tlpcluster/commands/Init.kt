@@ -2,6 +2,7 @@ package com.thelastpickle.tlpcluster.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
+import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.DockerCompose
 import com.thelastpickle.tlpcluster.Utils
 import org.reflections.Reflections
@@ -16,7 +17,7 @@ sealed class CopyResourceResult {
 }
 
 @Parameters(commandDescription = "Initialize this directory for tlp-cluster")
-class Init : ICommand {
+class Init(val context: Context) : ICommand {
 
     @Parameter(description = "Client, Ticket, Purpose", required = true, arity = 3)
     var tags = mutableListOf<String>()
@@ -45,6 +46,8 @@ class Init : ICommand {
         val client = tags[0]
         val ticket = tags[1]
         val purpose = tags[2]
+
+        context.stress
 
         check(client.isNotBlank())
         check(ticket.isNotBlank())
