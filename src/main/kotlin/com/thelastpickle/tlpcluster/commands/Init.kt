@@ -47,7 +47,7 @@ class Init(val context: Context) : ICommand {
         val ticket = tags[1]
         val purpose = tags[2]
 
-        context.stress
+        context.stress.maybeCreateImage()
 
         check(client.isNotBlank())
         check(ticket.isNotBlank())
