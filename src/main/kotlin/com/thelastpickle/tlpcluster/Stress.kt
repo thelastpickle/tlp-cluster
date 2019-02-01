@@ -71,10 +71,18 @@ assertThat(imageInfo.comment(), is("CommitedByTest-" + "foobar"));
 
         val name = "tlp-stress-build-env"
 
+
         // does the container exist?
-        
+
+        val existingingContainer = docker.inspectImage(image).container()
+
+        println("existing container: $existingingContainer")
 
         val creation = docker.createContainer(config, name)
+
+        // execute the build
+        // run fpm
+
         val id = creation.id()
         println("Created container $name with id $id")
     }
