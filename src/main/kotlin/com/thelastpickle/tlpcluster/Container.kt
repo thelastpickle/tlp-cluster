@@ -1,9 +1,10 @@
 package com.thelastpickle.tlpcluster
 
-class Container {
+class Container(val image: String) {
+
     companion object {
         fun from(image: String) : Container {
-            return Container()
+            return Container(image)
         }
     }
 

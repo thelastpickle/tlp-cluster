@@ -13,6 +13,8 @@ class Stress(val location: File) {
     val repo: Repository
     val docker: DockerClient
 
+    val sourceImage = "ubuntu:bionic"
+
     init {
         if(!location.exists()) {
             Git.cloneRepository()
@@ -37,55 +39,60 @@ class Stress(val location: File) {
     }
 
     fun maybeCreateImage() {
-        // doesn't create an image if it doesn't exist
+        // always rebuilds
 
-        /*
-
-final String tag = "foobar";
-final ContainerCreation newContainer = docker.commitContainer(
-    id, "mosheeshel/busybox", tag, config, "CommitedByTest-" + tag, "newContainer");
-
-final ImageInfo imageInfo = docker.inspectImage(newContainer.id());
-assertThat(imageInfo.author(), is("newContainer"));
-assertThat(imageInfo.comment(), is("CommitedByTest-" + "foobar"));
-         */
-
-
-        val image = "ubuntu:bionic"
-        println("Pulling docker image: $image")
-        docker.pull(image)
+        println("Pulling docker image: $sourceImage")
+        docker.pull(sourceImage)
 
         val config = ContainerConfig.builder()
-                .image(image)
+                .image(sourceImage)
                 .build()
 
         val name = "tlp-stress-build-env"
+        /*
+        final AtomicReference<String> imageIdFromMessage = new AtomicReference<>();
 
-        val containers = docker.listContainers(DockerClient.ListContainersParam.allContainers())
-
-        // does the container exist?
-        val existingingContainer = docker.inspectImage(image).container()
-
-        if(existingingContainer.isNotEmpty()) {
-            docker.removeContainer(existingingContainer)
+final String returnedImageId = docker.build(
+    Paths.get(dockerDirectory), "test", new ProgressHandler() {
+      @Override
+      public void progress(ProgressMessage message) throws DockerException {
+        final String imageId = message.buildImageId();
+        if (imageId != null) {
+          imageIdFromMessage.set(imageId);
         }
+      }
+    });
 
-        println("existing container: $existingingContainer")
+         */
+        docker.create()
 
-        val creation = docker.createContainer(config, name)
+//        val containers = docker.listContainers(DockerClient.ListContainersParam.allContainers())
 
-        // execute the build
-        // run fpm
 
-        val id = creation.id()
-        println("Created container $name with id $id")
-
-        docker.startContainer(id)
-
-        // do a build
-
-        val execId = docker.execCreate(id, arrayOf("apt-get", "install", "-y", "gradle")).id()
-        docker.execStart(execId).readFully()
+//        val stressContainer = containers.filter{ it.names()?.contains("/$name") ?: false }
+//
+//        stressContainer.forEach {
+//            println("Removing container ${it.id()}")
+//            docker.removeContainer(it.id())
+//        }
+//
+//
+//
+//        val creation = docker.createContainer(config, name)
+//
+//        // execute the build
+//        // run fpm
+//
+//        val id = creation.id()
+//        println("Created container $name with id $id")
+//
+//        docker.startContainer(id)
+//
+//        // do a build
+//        println(docker.stats(id))
+//
+//        val execId = docker.execCreate(id, arrayOf("apt-get", "install", "-y", "gradle")).id()
+//        docker.execStart(execId).readFully()
 
         // commit the container
 
