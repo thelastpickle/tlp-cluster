@@ -40,16 +40,6 @@ class Stress(val location: File) {
         // doesn't create an image if it doesn't exist
 
         /*
-        // Pull image
-docker.pull("busybox:latest");
-
-// Create container
-final ContainerConfig config = ContainerConfig.builder()
-    .image("busybox:latest")
-    .build();
-final String name = randomName();
-final ContainerCreation creation = docker.createContainer(config, name);
-final String id = creation.id();
 
 final String tag = "foobar";
 final ContainerCreation newContainer = docker.commitContainer(
@@ -61,7 +51,7 @@ assertThat(imageInfo.comment(), is("CommitedByTest-" + "foobar"));
          */
 
 
-        val image = "gradle:jdk8-alpine"
+        val image = "ubuntu:bionic"
         println("Pulling docker image: $image")
         docker.pull(image)
 
@@ -71,10 +61,14 @@ assertThat(imageInfo.comment(), is("CommitedByTest-" + "foobar"));
 
         val name = "tlp-stress-build-env"
 
+        val containers = docker.listContainers(DockerClient.ListContainersParam.allContainers())
 
         // does the container exist?
-
         val existingingContainer = docker.inspectImage(image).container()
+
+        if(existingingContainer.isNotEmpty()) {
+            docker.removeContainer(existingingContainer)
+        }
 
         println("existing container: $existingingContainer")
 
@@ -85,6 +79,20 @@ assertThat(imageInfo.comment(), is("CommitedByTest-" + "foobar"));
 
         val id = creation.id()
         println("Created container $name with id $id")
+
+        docker.startContainer(id)
+
+        // do a build
+
+        val execId = docker.execCreate(id, arrayOf("apt-get", "install", "-y", "gradle")).id()
+        docker.execStart(execId).readFully()
+
+        // commit the container
+
+
+
     }
+
+
 
 }

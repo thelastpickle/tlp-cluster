@@ -47,7 +47,8 @@ fun main(arguments: Array<String>) {
                          "build" to BuildCassandra(context),
                          "ls" to ListCassandraBuilds(context),
                          "use" to UseCassandra(context),
-                         "clean" to Clean())
+                         "clean" to Clean(),
+                         "rebuild-docker" to RebuildDocker(context))
 
     for(c in commands.entries) {
         jcommander.addCommand(c.key, c.value)
