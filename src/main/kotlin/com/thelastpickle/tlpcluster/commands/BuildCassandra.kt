@@ -4,13 +4,12 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Cassandra
 import com.thelastpickle.tlpcluster.Context
-import com.thelastpickle.tlpcluster.DockerCompose
 import java.io.File
 
 @Parameters(commandDescription = "Build Cassandra (either tag or custom dir)")
 class BuildCassandra(val context: Context)  : ICommand {
 
-    @Parameter(description = "Build Name and path (or just a tag)")
+    @Parameter(description = "build_name [path | tag]")
     var params: List<String> = mutableListOf()
 
     override fun execute() {

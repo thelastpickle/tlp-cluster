@@ -15,7 +15,7 @@ services:
       dockerfile: DockerfileSSH
       context: "."
     volumes:
-      - "${HOME}/.ssh:/root/.ssh:ro"
+      - "${SSH_KEY_PATH}:/root/.ssh/aws-private-key:ro"
       - "${PWD}:/local"
     working_dir: "/local"
 

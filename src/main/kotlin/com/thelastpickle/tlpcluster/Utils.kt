@@ -6,7 +6,7 @@ import java.io.File
 
 class Utils {
     companion object {
-        fun copyProvisioningScripts() {
+        fun copyProvisioningScripts(sshKey: String) : OutputResult {
             val dc = DockerCompose(inheritIO = true)
             /*
             pssh parallel-rsync -avrz  \
@@ -15,12 +15,8 @@ class Utils {
                             -O UserKnownHostsFile=/local/known_hosts \
                             ./provisioning/ /home/ubuntu/provisioning/
              */
-            dc.run("pssh", arrayOf("parallel-rsync", "-avrz",
-                    "-h", "hosts.txt", "-l", "ubuntu",
-                    "-O", "StrictHostKeyChecking=no",
-                    "-O", "UserKnownHostsFile=/local/known_hosts",
-                    "./provisioning/", "/home/ubuntu/provisioning/"))
-
+            dc.setSshKeyPath(sshKey)
+            return dc.run("pssh", arrayOf("/bin/sh", "/local/copy_provisioning_resources.sh"))
         }
 
         /**
@@ -34,10 +30,9 @@ class Utils {
                 return CopyResourceResult.Created(fp)
             }
             return CopyResourceResult.Existed(fp)
-
         }
 
-        fun install() {
+        fun install(sshKey: String) : OutputResult {
             // check to make sure there's a cassandra deb package
 
             val files = FileUtils.listFiles(File("provisioning", "cassandra"), arrayOf("deb"), false)
@@ -48,13 +43,8 @@ class Utils {
 
             // pssh /usr/bin/parallel-ssh $PSSH_COMMON_OPTIONS -h /local/hosts.txt 'cd provisioning; sudo sh install.sh'
             val dc = DockerCompose(inheritIO = true)
-            dc.run("pssh", arrayOf("parallel-ssh", "-ivl", "ubuntu",
-                    "-O", "StrictHostKeyChecking=no",
-                    "-O", "UserKnownHostsFile=/local/known_hosts",
-                    "-h", "/local/hosts.txt",
-                    "cd provisioning; chmod +x install.sh; sudo ./install.sh cassandra"))
-
-
+            dc.setSshKeyPath(sshKey)
+            return dc.run("pssh", arrayOf("/bin/sh", "/local/provision_cassandra.sh"))
         }
 
 

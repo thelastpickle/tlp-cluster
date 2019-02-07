@@ -1,6 +1,5 @@
 package com.thelastpickle.tlpcluster
 
-import org.apache.commons.io.FileUtils
 import org.eclipse.jgit.api.CreateBranchCommand
 import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.lib.Repository
@@ -53,7 +52,7 @@ class Cassandra(val gitLocation: File) {
             return dc
                     .setBuildName(name)
                     .setCassandraDir(location.absolutePath)
-                    .up("build-cassandra", arrayOf())
+                    .run("build-cassandra", arrayOf())
 
         }
     }
@@ -63,7 +62,6 @@ class Cassandra(val gitLocation: File) {
         val tag = "cassandra-$version"
 
         Git.open(gitLocation).checkout().setName(tag)
-                .setCreateBranch(true)
                 .setUpstreamMode(CreateBranchCommand.SetupUpstreamMode.TRACK)
                 .setStartPoint(tag)
                 .call()

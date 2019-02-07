@@ -49,7 +49,7 @@ Running the command without any arguments will print out the usage:
 
 [source,bash]
 ----
-tlp-tools
+tlp-cluster
 ----
 
 
@@ -60,10 +60,16 @@ The tool uses the current working directory as a project, of sorts. To get start
 
 [source,bash]
 ----
-tlp-cluster init Customer TICKET-ID "Reason for cluster"
+tlp-cluster init CLIENT TICKET PURPOSE
 ----
 
-This will initialize the current directory with a variables file, `terraform.tfvars`. Open it up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.
+Where:
+
+* `CLIENT` - Name of the customer or client associated with the work you are doing with `tlp-cluster`.
+* `TICKET` - Jira ticket number associated with the work you are doing with `tlp-cluster`.
+* `PURPOSE` - Reason why you are creating the cluster.
+
+This will initialize the current directory with a variables file, `terraform.tfvars` and a configuration file, terraform.tf.json. Open them up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.
 
 Certain instances types may not work with the ami that's hard coded.
 
@@ -74,7 +80,7 @@ Launch your instances with the following:
 
 [source,bash]
 ----
-tlp-cluster provision
+tlp-cluster up
 ----
 
 There are a few things Terraform will ask for if they are not present in `terraform.tfvars`:
@@ -96,11 +102,57 @@ security_groups = ["yourgroup"]
 
 Whether you pass these values is on the fly, or place them in the file, Terraform should eventually ask you to type `yes` and fire up your instances.
 
-The `provisioning` directory contains a number of files that can be used to set up your instances. Being realistic, since we do so much non-standard work (EBS vs instance store, LVM vs FS directly on a device, caches, etc) we need the ability to run arbitrary commands. This isn’t a great use case for puppet / chef / salt / ansible (yet), so we’ll just use easy to modify scripts for now.
-
 You can run arbitrary commands on all hosts:
 
 [source,bash]
 ----
 tlp-cluster cs ls
 ----
+
+
+== Installing Cassandra
+
+To install Cassandra on your instances, you will need to follow these steps:
+
+1. Build the version you need and give it a build name (optional).
+2. Select the build name you want install.
+3. Install the selected build.
+
+The first step is optional because you may already have a build in the `~/.tlp-cluster/build` directory that you want to use.
+
+If you have no builds you will need to run the following:
+
+[source,bash]
+----
+tlp-cluster build BUILD_NAME [CASSANDRA_TAG | CASSANDRA_LOCAL_REPO]
+----
+
+Where:
+
+* `BUILD_NAME` - Name you want to give the build e.g. my-build-cass-4.0.
+* `CASSANDRA_TAG` - The version number of a tagged Cassandra build e.g. `3.11.3`. Use this if you want to deploy already existing released version of Cassandra to your cluster.
+* `CASSANDRA_LOCAL_REPO` - Full path to clone of the Cassandra repository. Use this if you want to deploy a custom version of Cassandra to your cluster.
+
+If you already have a build that you would like to use you can run the following:
+
+[source,bash]
+----
+tlp-cluster use BUILD_NAME
+----
+
+This will copy the binaries and configuration files to the `provisioning/cassandra` directory in your `tlp-cluster` repository. The `provisioning` directory contains a number of files that can be used to set up your instances. Being realistic, since we do so much non-standard work (EBS vs instance store, LVM vs FS directly on a device, caches, etc) we need the ability to run arbitrary commands. This isn’t a great use case for puppet / chef / salt / ansible (yet), so we are just using easy to modify scripts for now.
+
+If you want to install other binaries or perform other operations during provisioning of the instances, you can add them to the `provisioning/cassandra` directory. Note that any new scripts you add should be prefixed with a number which is used to determine the order they are executed by the `install.sh` script.
+
+To provision the instances run the following:
+
+[source,bash]
+----
+tlp-cluster install -k SSH_KEY_PATH
+----
+
+Where:
+
+* `SSH_KEY_PATH` - Is the full path to the private key from the key pair used when creating the instances.
+
+This will push the contents of the `provisioning/cassandra` directory up to each of the instances you have created and install Cassandra on them.
