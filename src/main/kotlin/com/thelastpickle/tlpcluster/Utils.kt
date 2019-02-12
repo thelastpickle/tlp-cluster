@@ -58,5 +58,14 @@ class Utils {
 
         }
 
+        fun prompt(question: String, default: String) : String {
+            var line = (readLine() ?: default).trim()
+
+            if(line.equals(""))
+                line = default
+
+            return line
+        }
+
     }
 }
