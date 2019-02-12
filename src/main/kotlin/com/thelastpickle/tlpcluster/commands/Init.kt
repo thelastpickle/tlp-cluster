@@ -73,7 +73,7 @@ class Init(val context: Context) : ICommand {
                     "client" to client,
                     "purpose" to purpose)
 
-        val config = Configuration(configTags, region = context.userConfig.region)
+        val config = Configuration(configTags, region = context.userConfig.region, context = context)
 
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances

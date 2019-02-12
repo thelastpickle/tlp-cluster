@@ -1,12 +1,15 @@
 package com.thelastpickle.tlpcluster.terraform
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.thelastpickle.tlpcluster.Context
 import java.io.File
 
 class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
-                    var region: String = "us-west-2") {
+                    var region: String = "us-west-2",
+                    var context: Context) {
 
     var numCassandraInstances = 3
     val usEebs = false
@@ -24,7 +27,8 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
     // no way of enabling this right now
     val monitoring = false
 
-    private val config  = TerraformConfig()
+    private val config  = TerraformConfig(context.userConfig.awsAccessKey, context.userConfig.awsSecret)
+
     val mapper = ObjectMapper()
 
     init {
@@ -76,6 +80,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
         setVariable("region", region)
         setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
 
+
         setResource("cassandra", cassandraAMI, cassandraInstanceType, numCassandraInstances)
         setResource("stress", stressAMI, stressInstanceType, numStressInstances)
 
@@ -99,15 +104,19 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
 
 }
 
-class TerraformConfig {
+class TerraformConfig(@JsonIgnore val accessKey: String,
+                      @JsonIgnore val secret: String) {
+
     var variable = mutableMapOf<String, Variable>()
-    val provider = mutableMapOf("aws" to Provider("\${var.region}", "/credentials", "\${var.profile}"))
+    val provider = mutableMapOf("aws" to Provider("\${var.region}", accessKey, secret))
     val resource = AWSResource()
     val output = mutableMapOf<String, Output>()
 }
 
 
-data class Provider(val region: String, val shared_credentials_file: String, val profile: String)
+data class Provider(val region: String,
+                    val access_key: String,
+                    val secret_key: String)
 
 data class Variable(val default: Any?, val type: String? = null)
 
