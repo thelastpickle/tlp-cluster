@@ -65,6 +65,8 @@ class UseCassandra(val context: Context) : ICommand {
         val fp = File(yamlLocation)
         val yaml = Yaml.create(fp)
 
+        yaml.setProperty("endpoint_snitch", "Ec2Snitch")
+
         val seedFile = File("seeds.txt")
         if (seedFile.exists()) {
             yaml.setSeeds(Seeds.open(seedFile.inputStream()))
@@ -79,7 +81,6 @@ class UseCassandra(val context: Context) : ICommand {
             }
         }
 
-        yaml.setProperty("endpoint_snitch", "Ec2Snitch")
         yaml.write(yamlLocation)
 
         val env = File(envLocation)
