@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import java.io.File
 
-class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
+class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
+                    var region: String = "us-west-2") {
+
     var numCassandraInstances = 3
     val usEebs = false
     var email = ""
@@ -18,8 +20,6 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf()) {
     var numStressInstances = 0
     var stressAMI = "ami-51537029"
     var stressInstanceType = "c5d.2xlarge"
-
-    var region = "us-west-2"
 
     // no way of enabling this right now
     val monitoring = false
