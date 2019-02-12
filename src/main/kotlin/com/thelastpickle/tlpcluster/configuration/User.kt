@@ -21,11 +21,13 @@ data class User(
             println("We just need to know a few things before we get started.")
 
 
+            val privateKey = File(System.getProperty("user.home"), ".ssh/id_rsa").absoluteFile.toString()
+
             val email = Utils.prompt("What's your email?", "")
             val region = Utils.prompt("What AWS region do you prefer?", "us-west-2")
             val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
-            val keyName = Utils.prompt("What key do you use on this machine to log into instances?", "")
-            val profile = Utils.prompt("AWS profile to use?", "")
+            val keyName = Utils.prompt("What private key do you use on this machine to log into instances?", privateKey)
+            val profile = Utils.prompt("AWS profile to use? (see ~/.aws/credentials)", "")
 
 
             val user = User(email, region, securityGroup, keyName, profile)
