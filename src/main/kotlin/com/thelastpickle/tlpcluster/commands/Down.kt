@@ -9,7 +9,7 @@ class Down : ICommand {
         println("Crushing dreams, terminating instances.")
 
         val docker = DockerCompose(inheritIO = true)
-        docker.run("terraform", arrayOf("destroy", "-var-file=/user/user.tfvars", "/local" ))
+        docker.run("terraform", arrayOf("destroy", "/local" ))
         docker.down()
     }
 }

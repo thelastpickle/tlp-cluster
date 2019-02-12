@@ -36,14 +36,9 @@ Now you can use the tool, yay.
 
 This tool requires a bit of bash and docker.  I don't know if will run on Windows.  We assume most people doing any serious Cassandra development will have access to a Linux box or virtual machine.
 
-First, make sure you’ve set up an AWS profile https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html[profile].
-
-The rest of this doc will refer to the profile `tlp`.
-
-Second, run the tool without any parameters. It’ll tell you that it’s set up a configuration file at `~/.tlp-cluster/user.tfvars`. Open that file with your editor and fill in the variables. They all coorespond to the same vocabulary in AWS.
+If you've never used to the tool before, run the tool without any parameters, `bin/tlp-cluster`.   You will be asked some questions to generate a configuration file which will be placed in your `$HOME/.tlp-cluster/user.yaml`.
 
 IMPORTANT: We currently only support the ubuntu 16 ami in us-west-2.  We'd love a pull request to improve this!
-
 
 Running the command without any arguments will print out the usage:
 
