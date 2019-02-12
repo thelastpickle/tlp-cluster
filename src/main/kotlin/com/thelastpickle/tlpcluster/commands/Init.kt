@@ -2,6 +2,7 @@ package com.thelastpickle.tlpcluster.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
+import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.DockerCompose
 import com.thelastpickle.tlpcluster.Utils
 import org.reflections.Reflections
@@ -16,7 +17,7 @@ sealed class CopyResourceResult {
 }
 
 @Parameters(commandDescription = "Initialize this directory for tlp-cluster")
-class Init : ICommand {
+class Init(val context: Context) : ICommand {
 
     @Parameter(description = "Client, Ticket, Purpose", required = true, arity = 3)
     var tags = mutableListOf<String>()
@@ -71,7 +72,8 @@ class Init : ICommand {
         val configTags = mutableMapOf("ticket" to ticket,
                     "client" to client,
                     "purpose" to purpose)
-        val config = Configuration(configTags)
+
+        val config = Configuration(configTags, region = context.userConfig.region)
 
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
@@ -109,7 +111,7 @@ class Init : ICommand {
         )
 
         if(start) {
-            Up().execute()
+            Up(context).execute()
         }
 
 

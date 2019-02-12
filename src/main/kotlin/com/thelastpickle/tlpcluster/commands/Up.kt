@@ -2,12 +2,13 @@ package com.thelastpickle.tlpcluster.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
+import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.DockerCompose
 import sun.misc.IOUtils
 import java.io.File
 
 @Parameters(commandDescription = "Starts instances")
-class Up : ICommand {
+class Up(val context: Context) : ICommand {
     override fun execute() {
 
         // we have to list both the variable files explicitly here
