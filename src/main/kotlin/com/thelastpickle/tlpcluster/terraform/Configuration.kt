@@ -27,7 +27,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
     // no way of enabling this right now
     val monitoring = false
 
-    private val config  = TerraformConfig(context.userConfig.awsAccessKey, context.userConfig.awsSecret)
+    private val config  = TerraformConfig(region, context.userConfig.awsAccessKey, context.userConfig.awsSecret)
 
     val mapper = ObjectMapper()
 
@@ -73,7 +73,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
         setVariable("purpose", null)
         setVariable("ticket", null)
         setVariable("client", null)
-        setVariable("key_name", null)
+        setVariable("key_name", context.userConfig.keyName)
         setVariable("cassandra_instance_name", "cassandra-node")
         setVariable("stress_instance_name", "stress-instance")
         setVariable("profile", null)
@@ -104,11 +104,12 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
 
 }
 
-class TerraformConfig(@JsonIgnore val accessKey: String,
+class TerraformConfig(@JsonIgnore val region: String,
+                      @JsonIgnore val accessKey: String,
                       @JsonIgnore val secret: String) {
 
     var variable = mutableMapOf<String, Variable>()
-    val provider = mutableMapOf("aws" to Provider("\${var.region}", accessKey, secret))
+    val provider = mutableMapOf("aws" to Provider(region, accessKey, secret))
     val resource = AWSResource()
     val output = mutableMapOf<String, Output>()
 }
