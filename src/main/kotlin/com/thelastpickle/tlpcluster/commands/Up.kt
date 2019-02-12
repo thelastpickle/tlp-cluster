@@ -21,7 +21,7 @@ class Up(val context: Context) : ICommand {
 
         val dc = DockerCompose(inheritIO = true)
 
-        val applyResult = dc.run("terraform", arrayOf("apply", "-var-file=/user/user.tfvars", "-var-file=/local/terraform.tfvars", "/local"))
+        val applyResult = dc.run("terraform", arrayOf("apply", "/local"))
 
         val dc2 = DockerCompose()
 
