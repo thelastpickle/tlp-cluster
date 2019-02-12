@@ -12,24 +12,13 @@ class MainArgs {
 
 fun main(arguments: Array<String>) {
 
-    val tlpcluster = File(System.getProperty("user.home"), "/.tlp-cluster/user.tfvars")
-    val result = Utils.maybeCopyResource("/com/thelastpickle/tlpcluster/commands/user.tfvars", tlpcluster)
-
     val tlpclusterUserDirectory = File(System.getProperty("user.home"), "/.tlp-cluster/")
 
     // this will automatically clone the C* repo
     val cassFp = File(System.getProperty("user.home"), "/.tlp-cluster/cassandra")
     val cass = Cassandra(cassFp)
 
-    when {
-        result is CopyResourceResult.Created -> {
-            println("It looks like this is your first time running tlp-cluster.  I've created your user configuration file at ~/.tlp-cluster/user.tfvars.  Please edit that to set up your AWS account info before running any more commands.")
-            System.exit(0)
-        }
-    }
-
     // make sure we can do cassandra builds
-
 
     val context = Context(tlpclusterUserDirectory, cass)
 
