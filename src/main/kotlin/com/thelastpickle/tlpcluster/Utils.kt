@@ -59,6 +59,7 @@ class Utils {
         }
 
         fun prompt(question: String, default: String) : String {
+            print("$question [$default]: ")
             var line = (readLine() ?: default).trim()
 
             if(line.equals(""))
