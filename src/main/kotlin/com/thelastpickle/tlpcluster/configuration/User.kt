@@ -10,7 +10,8 @@ data class User(
     var region: String,
     var securityGroup: String,
     var keyName: String,
-    var profile: String
+    var awsAccessKey: String,
+    var awsSecret: String
 ) {
     companion object {
         /**
@@ -27,10 +28,12 @@ data class User(
             val region = Utils.prompt("What AWS region do you prefer?", "us-west-2")
             val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
             val keyName = Utils.prompt("What private key do you use on this machine to log into instances?", privateKey)
-            val profile = Utils.prompt("AWS profile to use? (see ~/.aws/credentials)", "")
 
+            val awsAccessKey = Utils.prompt("AWS Access Key?", "")
+            val awsSecret = Utils.prompt("Aws Secret?", "")
 
-            val user = User(email, region, securityGroup, keyName, profile)
+            val user = User(email, region, securityGroup, keyName, awsAccessKey, awsSecret)
+
             context.yaml.writeValue(location, user)
 
         }
