@@ -5,8 +5,6 @@ services:
     build: .
     volumes:
       - "./:/local"
-      - "${HOME}/.tlp-cluster/:/user/"
-      - "${HOME}/.aws/credentials:/credentials"
 
     working_dir: "/local"
 
