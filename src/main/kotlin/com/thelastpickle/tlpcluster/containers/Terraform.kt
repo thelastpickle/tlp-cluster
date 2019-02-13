@@ -132,6 +132,9 @@ class Terraform(val context: Context) {
 
         println("Container exited with exit code ${containerState.exitCode}, ${containerState.error}")
 
+        outputThread.stop()
+        redirectStdInputThread.stop()
+
         // clean up after ourselves
         context.docker.removeContainerCmd(dockerContainer.id)
                 .withRemoveVolumes(true)
