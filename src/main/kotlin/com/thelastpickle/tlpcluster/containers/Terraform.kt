@@ -11,6 +11,7 @@ import com.github.dockerjava.core.command.EventsResultCallback
 import com.github.dockerjava.core.command.LogContainerResultCallback
 import com.thelastpickle.tlpcluster.Context
 import java.io.*
+import kotlin.concurrent.thread
 
 class Terraform(val context: Context) {
 
@@ -104,11 +105,13 @@ class Terraform(val context: Context) {
 
         println("Started OK, input/output fun time")
 
-        do {
-            println(stdOutReader.readLine())
-        } while(true)
+        val outputThread = thread {
+            println("Reading line")
+            do {
+                println(stdOutReader.readLine())
+            } while(true)
+        }
 
-        println("Reading line")
 //        val line = reader.readLine()
 //        println("Read line from standard input, sending to terraform: $line")
 
