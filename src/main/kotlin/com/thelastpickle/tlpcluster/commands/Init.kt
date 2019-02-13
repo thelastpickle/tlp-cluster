@@ -103,7 +103,7 @@ class Init(val context: Context) : ICommand {
         terraform.appendText("purpose = \"$purpose\"\n")
 
         val dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerHost("tcp://localhost:1234")
+                .withDockerHost("unix:///var/run/docker.sock")
                 .build()
 
         val dockerClient = DockerClientBuilder.getInstance(dockerConfig).build()
