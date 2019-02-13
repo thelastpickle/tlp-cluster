@@ -72,23 +72,21 @@ class Terraform(val context: Context) {
 
          */
 
-        // first, handle stdin.  the PipedOutputStream will accept data and feed it to docker
+        // first, handle stdin.  the PipedOutputStream will accept data and feed it to PipedInputStream, which then goes to docker
         // it looks like this, essentially
         // stdInputPipe -> stdInputPipeToContainer -> terraform container
         val stdInputPipe = PipedOutputStream()
         val stdInputPipeToContainer = PipedInputStream(stdInputPipe)
 
         // now I need a means of writing to the stdInputPipe, and it should be buffered
-
         val writer = stdInputPipe.bufferedWriter()
+
         // now a means of reading from stdin
-
-
+        val stdIn = System.`in`.bufferedReader()
 
         // dealing with standard output from the docker container
         val source = PipedOutputStream() // we're going to feed the frames to here
         val stdOutReader = PipedInputStream(source).bufferedReader()
-
 
         context.docker.attachContainerCmd(dockerContainer.id)
                 .withStdIn(stdInputPipeToContainer)
@@ -121,13 +119,21 @@ class Terraform(val context: Context) {
             } while(true)
         }
 
+        
+        val redirectStdInputThread = thread {
+            while(true) {
+                val line = stdIn.readLine()
+                writer.appendln(line)
+            }
+
+        }
+
 
         do {
             Thread.sleep(500)
             containerState = context.docker.inspectContainerCmd(dockerContainer.id).exec().state
-
-
         } while (containerState.running == true)
+
 
         if (!containerState.status.equals("exited")) {
             println("Error in execution. Container exited with code : " + containerState.exitCode + ". " + containerState.error)
