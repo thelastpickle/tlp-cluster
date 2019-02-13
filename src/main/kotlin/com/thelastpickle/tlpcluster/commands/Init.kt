@@ -2,20 +2,16 @@ package com.thelastpickle.tlpcluster.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
-import com.github.dockerjava.api.async.ResultCallback
 import com.thelastpickle.tlpcluster.Context
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import java.io.File
-import java.io.Closeable
 import org.apache.commons.io.FileUtils
 import com.thelastpickle.tlpcluster.terraform.Configuration
-import com.github.dockerjava.core.DockerClientBuilder
-import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.command.BuildImageResultCallback
-import com.github.dockerjava.core.command.AttachContainerResultCallback
 import com.github.dockerjava.api.command.InspectContainerResponse
 import com.github.dockerjava.api.model.*
+import com.thelastpickle.tlpcluster.containers.Terraform
 
 
 sealed class CopyResourceResult {
@@ -95,83 +91,16 @@ class Init(val context: Context) : ICommand {
 
 
         // add required tags to variable file
-        val terraform = File("terraform.tfvars")
-        terraform.appendText("\n")
+        val terraformVars = File("terraform.tfvars")
+        terraformVars.appendText("\n")
 
-        terraform.appendText("client = \"$client\"\n")
-        terraform.appendText("ticket = \"$ticket\"\n")
-        terraform.appendText("purpose = \"$purpose\"\n")
+        terraformVars.appendText("client = \"$client\"\n")
+        terraformVars.appendText("ticket = \"$ticket\"\n")
+        terraformVars.appendText("purpose = \"$purpose\"\n")
 
-        val dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerHost("unix:///var/run/docker.sock")
-                .build()
+        val terraform = Terraform(context)
+        terraform.init()
 
-        val dockerClient = DockerClientBuilder.getInstance(dockerConfig).build()
-        val dockerBuildCallback = BuildImageResultCallback()
-        val dockerImageName = "terraform"
-        val dockerImageTag = "thelastpickle/tlp-cluster/$dockerImageName"
-
-        println("Building Terraform image")
-
-        dockerClient.buildImageCmd()
-                .withDockerfile(File("build/resources/main/com/thelastpickle/tlpcluster/commands/origin/Dockerfile"))
-                .withTags(hashSetOf(dockerImageTag))
-                .exec(dockerBuildCallback)
-
-        val imageId = dockerBuildCallback.awaitImageId()
-        val volumeLocal = Volume("/local")
-
-        println("Finished building Terraform image: $imageId")
-
-        val cwdPath = System.getProperty("user.dir")
-
-        println("working dir is: $cwdPath")
-
-        println("Creating Terraform container")
-
-        val dockerContainer = dockerClient.createContainerCmd(dockerImageTag)
-                .withVolumes(volumeLocal)
-                .withBinds(Bind(cwdPath, volumeLocal, AccessMode.rw))
-                .withCmd(mutableListOf("init", "/local"))
-                .exec()
-
-        println("Starting Terraform container")
-
-        dockerClient.startContainerCmd(dockerContainer.id).exec()
-
-        var containerState : InspectContainerResponse.ContainerState
-
-        do {
-            Thread.sleep(5000)
-            containerState = dockerClient.inspectContainerCmd(dockerContainer.id).exec().state
-        } while (containerState.running == true)
-
-        if (!containerState.status.equals("exited")) {
-            println("Error in execution. Container exited with code : " + containerState.exitCode + ". " + containerState.error)
-            return
-        }
-
-        println("Container execution completed")
-
-        // clean up after ourselves
-        dockerClient.removeContainerCmd(dockerContainer.id)
-                .withRemoveVolumes(true)
-                .exec()
-
-//        val composeResult = DockerCompose().run("terraform", arrayOf("init", "/local"))
-//
-//        composeResult.fold(
-//                {
-//                    println(it.output)
-//                    println(it.err)
-//                    println("Your environment has been set up.  Please edit your terraform.tfvars then run 'tlp-cluster up' to start your AWS nodes.")
-//
-//                },
-//                {
-//                    println(it.message)
-//                    System.exit(1)
-//                }
-//        )
 
         if(start) {
             Up(context).execute()
