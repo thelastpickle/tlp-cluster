@@ -21,9 +21,6 @@ data class User(
             println("Welcome to the tlp-cluster interactive setup.")
             println("We just need to know a few things before we get started.")
 
-
-            val privateKey = File(System.getProperty("user.home"), ".ssh/id_rsa").absoluteFile.toString()
-
             val email = Utils.prompt("What's your email?", "")
             val region = Utils.prompt("What AWS region do you prefer?", "us-west-2")
             val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
