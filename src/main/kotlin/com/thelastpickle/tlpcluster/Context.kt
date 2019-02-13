@@ -6,6 +6,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientBuilder
+import com.github.dockerjava.netty.NettyDockerCmdExecFactory
 import com.thelastpickle.tlpcluster.configuration.User
 import java.io.File
 
@@ -42,11 +43,14 @@ data class Context(val tlpclusterUserDirectory: File,
     }
 
     val docker by lazy {
+
         val dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost("unix:///var/run/docker.sock")
                 .build()
 
-        DockerClientBuilder.getInstance(dockerConfig).build()
+        DockerClientBuilder.getInstance(dockerConfig)
+                .withDockerCmdExecFactory(NettyDockerCmdExecFactory())
+                .build()
     }
 
 
