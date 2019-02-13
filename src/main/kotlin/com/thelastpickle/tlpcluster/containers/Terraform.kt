@@ -88,6 +88,24 @@ class Terraform(val context: Context) {
         val source = PipedOutputStream() // we're going to feed the frames to here
         val stdOutReader = PipedInputStream(source).bufferedReader()
 
+        // We put this on a different thread because I have no idea what input it's going to ask for
+        // and the operations are blocking
+        val outputThread = thread {
+            println("Reading line")
+            do {
+                println(stdOutReader.readLine())
+            } while(true)
+        }
+
+
+        val redirectStdInputThread = thread {
+            while(true) {
+                val line = stdIn.readLine()
+                println("Sending $line to container")
+                writer.appendln(line)
+            }
+        }
+
         context.docker.attachContainerCmd(dockerContainer.id)
                 .withStdIn(stdInputPipeToContainer)
                 .withStdOut(true)
@@ -99,36 +117,14 @@ class Terraform(val context: Context) {
                             source.write(item.payload)
                         }
                     }
+
+                    override fun onError(throwable: Throwable?) {
+                        println(throwable.toString())
+                        super.onError(throwable)
+                    }
             })
 
-
-        // wait for container to start
-        do {
-            println("Starting terraform...")
-            Thread.sleep(100)
-            val state = context.docker.inspectContainerCmd(dockerContainer.id).exec().state
-        } while(state.running != true)
-
-//        println("Started OK, input/output fun time")
-
-        // We put this on a different thread because I have no idea what input it's going to ask for
-        val outputThread = thread {
-            println("Reading line")
-            do {
-                println(stdOutReader.readLine())
-            } while(true)
-        }
-
-        
-        val redirectStdInputThread = thread {
-            while(true) {
-                val line = stdIn.readLine()
-                writer.appendln(line)
-            }
-
-        }
-
-
+        // stay here till the container stops
         do {
             Thread.sleep(500)
             containerState = context.docker.inspectContainerCmd(dockerContainer.id).exec().state
