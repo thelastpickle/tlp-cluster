@@ -8,7 +8,7 @@ import java.io.File
 @Parameters(commandNames = ["install"], commandDescription = "Install Everything")
 class Install : ICommand {
     @Parameter(description = "Number of Cassandra instances", names = ["--sshkey", "-k"])
-    var sshKey: String = ""
+    var sshKey: String = File(System.getProperty("user.home"), "/.ssh/id_rsa").absolutePath
 
     override fun execute() {
         check(sshKey.isNotBlank())

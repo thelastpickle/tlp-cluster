@@ -27,7 +27,7 @@ data class User(
             val email = Utils.prompt("What's your email?", "")
             val region = Utils.prompt("What AWS region do you prefer?", "us-west-2")
             val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
-            val keyName = Utils.prompt("What private key do you use on this machine to log into instances?", privateKey)
+            val keyName = Utils.prompt("What AWS key pair do you use?", "")
 
             val awsAccessKey = Utils.prompt("AWS Access Key?", "")
             val awsSecret = Utils.prompt("Aws Secret?", "")
