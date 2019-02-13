@@ -130,13 +130,7 @@ class Terraform(val context: Context) {
             containerState = context.docker.inspectContainerCmd(dockerContainer.id).exec().state
         } while (containerState.running == true)
 
-
-        if (!containerState.status.equals("exited")) {
-            println("Error in execution. Container exited with code : " + containerState.exitCode + ". " + containerState.error)
-            return
-        }
-
-        println("Container execution completed")
+        println("Container exited with exit code ${containerState.exitCode}, ${containerState.error}")
 
         // clean up after ourselves
         context.docker.removeContainerCmd(dockerContainer.id)
