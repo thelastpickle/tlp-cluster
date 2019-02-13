@@ -16,34 +16,20 @@ class Terraform(val context: Context) {
 
     fun init() {
 
-        val dockerBuildCallback = BuildImageResultCallback()
-        val dockerImageName = "terraform"
-        val dockerImageTag = "thelastpickle/tlp-cluster/$dockerImageName"
-
-        /// we can use the existing terraform image and ditch the dockerfile
-        println("Building Terraform image")
-
-        context.docker.buildImageCmd()
-                .withDockerfile(File("build/resources/main/com/thelastpickle/tlpcluster/commands/origin/Dockerfile"))
-                .withTags(hashSetOf(dockerImageTag))
-                .exec(dockerBuildCallback)
-
-        val imageId = dockerBuildCallback.awaitImageId()
         val volumeLocal = Volume("/local")
-
-        println("Finished building Terraform image: $imageId")
 
         val cwdPath = System.getProperty("user.dir")
 
-        println("working dir is: $cwdPath")
-
-        println("Creating Terraform container")
-
-        val dockerContainer = context.docker.createContainerCmd(dockerImageTag)
+        val dockerContainer = context.docker.createContainerCmd("hashicorp/terraform")
                 .withVolumes(volumeLocal)
                 .withBinds(Bind(cwdPath, volumeLocal, AccessMode.rw))
+                .withWorkingDir("/local")
                 .withCmd(mutableListOf("init", "/local"))
+                .withAttachStdout(true)
                 .exec()
+
+
+        println("working dir is: $cwdPath")
 
         println("Starting Terraform container")
 

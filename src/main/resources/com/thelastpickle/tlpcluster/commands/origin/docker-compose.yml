@@ -1,12 +1,6 @@
 version: "3.0"
 
 services:
-  terraform:
-    build: .
-    volumes:
-      - "./:/local"
-
-    working_dir: "/local"
 
   pssh:
     build:
