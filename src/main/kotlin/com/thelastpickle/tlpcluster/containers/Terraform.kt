@@ -72,18 +72,26 @@ class Terraform(val context: Context) {
 
          */
 
-        // attach a buffered reader for the stdin
-        // write stuff to outPipe
-//        val outPipe = PipedOutputStream()
-//        val stdInput = PipedInputStream(outPipe)
+        // first, handle stdin.  the PipedOutputStream will accept data and feed it to docker
+        // it looks like this, essentially
+        // stdInputPipe -> stdInputPipeToContainer -> terraform container
+        val stdInputPipe = PipedOutputStream()
+        val stdInputPipeToContainer = PipedInputStream(stdInputPipe)
+
+        // now I need a means of writing to the stdInputPipe, and it should be buffered
+
+        val writer = stdInputPipe.bufferedWriter()
+        // now a means of reading from stdin
+
 
 
         // dealing with standard output from the docker container
         val source = PipedOutputStream() // we're going to feed the frames to here
         val stdOutReader = PipedInputStream(source).bufferedReader()
 
+
         context.docker.attachContainerCmd(dockerContainer.id)
-//                .withStdIn(stdInput)
+                .withStdIn(stdInputPipeToContainer)
                 .withStdOut(true)
                 .withStdErr(true)
                 .withFollowStream(true)
@@ -103,17 +111,15 @@ class Terraform(val context: Context) {
             val state = context.docker.inspectContainerCmd(dockerContainer.id).exec().state
         } while(state.running != true)
 
-        println("Started OK, input/output fun time")
+//        println("Started OK, input/output fun time")
 
+        // We put this on a different thread because I have no idea what input it's going to ask for
         val outputThread = thread {
             println("Reading line")
             do {
                 println(stdOutReader.readLine())
             } while(true)
         }
-
-//        val line = reader.readLine()
-//        println("Read line from standard input, sending to terraform: $line")
 
 
         do {
