@@ -20,35 +20,14 @@ class Up(val context: Context) : ICommand {
         // priority over user
         val terraform = Terraform(context)
         terraform.up()
-//
-//        val dc = DockerCompose(inheritIO = true)
-//
-//        val applyResult = dc.run("terraform", arrayOf("apply", "/local"))
-//
-//        val dc2 = DockerCompose()
-//
-//        val cassIps = dc2.run("terraform", arrayOf("output", "cassandra_ips"))
-//        val internalCassIps = dc2.run("terraform", arrayOf("output", "cassandra_internal_ips"))
-//        val stressIps = dc2.run("terraform", arrayOf("output", "stress_ips"))
-//
-//        cassIps.fold({
-//                File("hosts.txt").writeText(convertToUsefulFile(it.output))
-//            },
-//            {
-//                println("Could not run docker-compose commands - missing yaml.  Run tlp-cluster init to fix")
-//                System.exit(1)
-//            }
-//        )
-//
-//        internalCassIps.onSuccess {
-//            File("seeds.txt").writeText(convertToUsefulFile(it.output.lines().take(3).joinToString("\n")))
-//        }
-//        // TODO: handle failure
-//
-//        stressIps.onSuccess {
-//            File("stress_ips.txt").writeText(convertToUsefulFile(it.output.lines().take(3).joinToString("\n")))
-//        }
-//        // TODO: handle failure
+
+        val publicIps = terraform.cassandraIps()
+        val privateIps = terraform.cassandraInternalIps()
+        val stressIps = terraform.stressIps()
+
+        File("hosts.txt").writeText(convertToUsefulFile(publicIps))
+        File("seeds.txt").writeText(convertToUsefulFile(privateIps.lines().take(3).joinToString("\n")))
+        File("stress_ips.txt").writeText(convertToUsefulFile(stressIps))
 
         println("""Instances have been provisioned.  Cassandra hosts are located in hosts.txt.
 Seeds are using internal IPs and are located in seeds.txt.

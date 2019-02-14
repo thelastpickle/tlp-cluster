@@ -8,6 +8,7 @@ import com.github.dockerjava.api.model.Volume
 import com.github.dockerjava.core.command.AttachContainerResultCallback
 import com.thelastpickle.tlpcluster.Context
 import java.io.*
+import java.lang.StringBuilder
 import kotlin.concurrent.thread
 
 class Terraform(val context: Context) {
@@ -16,7 +17,10 @@ class Terraform(val context: Context) {
 
     }
 
-    fun execute(command: MutableList<String>) {
+    fun execute(command: MutableList<String>) : String {
+
+        val result = StringBuilder()
+
         val volumeLocal = Volume("/local")
 
         val cwdPath = System.getProperty("user.dir")
@@ -55,7 +59,9 @@ class Terraform(val context: Context) {
         val outputThread = thread {
             println("Reading lines")
             do {
-                println(stdOutReader.readLine())
+                val message = stdOutReader.readLine()
+                println(message)
+                result.appendln(message)
             } while(true)
         }
 
@@ -102,15 +108,30 @@ class Terraform(val context: Context) {
         context.docker.removeContainerCmd(dockerContainer.id)
                 .withRemoveVolumes(true)
                 .exec()
+
+        return result.toString()
+
     }
 
-    fun init() {
+    fun init() : String {
         return execute(mutableListOf("init", "/local"))
     }
 
-    fun up() {
+    fun up() : String {
         return execute(mutableListOf("apply", "/local"))
 
+    }
+
+    fun cassandraIps(): String {
+        return execute(mutableListOf("output", "cassandra_ips") )
+    }
+
+    fun cassandraInternalIps(): String {
+        return execute(mutableListOf("output", "cassandra_internal_ips") )
+    }
+
+    fun stressIps() : String {
+        return execute(mutableListOf("output", "stress_ips") )
     }
 
 }
