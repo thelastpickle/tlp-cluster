@@ -1,14 +1,11 @@
 package com.thelastpickle.tlpcluster.containers
 
-import com.github.dockerjava.api.async.ResultCallback
 import com.github.dockerjava.api.command.InspectContainerResponse
 import com.github.dockerjava.api.model.AccessMode
 import com.github.dockerjava.api.model.Bind
 import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.api.model.Volume
 import com.github.dockerjava.core.command.AttachContainerResultCallback
-import com.github.dockerjava.core.command.EventsResultCallback
-import com.github.dockerjava.core.command.LogContainerResultCallback
 import com.thelastpickle.tlpcluster.Context
 import java.io.*
 import kotlin.concurrent.thread
@@ -31,6 +28,7 @@ class Terraform(val context: Context) {
                 .withCmd(command)
                 .withAttachStdout(true)
                 .withAttachStdin(true)
+                .withTty(true)
                 .exec()
 
 

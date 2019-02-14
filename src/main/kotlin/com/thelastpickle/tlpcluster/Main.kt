@@ -54,5 +54,6 @@ fun main(arguments: Array<String>) {
 
 
     println("Done")
+    System.exit(0)
 }
 
