@@ -14,13 +14,15 @@ internal class CassandraDebUnpackerTest {
 
     lateinit var downloadDir : Path
     lateinit var unpacker : CassandraDebUnpacker
+    lateinit var context: Context
 
     @BeforeEach
     fun setupUnpacker() {
+        context = Context.testContext()
         downloadDir = Files.createTempDirectory("test")
         unpacker = CassandraDebUnpacker("2.1.14", downloadDir)
-
     }
+
     @AfterEach
     fun tearDownUnpacker() {
         FileUtils.deleteDirectory(downloadDir.toFile())
@@ -29,6 +31,7 @@ internal class CassandraDebUnpackerTest {
     @Test
     fun ensureDownloadCreatesDebPackageAndConfFiles() {
         unpacker.download()
+        unpacker.extractConf(context)
 
         assertThat(File(downloadDir.toFile(), "cassandra_2.1.14_all.deb")).exists()
         assertThat(File(downloadDir.toFile(), "conf")).exists()
@@ -55,7 +58,7 @@ internal class CassandraDebUnpackerTest {
 
     @Test
     fun ensureDebExistsBeforeExtracting() {
-        assertThatIllegalStateException().isThrownBy { unpacker.extractConf() }
+        assertThatIllegalStateException().isThrownBy { unpacker.extractConf(context) }
                 .withMessageContaining("Check failed")
 
     }

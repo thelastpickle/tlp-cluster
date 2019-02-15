@@ -1,5 +1,6 @@
 package com.thelastpickle.tlpcluster
 
+import com.thelastpickle.tlpcluster.containers.DebUnpack
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.net.URL
@@ -23,9 +24,12 @@ class CassandraDebUnpacker(val version: String, val dest: Path) {
 
     }
 
-    fun extractConf() {
+    fun extractConf(context: Context) {
         // required that the download have already run
         check(File(getFileName()).exists())
+
+        val debUnpack = DebUnpack(context)
+        debUnpack.start(dest.toString())
     }
 
     fun getURL() = "http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/" + getFileName()

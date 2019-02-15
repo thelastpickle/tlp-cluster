@@ -61,7 +61,7 @@ class Docker(val context: Context) {
     fun runContainer(
             imageTag: String,
             command: MutableList<String>,
-            volumes: MutableList<VolumeMapping>, // Triple: source, target , mode
+            volumes: MutableList<VolumeMapping>,
             workingDirectory : String) : Result<String> {
 
         val capturedStdOut = StringBuilder()
