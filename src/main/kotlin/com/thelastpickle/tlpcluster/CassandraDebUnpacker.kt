@@ -26,7 +26,8 @@ class CassandraDebUnpacker(val version: String, val dest: Path) {
 
     fun extractConf(context: Context) {
         // required that the download have already run
-        check(File(getFileName()).exists())
+        check(File(dest.toFile(), getFileName()).exists())
+
 
         val debUnpack = DebUnpack(context)
         debUnpack.start(dest.toString())

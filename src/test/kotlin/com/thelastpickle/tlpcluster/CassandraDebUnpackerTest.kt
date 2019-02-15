@@ -31,10 +31,11 @@ internal class CassandraDebUnpackerTest {
     @Test
     fun ensureDownloadCreatesDebPackageAndConfFiles() {
         unpacker.download()
-        unpacker.extractConf(context)
 
         assertThat(File(downloadDir.toFile(), "cassandra_2.1.14_all.deb")).exists()
         assertThat(File(downloadDir.toFile(), "conf")).exists()
+
+        unpacker.extractConf(context)
 
     }
 
