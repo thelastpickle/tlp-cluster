@@ -39,7 +39,9 @@ class CassandraUnpack(val context: Context,
         }
 
         if(!found) {
+            println("Downloading version $version")
             FileUtils.copyURLToFile(URL(getURL()), destination)
+            println("Download complete.")
             // copy file over to the cache if we're using it
             cacheLocation.map {
                 FileUtils.copyFile(destination, File(it.toFile(), getFileName()))
@@ -50,7 +52,7 @@ class CassandraUnpack(val context: Context,
 
 
 
-    fun extractConf(context: Context) : Result<String> {
+    fun extractConf() : Result<String> {
         // required that the download have already run
         check(File(dest.toFile(), getFileName()).exists())
 

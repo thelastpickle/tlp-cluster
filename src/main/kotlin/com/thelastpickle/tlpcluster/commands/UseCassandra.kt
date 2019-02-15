@@ -5,9 +5,11 @@ import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.configuration.Seeds
 import com.thelastpickle.tlpcluster.configuration.Yaml
+import com.thelastpickle.tlpcluster.containers.CassandraUnpack
 import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.FileFilter
+import java.util.*
 
 @Parameters(commandDescription = "Use a Cassandra build")
 class UseCassandra(val context: Context) : ICommand {
@@ -20,17 +22,8 @@ class UseCassandra(val context: Context) : ICommand {
     override fun execute() {
         check(name.isNotBlank())
 
-        val buildDir = File(context.cassandraRepo.buildDir, name)
-        val currentFile = File(context.cassandraRepo.buildDir, "CURRENT")
 
-        if (!buildDir.exists()) {
-            println("Unable to find build $name in the list of builds. Has it been built using the 'build' command?")
-            return
-        }
-
-        val conf = File(buildDir, "conf")
-        val debs = File(buildDir, "deb")
-
+        // setup the provisioning directory
         val artifactDest = File("provisioning/cassandra/")
 
         println("Destination artifacts: $artifactDest")
@@ -41,22 +34,49 @@ class UseCassandra(val context: Context) : ICommand {
             deb.delete()
         }
 
-        for(deb in debs.listFiles().filter { it.isFile }) {
-            println("Copying $deb")
-            FileUtils.copyFileToDirectory(deb, artifactDest)
-        }
+        // if we're been passed a version, use the debs we get from apache
+        val versionRegex = """\d+\.\d+\.\d+""".toRegex()
 
-        val configDest = File(artifactDest, "conf")
-        configDest.mkdir()
 
-        for(config in conf.listFiles()) {
-            println("Copying configuration $config")
-            if(config.isDirectory) {
-                FileUtils.copyDirectory(config, configDest)
-            } else {
-                FileUtils.copyFileToDirectory(config, configDest)
+        if(versionRegex.matches(name)) {
+            val cacheLocation = File(System.getProperty("user.home"), ".tlp-cluster/cache")
+            println("Using released version $name")
+            val unpacker = CassandraUnpack(context, name, artifactDest.toPath(), Optional.of(cacheLocation.toPath()))
+            unpacker.download()
+            unpacker.extractConf()
+
+        } else {
+            // otherwise it's a custom build
+
+            val buildDir = File(context.cassandraRepo.buildDir, name)
+
+            if (!buildDir.exists()) {
+                println("Unable to find build $name in the list of builds. Has it been built using the 'build' command?")
+                return
+            }
+
+            val conf = File(buildDir, "conf")
+            val debs = File(buildDir, "deb")
+
+
+            for(deb in debs.listFiles().filter { it.isFile }) {
+                println("Copying $deb")
+                FileUtils.copyFileToDirectory(deb, artifactDest)
+            }
+
+            val configDest = File(artifactDest, "conf")
+            configDest.mkdir()
+
+            for(config in conf.listFiles()) {
+                println("Copying configuration $config")
+                if(config.isDirectory) {
+                    FileUtils.copyDirectory(config, configDest)
+                } else {
+                    FileUtils.copyFileToDirectory(config, configDest)
+                }
             }
         }
+
 
         // update the seeds list
         val yamlLocation = "provisioning/cassandra/conf/cassandra.yaml"
@@ -86,7 +106,6 @@ class UseCassandra(val context: Context) : ICommand {
         val env = File(envLocation)
         env.appendText("\nJVM_OPTS=\"\$JVM_OPTS -Dcassandra.consistent.rangemovement=false\"\n")
 
-        currentFile.writeText(name)
 
         println("Cassandra deb and config copied to provisioning/.  Config files are located in provisioning/cassandra.  Use tlp-cluster install to push the artifacts to the nodes.")
     }
