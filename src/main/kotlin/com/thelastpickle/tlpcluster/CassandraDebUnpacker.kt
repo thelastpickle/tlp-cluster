@@ -23,6 +23,11 @@ class CassandraDebUnpacker(val version: String, val dest: Path) {
 
     }
 
+    fun extractConf() {
+        // required that the download have already run
+        check(File(getFileName()).exists())
+    }
+
     fun getURL() = "http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/" + getFileName()
     fun getFileName() = "cassandra_${version}_all.deb"
 }

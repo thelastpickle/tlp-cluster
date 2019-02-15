@@ -2,6 +2,7 @@ package com.thelastpickle.tlpcluster
 
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatIllegalStateException
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
@@ -50,5 +51,12 @@ internal class CassandraDebUnpackerTest {
 
     @Test
     fun getDest() {
+    }
+
+    @Test
+    fun ensureDebExistsBeforeExtracting() {
+        assertThatIllegalStateException().isThrownBy { unpacker.extractConf() }
+                .withMessageContaining("Check failed")
+
     }
 }
