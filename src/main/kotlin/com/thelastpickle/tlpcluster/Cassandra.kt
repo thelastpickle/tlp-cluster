@@ -48,11 +48,6 @@ class Cassandra(val gitLocation: File) {
         return buildDir.listFiles().filter { it.isDirectory }.map { it.name }
     }
 
-    fun pullVersion(version: String) {
-        // http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/
-        // example http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/cassandra_2.1.14_all.deb
-        // org.apache.commons.io.FileUtils.copyURLToFile(URL, File
 
-    }
 
 }
