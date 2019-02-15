@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.*
 
 internal class CassandraUnpackTest {
 
@@ -64,6 +65,20 @@ internal class CassandraUnpackTest {
     fun ensureDebExistsBeforeExtracting() {
         Assertions.assertThatIllegalStateException().isThrownBy { unpacker.extractConf(context) }
                 .withMessageContaining("Check failed")
+
+    }
+
+    @Test
+    fun testCache() {
+        val cache = Files.createTempDirectory("cache")
+        unpacker = CassandraUnpack(context, "2.1.14", downloadDir, Optional.of(cache))
+        unpacker.download()
+        assertThat(unpacker.cacheHits).isEqualTo(0)
+        assertThat(unpacker.cacheChecks).isEqualTo(1)
+
+        unpacker.download()
+        assertThat(unpacker.cacheChecks).isEqualTo(2)
+        assertThat(unpacker.cacheHits).isEqualTo(1)
 
     }
 }

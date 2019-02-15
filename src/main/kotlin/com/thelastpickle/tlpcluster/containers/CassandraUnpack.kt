@@ -9,19 +9,46 @@ import org.apache.commons.io.FileUtils
 import java.io.File
 import java.net.URL
 import java.nio.file.Path
+import java.util.*
 
-class CassandraUnpack(val context: Context, val version: String, val dest: Path) {
+class CassandraUnpack(val context: Context,
+                      val version: String,
+                      val dest: Path,
+                      val cacheLocation: Optional<Path> = Optional.empty()) {
 
     val docker = Docker(context)
 
+    var cacheHits = 0
+    var cacheChecks = 0
 
     fun download() {
         // example http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/cassandra_2.1.14_all.deb
+        // if using a cache, check for the version
+        var found = false
+        val destination = File(dest.toFile(), getFileName())
 
-        FileUtils.copyURLToFile(URL(getURL()), File(dest.toFile(), getFileName()))
+        cacheLocation.map {
+            cacheChecks++
+            val tmp = File(it.toFile(), getFileName())
+            if(tmp.exists()) {
+                println("skipping download, using cache")
+                FileUtils.copyFile(tmp, destination)
+                found = true
+                cacheHits++
+            }
+        }
+
+        if(!found) {
+            FileUtils.copyURLToFile(URL(getURL()), destination)
+            // copy file over to the cache if we're using it
+            cacheLocation.map {
+                FileUtils.copyFile(destination, File(it.toFile(), getFileName()))
+            }
+        }
         File(dest.toFile(), "conf").mkdir()
-
     }
+
+
 
     fun extractConf(context: Context) : Result<String> {
         // required that the download have already run
