@@ -37,7 +37,7 @@ internal class CassandraUnpackTest {
         assertThat(File(downloadDir.toFile(), "cassandra_2.1.14_all.deb")).isFile()
         assertThat(File(downloadDir.toFile(), "conf")).exists()
 
-        unpacker.extractConf(context)
+        unpacker.extractConf()
 
         assertThat(File(downloadDir.toFile(), "conf/cassandra.yaml")).isFile()
     }
@@ -63,7 +63,7 @@ internal class CassandraUnpackTest {
 
     @Test
     fun ensureDebExistsBeforeExtracting() {
-        Assertions.assertThatIllegalStateException().isThrownBy { unpacker.extractConf(context) }
+        Assertions.assertThatIllegalStateException().isThrownBy { unpacker.extractConf() }
                 .withMessageContaining("Check failed")
 
     }

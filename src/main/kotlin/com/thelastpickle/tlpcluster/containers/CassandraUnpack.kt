@@ -59,7 +59,7 @@ class CassandraUnpack(val context: Context,
         val shellScript = ResourceFile(javaClass.getResource("unpack_cassandra.sh"))
 
         val volumes = mutableListOf(
-                VolumeMapping(dest.toString(), "/working", AccessMode.rw),
+                VolumeMapping(dest.toAbsolutePath().toString(), "/working", AccessMode.rw),
                 VolumeMapping(shellScript.path, "/unpack_cassandra.sh", AccessMode.ro)
         )
 
