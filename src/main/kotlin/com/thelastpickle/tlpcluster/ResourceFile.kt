@@ -14,6 +14,8 @@ class ResourceFile(val resource: URL) {
     val fp: File
 
     init {
+        checkNotNull(resource)
+
         fp = File.createTempFile(
                 FilenameUtils.getBaseName(resource.file),
                 FilenameUtils.getExtension(resource.file))
@@ -21,4 +23,8 @@ class ResourceFile(val resource: URL) {
         IOUtils.copy(resource.openStream(), FileUtils.openOutputStream(fp))
 
     }
+
+    val path : String
+        get() = fp.absolutePath
+
 }

@@ -1,26 +1,27 @@
-package com.thelastpickle.tlpcluster
+package com.thelastpickle.tlpcluster.containers
 
+import com.thelastpickle.tlpcluster.Context
 import org.apache.commons.io.FileUtils
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatIllegalStateException
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Test
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 
-internal class CassandraDebUnpackerTest {
+internal class CassandraUnpackTest {
 
     lateinit var downloadDir : Path
-    lateinit var unpacker : CassandraDebUnpacker
+    lateinit var unpacker : CassandraUnpack
     lateinit var context: Context
 
     @BeforeEach
     fun setupUnpacker() {
         context = Context.testContext()
         downloadDir = Files.createTempDirectory("test")
-        unpacker = CassandraDebUnpacker("2.1.14", downloadDir)
+        unpacker = CassandraUnpack(context, "2.1.14", downloadDir)
     }
 
     @AfterEach
@@ -32,12 +33,14 @@ internal class CassandraDebUnpackerTest {
     fun ensureDownloadCreatesDebPackageAndConfFiles() {
         unpacker.download()
 
-        assertThat(File(downloadDir.toFile(), "cassandra_2.1.14_all.deb")).exists()
+        assertThat(File(downloadDir.toFile(), "cassandra_2.1.14_all.deb")).isFile()
         assertThat(File(downloadDir.toFile(), "conf")).exists()
 
         unpacker.extractConf(context)
 
+        assertThat(File(downloadDir.toFile(), "conf/cassandra.yaml")).isFile()
     }
+
 
     @Test
     fun getURL() {
@@ -59,7 +62,7 @@ internal class CassandraDebUnpackerTest {
 
     @Test
     fun ensureDebExistsBeforeExtracting() {
-        assertThatIllegalStateException().isThrownBy { unpacker.extractConf(context) }
+        Assertions.assertThatIllegalStateException().isThrownBy { unpacker.extractConf(context) }
                 .withMessageContaining("Check failed")
 
     }
