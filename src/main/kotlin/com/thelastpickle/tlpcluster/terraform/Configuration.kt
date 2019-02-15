@@ -99,8 +99,6 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
         build()
         mapper.writeValue(f, config)
     }
-
-
 }
 
 class TerraformConfig(@JsonIgnore val region: String,

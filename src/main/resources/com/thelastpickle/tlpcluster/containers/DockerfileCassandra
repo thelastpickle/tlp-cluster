@@ -18,9 +18,5 @@ RUN apt-get update && \
    equivs
 
 
-RUN mkdir /cassandra
-
-COPY build_cassandra.sh /usr/bin/build_cassandra.sh
-RUN chmod 755 /usr/bin/build_cassandra.sh
-
-ENTRYPOINT ["/usr/bin/build_cassandra.sh"]
+RUN mkdir /cassandra && \
+    mkdir /local

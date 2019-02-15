@@ -4,11 +4,22 @@ import java.io.File
 
 class Clean : ICommand {
     override fun execute() {
-        File("seeds.txt").delete()
-        File("terraform.tfstate").delete()
-        File("terraform.tfstate.backup").delete()
-        File("stress_ips.txt").delete()
-        File("hosts.txt").delete()
+        val toDelete = listOf(
+                "create_provisioning_resources.sh",
+                "seeds.txt",
+                "terraform.tfstate",
+                "terraform.tfstate.backup",
+                "stress_ips.txt",
+                "hosts.txt",
+                "terraform.tf.json",
+                "terraform.tfvars"
+        )
+
+        for(f in toDelete) {
+            File(f).delete()
+        }
+        File(".terraform").deleteRecursively()
+        File("provisioning").deleteRecursively()
     }
 
 }

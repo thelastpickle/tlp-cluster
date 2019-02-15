@@ -3,13 +3,16 @@ package com.thelastpickle.tlpcluster.commands
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Context
-import com.thelastpickle.tlpcluster.DockerCompose
-import com.thelastpickle.tlpcluster.Utils
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import java.io.File
 import org.apache.commons.io.FileUtils
 import com.thelastpickle.tlpcluster.terraform.Configuration
+import com.github.dockerjava.core.command.BuildImageResultCallback
+import com.github.dockerjava.api.command.InspectContainerResponse
+import com.github.dockerjava.api.model.*
+import com.thelastpickle.tlpcluster.containers.Terraform
+
 
 sealed class CopyResourceResult {
     class Created(val fp: File) : CopyResourceResult()
@@ -88,32 +91,20 @@ class Init(val context: Context) : ICommand {
 
 
         // add required tags to variable file
-        val terraform = File("terraform.tfvars")
-        terraform.appendText("\n")
+        val terraformVars = File("terraform.tfvars")
+        terraformVars.appendText("\n")
 
-        terraform.appendText("client = \"$client\"\n")
-        terraform.appendText("ticket = \"$ticket\"\n")
-        terraform.appendText("purpose = \"$purpose\"\n")
+        terraformVars.appendText("client = \"$client\"\n")
+        terraformVars.appendText("ticket = \"$ticket\"\n")
+        terraformVars.appendText("purpose = \"$purpose\"\n")
 
-        val composeResult = DockerCompose().run("terraform", arrayOf("init", "/local"))
+        val terraform = Terraform(context)
+        terraform.init()
 
-        composeResult.fold(
-                {
-                    println(it.output)
-                    println(it.err)
-                    println("Your environment has been set up.  Please edit your terraform.tfvars then run 'tlp-cluster up' to start your AWS nodes.")
-
-                },
-                {
-                    println(it.message)
-                    System.exit(1)
-                }
-        )
 
         if(start) {
             Up(context).execute()
         }
-
 
     }
 

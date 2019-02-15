@@ -32,30 +32,6 @@ class Cassandra(val gitLocation: File) {
 
     }
 
-    companion object {
-        fun build(name: String, location: File): OutputResult {
-            // i'm not sure how this works,but i'm leaving it here
-            // I think we'll move to this eventually I just don't know the details on how it works
-//            val docker = DefaultDockerClient.builder().build()
-//            docker.pull("ubuntu")
-//
-//            val config = ContainerConfig.builder()
-//
-//
-//            val container = docker.createContainer(config.build())
-//            val containerId = container.id()
-//            docker.copyToContainer()
-
-//            docker.startContainer(container.id())
-            val dc = DockerCompose(inheritIO = true)
-
-            return dc
-                    .setBuildName(name)
-                    .setCassandraDir(location.absolutePath)
-                    .run("build-cassandra", arrayOf())
-
-        }
-    }
 
     fun checkoutVersion(version: String) {
 
@@ -67,10 +43,8 @@ class Cassandra(val gitLocation: File) {
                 .call()
     }
 
+
     fun listBuilds() : List<String> {
         return buildDir.listFiles().filter { it.isDirectory }.map { it.name }
     }
-
-
-
 }

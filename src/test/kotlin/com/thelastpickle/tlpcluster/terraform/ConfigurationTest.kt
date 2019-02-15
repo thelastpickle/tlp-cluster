@@ -1,5 +1,6 @@
 package com.thelastpickle.tlpcluster.terraform
 
+import com.thelastpickle.tlpcluster.Context
 import org.junit.jupiter.api.Assertions.*
 
 import org.assertj.core.api.Assertions.assertThat
@@ -11,7 +12,7 @@ internal class ConfigurationTest {
             "purpose" to "Testing tags",
             "email" to "test@test.com")
 
-    private val c = Configuration(tags)
+    private val c = Configuration(tags, "us-west-2", context = Context.testContext())
 
     @Test
     fun ensureSetVariableWorks() {

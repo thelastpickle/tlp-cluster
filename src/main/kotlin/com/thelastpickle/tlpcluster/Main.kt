@@ -31,8 +31,8 @@ fun main(arguments: Array<String>) {
                          "up" to Up(context),
                          "start" to Start(context),
                          "stop" to Stop(),
-                         "install" to Install(),
-                         "down" to Down(),
+                         "install" to Install(context),
+                         "down" to Down(context),
                          "build" to BuildCassandra(context),
                          "ls" to ListCassandraBuilds(context),
                          "use" to UseCassandra(context),
@@ -54,5 +54,8 @@ fun main(arguments: Array<String>) {
 
 
     println("Done")
+
+    // currently this is a work around to break out of a thread (netty?) that is never shut down.
+    System.exit(0)
 }
 

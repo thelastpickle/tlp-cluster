@@ -4,8 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.github.dockerjava.core.DefaultDockerClientConfig
+import com.github.dockerjava.core.DockerClientBuilder
+import com.github.dockerjava.netty.NettyDockerCmdExecFactory
 import com.thelastpickle.tlpcluster.configuration.User
 import java.io.File
+import java.nio.file.Files
 
 data class Context(val tlpclusterUserDirectory: File,
                    val cassandraRepo: Cassandra) {
@@ -39,6 +43,27 @@ data class Context(val tlpclusterUserDirectory: File,
         yaml.readValue<User>(userConfigFile)
     }
 
+    val docker by lazy {
 
+        val dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
+                .withDockerHost("unix:///var/run/docker.sock")
+                .build()
 
+        DockerClientBuilder.getInstance(dockerConfig)
+                .withDockerCmdExecFactory(NettyDockerCmdExecFactory())
+                .build()
+    }
+
+    val cwdPath = System.getProperty("user.dir")
+
+    companion object {
+        /**
+         * Used only for testing
+         */
+        fun testContext() : Context {
+            var testTempDirectory = Files.createTempDirectory("tlpcluster")
+            var testTempDirectoryCassandra = Files.createTempDirectory("tlpcluster")
+            return Context(testTempDirectory.toFile(), Cassandra(testTempDirectoryCassandra.toFile()))
+        }
+    }
 }
