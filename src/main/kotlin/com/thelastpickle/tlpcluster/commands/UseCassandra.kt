@@ -7,6 +7,7 @@ import com.thelastpickle.tlpcluster.configuration.Seeds
 import com.thelastpickle.tlpcluster.configuration.Yaml
 import com.thelastpickle.tlpcluster.containers.CassandraUnpack
 import org.apache.commons.io.FileUtils
+import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.io.FileFilter
 import java.util.*
@@ -15,6 +16,8 @@ import java.util.*
 class UseCassandra(val context: Context) : ICommand {
     @Parameter
     var name: String = ""
+
+    val log = logger()
 
     @Parameter(description = "Configuration settings to change in the cassandra.yaml file specified in the format key:value,...", names = ["--config", "-c"])
     var configSettings = listOf<String>()

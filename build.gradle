@@ -55,13 +55,12 @@ jar {
 // In this section you declare the dependencies for your production and test code
 dependencies {
     // The production code uses the SLF4J logging API at compile time
-    compile 'org.slf4j:slf4j-api:1.7.21'
+//    compile 'org.slf4j:slf4j-api:1.7.21'
 
     // this causes failure, not sure why
-    implementation group: "org.apache.logging.log4j", name: "log4j-api", version: "2.11.1"
-    implementation group: "org.apache.logging.log4j", name: "log4j-core", version:"2.11.1"
-    implementation "org.apache.logging.log4j:log4j-api-kotlin:1.0.0"
-
+    compile "org.apache.logging.log4j:log4j-api-kotlin:1.0.0"
+    compile "org.apache.logging.log4j:log4j-api:2.11.1"
+    compile "org.apache.logging.log4j:log4j-core:2.11.1"
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlin_version
