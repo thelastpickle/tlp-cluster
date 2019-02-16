@@ -86,17 +86,13 @@ class Init(val context: Context) : ICommand {
         config.stressInstanceType = instanceType
         config.cassandraInstanceType = instanceType
 
+        config.setVariable("client", client)
+        config.setVariable("ticket", ticket)
+        config.setVariable("purpose", purpose)
+
         val configOutput = File("terraform.tf.json")
         config.write(configOutput)
 
-
-        // add required tags to variable file
-        val terraformVars = File("terraform.tfvars")
-        terraformVars.appendText("\n")
-
-        terraformVars.appendText("client = \"$client\"\n")
-        terraformVars.appendText("ticket = \"$ticket\"\n")
-        terraformVars.appendText("purpose = \"$purpose\"\n")
 
         val terraform = Terraform(context)
         terraform.init()
