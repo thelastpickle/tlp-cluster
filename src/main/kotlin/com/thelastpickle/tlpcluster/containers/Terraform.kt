@@ -20,12 +20,20 @@ class Terraform(val context: Context) {
         return execute("init")
     }
 
-    fun up() : Result<String> {
-        return execute("apply")
+    fun up(autoApprove : Boolean = false) : Result<String> {
+        val commands = mutableListOf("apply")
+        if(autoApprove) {
+            commands.add("-auto-approve")
+        }
+        return execute(*commands.toTypedArray())
     }
 
-    fun down() : Result<String> {
-        return execute("destroy")
+    fun down(autoApprove: Boolean) : Result<String> {
+        val commands = mutableListOf("destroy")
+        if(autoApprove) {
+            commands.add("-auto-approve")
+        }
+        return execute(*commands.toTypedArray())
     }
 
     fun cassandraIps(): Result<String> {

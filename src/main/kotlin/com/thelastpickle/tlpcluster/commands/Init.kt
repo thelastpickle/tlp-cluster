@@ -43,6 +43,7 @@ class Init(val context: Context) : ICommand {
     @Parameter(description = "Instance Type", names = ["--instance"])
     var instanceType =  "c5d.2xlarge"
 
+
     override fun execute() {
         println("Initializing directory")
 

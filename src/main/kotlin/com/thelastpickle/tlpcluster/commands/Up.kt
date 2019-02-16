@@ -1,5 +1,6 @@
 package com.thelastpickle.tlpcluster.commands
 
+import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.containers.Terraform
@@ -7,6 +8,10 @@ import java.io.File
 
 @Parameters(commandDescription = "Starts instances")
 class Up(val context: Context) : ICommand {
+
+    @Parameter(description = "Auto approve changes", names = ["--auto-approve", "-a"])
+    var autoApprove = false
+
     override fun execute() {
         // we have to list both the variable files explicitly here
         // even though we have a terraform.tvars
@@ -16,7 +21,7 @@ class Up(val context: Context) : ICommand {
         // priority over user
         val terraform = Terraform(context)
 
-        terraform.up().onFailure {
+        terraform.up(autoApprove).onFailure {
             println(it.message)
             println("Some resources may have been unsuccessfully provisioned.")
             return
