@@ -9,7 +9,7 @@ import java.io.File
 @Parameters(commandDescription = "Starts instances")
 class Up(val context: Context) : ICommand {
 
-    @Parameter(description = "Auto approve changes", names = ["--auto-approve", "-a"])
+    @Parameter(description = "Auto approve changes", names = ["--auto-approve", "-a", "--yes"])
     var autoApprove = false
 
     override fun execute() {
