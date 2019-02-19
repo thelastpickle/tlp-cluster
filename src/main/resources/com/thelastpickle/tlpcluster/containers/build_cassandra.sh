@@ -23,3 +23,4 @@ dpkg-buildpackage -uc -us
 
 cp ../cassandra*all.deb /builds/deb/
 cp -R debian/cassandra/etc/cassandra/* /builds/conf/
+

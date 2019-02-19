@@ -6,6 +6,7 @@ import com.thelastpickle.tlpcluster.Docker
 import com.thelastpickle.tlpcluster.ResourceFile
 import com.thelastpickle.tlpcluster.VolumeMapping
 import org.apache.commons.io.FileUtils
+import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.net.URL
 import java.nio.file.Path
@@ -20,6 +21,8 @@ class CassandraUnpack(val context: Context,
 
     var cacheHits = 0
     var cacheChecks = 0
+
+    var log = logger()
 
     fun download() {
         // example http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/cassandra_2.1.14_all.deb
@@ -62,6 +65,7 @@ class CassandraUnpack(val context: Context,
                 VolumeMapping(dest.toAbsolutePath().toString(), "/working", AccessMode.rw),
                 VolumeMapping(shellScript.path, "/unpack_cassandra.sh", AccessMode.ro)
         )
+        log.debug { "Extracting config, volumes to map: $volumes" }
 
         return docker.runContainer("ubuntu",
                 mutableListOf("sh", "/unpack_cassandra.sh", getFileName()),

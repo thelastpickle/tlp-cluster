@@ -104,6 +104,7 @@ class UseCassandra(val context: Context) : ICommand {
             }
         }
 
+        log.debug { "Writing YAML to $yamlLocation" }
         yaml.write(yamlLocation)
 
         val env = File(envLocation)

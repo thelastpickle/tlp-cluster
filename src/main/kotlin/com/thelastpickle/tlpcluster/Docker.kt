@@ -4,6 +4,7 @@ import com.github.dockerjava.api.command.InspectContainerResponse
 import com.github.dockerjava.api.model.*
 import com.github.dockerjava.core.command.AttachContainerResultCallback
 import com.github.dockerjava.core.command.BuildImageResultCallback
+import org.apache.logging.log4j.kotlin.logger
 import java.io.Closeable
 import java.io.PipedOutputStream
 import java.io.PipedInputStream
@@ -14,6 +15,11 @@ data class VolumeMapping(val source: String, val destination: String, val mode: 
 
 
 class Docker(val context: Context) {
+
+    companion object {
+        val log = logger()
+    }
+
     init {
 
     }
@@ -67,8 +73,21 @@ class Docker(val context: Context) {
         val capturedStdOut = StringBuilder()
         val dockerCommandBuilder = context.docker.createContainerCmd(imageTag)
 
+        // this only runs on linux or mac, deeply sorry
+        val idQuery = ProcessBuilder("id", System.getProperty("user.name")).start().inputStream.bufferedReader().readLine()
+        val matches = "uid=(\\d*)".toRegex().find(idQuery)
+
+        var userId = 0
+        if(matches != null) {
+            userId = matches.groupValues[1].toInt()
+        }
+
+        log.debug { "user id: $userId" }
+        check(userId > 0)
+
         dockerCommandBuilder
                 .withCmd(command)
+                .withEnv("HOST_USER_ID=$userId")
                 .withStdinOpen(true)
 
         if (volumes.isNotEmpty()) {
