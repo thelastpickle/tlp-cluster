@@ -3,6 +3,7 @@ package com.thelastpickle.tlpcluster
 import com.beust.jcommander.JCommander
 import com.beust.jcommander.Parameter
 import com.thelastpickle.tlpcluster.commands.*
+import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 
 class MainArgs {
@@ -10,9 +11,13 @@ class MainArgs {
     var help = false
 }
 
+
 fun main(arguments: Array<String>) {
 
     val tlpclusterUserDirectory = File(System.getProperty("user.home"), "/.tlp-cluster/")
+
+    val logger = logger("com.thelastpickle.tlpcluster.MainKt")
+
 
     // this will automatically clone the C* repo
     val cassFp = File(System.getProperty("user.home"), "/.tlp-cluster/cassandra")
@@ -39,6 +44,7 @@ fun main(arguments: Array<String>) {
                          "clean" to Clean())
 
     for(c in commands.entries) {
+        logger.debug { "Adding command: ${c.key}" }
         jcommander.addCommand(c.key, c.value)
     }
 
