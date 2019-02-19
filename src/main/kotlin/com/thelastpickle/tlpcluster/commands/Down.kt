@@ -7,7 +7,7 @@ import com.thelastpickle.tlpcluster.containers.Terraform
 
 @Parameters(commandDescription = "Shut down a cluster")
 class Down(val context: Context) : ICommand {
-    @Parameter(description = "Auto approve changes", names = ["--auto-approve", "-a"])
+    @Parameter(description = "Auto approve changes", names = ["--auto-approve", "-a", "--yes"])
     var autoApprove = false
 
     override fun execute() {
