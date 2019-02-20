@@ -447,7 +447,12 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_setup">Setup</a></li>
 <li><a href="#_initialize_a_cluster">Initialize a Cluster</a></li>
 <li><a href="#_launch_instances">Launch Instances</a></li>
-<li><a href="#_installing_cassandra">Installing Cassandra</a></li>
+<li><a href="#_installing_cassandra">Installing Cassandra</a>
+<ul class="sectlevel2">
+<li><a href="#_the_easy_way_use_a_released_build">The Easy Way - Use a Released Build</a></li>
+<li><a href="#_the_hard_way_use_a_custom_build">The Hard Way - Use a custom Build</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </div>
@@ -582,39 +587,24 @@ We currently only support the ubuntu 16 ami in us-west-2.  We&#8217;d love a pul
 </div>
 </div>
 <div class="paragraph">
-<p>There are a few things Terraform will ask for if they are not present in <code>terraform.tfvars</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">name = "Your Name"
-email = "your@email.com"
-
-# AWS profile from your ~/.aws/credentials
-profile = "default"
-
-# name of the key you intend to use for connecting to the instance
-key_name = "yourkey"
-
-# securty group the nodes should belong to
-security_groups = ["yourgroup"]</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Whether you pass these values is on the fly, or place them in the file, Terraform should eventually ask you to type <code>yes</code> and fire up your instances.</p>
-</div>
-<div class="paragraph">
-<p>You can run arbitrary commands on all hosts:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster cs ls</code></pre>
-</div>
+<p>Terraform will eventually ask you to type <code>yes</code> and fire up your instances.  Optionally you can pass <code>--yes</code> to the <code>-up</code> command and you won&#8217;t be prompted.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_installing_cassandra">Installing Cassandra</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_the_easy_way_use_a_released_build">The Easy Way - Use a Released Build</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster use 3.11.4
+tlp-cluster install</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_hard_way_use_a_custom_build">The Hard Way - Use a custom Build</h3>
 <div class="paragraph">
 <p>To install Cassandra on your instances, you will need to follow these steps:</p>
 </div>
@@ -696,9 +686,10 @@ security_groups = ["yourgroup"]</code></pre>
 </div>
 </div>
 </div>
+</div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-20 21:54:37 UTC
+Last updated 2019-02-20 22:01:58 UTC
 </div>
 </div>
 </body>

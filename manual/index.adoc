@@ -78,34 +78,21 @@ Launch your instances with the following:
 tlp-cluster up
 ----
 
-There are a few things Terraform will ask for if they are not present in `terraform.tfvars`:
-
-[source,bash]
-----
-name = "Your Name"
-email = "your@email.com"
-
-# AWS profile from your ~/.aws/credentials
-profile = "default"
-
-# name of the key you intend to use for connecting to the instance
-key_name = "yourkey"
-
-# securty group the nodes should belong to
-security_groups = ["yourgroup"]
-----
-
-Whether you pass these values is on the fly, or place them in the file, Terraform should eventually ask you to type `yes` and fire up your instances.
-
-You can run arbitrary commands on all hosts:
-
-[source,bash]
-----
-tlp-cluster cs ls
-----
+Terraform will eventually ask you to type `yes` and fire up your instances.  Optionally you can pass `--yes` to the `-up` command and you won't be prompted.
 
 
 == Installing Cassandra
+
+=== The Easy Way - Use a Released Build
+
+[source,bash]
+----
+tlp-cluster use 3.11.4
+tlp-cluster install
+----
+
+
+=== The Hard Way - Use a custom Build
 
 To install Cassandra on your instances, you will need to follow these steps:
 
