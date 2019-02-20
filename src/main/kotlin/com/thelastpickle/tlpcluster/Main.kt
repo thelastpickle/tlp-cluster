@@ -41,7 +41,8 @@ fun main(arguments: Array<String>) {
                          "build" to BuildCassandra(context),
                          "ls" to ListCassandraBuilds(context),
                          "use" to UseCassandra(context),
-                         "clean" to Clean())
+                         "clean" to Clean(),
+                         "hosts" to Hosts(context))
 
     for(c in commands.entries) {
         logger.debug { "Adding command: ${c.key}" }
