@@ -14,11 +14,17 @@ internal class TFStateTest {
     val log = logger()
 
     @Test
-    fun blah() {
+    fun testBasicStuffIsReturned() {
         val nodes = state.getHosts(ServerType.Cassandra)
         assertThat(nodes.count()).isEqualTo(3)
 
         log.info { "Node0: ${nodes[0]}" }
         assertThat(nodes[0].alias).isEqualTo("cassandra0")
+    }
+
+    @Test
+    fun testWrongStuffIsntReturned() {
+        val nodes = state.getHosts(ServerType.Monitoring)
+        assertThat(nodes).isEmpty()
     }
 }
