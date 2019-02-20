@@ -511,13 +511,7 @@ cd /path/to/tlp-cluster
 <p>This tool requires a bit of bash and docker.  I don&#8217;t know if will run on Windows.  We assume most people doing any serious Cassandra development will have access to a Linux box or virtual machine.</p>
 </div>
 <div class="paragraph">
-<p>First, make sure you’ve set up an AWS profile <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-multiple-profiles.html">profile</a>.</p>
-</div>
-<div class="paragraph">
-<p>The rest of this doc will refer to the profile <code>tlp</code>.</p>
-</div>
-<div class="paragraph">
-<p>Second, run the tool without any parameters. It’ll tell you that it’s set up a configuration file at <code>~/.tlp-cluster/user.tfvars</code>. Open that file with your editor and fill in the variables. They all coorespond to the same vocabulary in AWS.</p>
+<p>If you&#8217;ve never used to the tool before, run the tool without any parameters, <code>bin/tlp-cluster</code>.   You will be asked some questions to generate a configuration file which will be placed in your <code>$HOME/.tlp-cluster/user.yaml</code>.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -704,7 +698,7 @@ security_groups = ["yourgroup"]</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-08 09:10:31 UTC
+Last updated 2019-02-13 02:39:57 UTC
 </div>
 </div>
 </body>
