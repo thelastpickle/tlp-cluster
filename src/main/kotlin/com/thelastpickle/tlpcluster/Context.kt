@@ -31,6 +31,7 @@ data class Context(val tlpclusterUserDirectory: File,
      * val state = mapper.readValue<MyStateObject>(json)
      */
     val yaml = ObjectMapper(YAMLFactory()).registerKotlinModule()
+    val json = ObjectMapper()
 
     private val userConfigFile = File(System.getProperty("user.home"), ".tlp-cluster/user.yaml")
 
