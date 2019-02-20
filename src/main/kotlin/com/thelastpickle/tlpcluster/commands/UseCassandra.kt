@@ -4,6 +4,7 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.configuration.Seeds
+import com.thelastpickle.tlpcluster.configuration.ServerType
 import com.thelastpickle.tlpcluster.configuration.Yaml
 import com.thelastpickle.tlpcluster.containers.CassandraUnpack
 import org.apache.commons.io.FileUtils
@@ -90,12 +91,10 @@ class UseCassandra(val context: Context) : ICommand {
 
         yaml.setProperty("endpoint_snitch", "Ec2Snitch")
 
-        val seedFile = File("seeds.txt")
-        if (seedFile.exists()) {
-            yaml.setSeeds(Seeds.open(seedFile.inputStream()))
-        } else {
-            println("WARNING: unable to find seeds.txt file. We failed to update the 'seed_provider' setting! Use tlp-cluster up to start the cluster so can get the seed node list.")
-        }
+        val seeds = context.tfstate.getHosts(ServerType.Cassandra).take(3)
+
+        yaml.setSeeds(seeds.map { it.private })
+
 
         configSettings.forEach {
             val keyValue = it.split(":")
