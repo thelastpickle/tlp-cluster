@@ -59,7 +59,7 @@ data class Context(val tlpclusterUserDirectory: File,
 
     val cwdPath = System.getProperty("user.dir")
 
-    val tfstate = TFState.parse(this, File(cwdPath, "terraform.tfstate"))
+    val tfstate by lazy { TFState.parse(this, File(cwdPath, "terraform.tfstate")) }
 
     companion object {
         /**
