@@ -85,11 +85,18 @@ Terraform will eventually ask you to type `yes` and fire up your instances.  Opt
 
 === The Easy Way - Use a Released Build
 
+The easiest path forward to getting a cluster up and running is the following:
+
 [source,bash]
 ----
 tlp-cluster use 3.11.4
 tlp-cluster install
+tlp-cluster start
 ----
+
+Simply replace 3.11.4 with the release version.
+
+
 
 
 === The Hard Way - Use a custom Build
