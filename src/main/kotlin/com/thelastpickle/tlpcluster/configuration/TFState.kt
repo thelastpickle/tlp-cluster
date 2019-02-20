@@ -6,11 +6,7 @@ import java.io.File
 import java.io.InputStream
 import java.util.LinkedHashMap
 
-enum class ServerType(val serverType: String) {
-    Cassandra("cassandra"),
-    Stress("stress"),
-    Monitoring("monitoring"),
-}
+
 
 class TFState(val context: Context,
               val file: InputStream) {
