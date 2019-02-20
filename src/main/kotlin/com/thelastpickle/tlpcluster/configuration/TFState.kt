@@ -48,8 +48,9 @@ class TFState(val context: Context,
                 val tmp = hostRegex.find(serverName)!!.groups
 
                 log.debug { "Regex find: $tmp" }
-
-                result.add(Host(public!!, private!!, tmp[1]?.value.toString() + tmp[2]?.value.toString()))
+                val host = Host(public!!, private!!, tmp[1]?.value.toString() + tmp[2]?.value.toString())
+                log.info { "Adding host: $host" }
+                result.add(host)
             }
 
         }
