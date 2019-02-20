@@ -7,6 +7,8 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientBuilder
 import com.github.dockerjava.netty.NettyDockerCmdExecFactory
+import com.thelastpickle.tlpcluster.configuration.Host
+import com.thelastpickle.tlpcluster.configuration.TFState
 import com.thelastpickle.tlpcluster.configuration.User
 import java.io.File
 import java.nio.file.Files
@@ -56,6 +58,8 @@ data class Context(val tlpclusterUserDirectory: File,
     }
 
     val cwdPath = System.getProperty("user.dir")
+
+    val tfstate = TFState.parse(this, File(cwdPath, "terraform.tfstate"))
 
     companion object {
         /**

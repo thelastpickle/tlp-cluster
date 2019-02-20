@@ -68,7 +68,8 @@ class Docker(val context: Context) {
             imageTag: String,
             command: MutableList<String>,
             volumes: MutableList<VolumeMapping>,
-            workingDirectory : String) : Result<String> {
+            workingDirectory : String,
+            env: MutableList<String> = mutableListOf()) : Result<String> {
 
         val capturedStdOut = StringBuilder()
         val dockerCommandBuilder = context.docker.createContainerCmd(imageTag)
@@ -85,9 +86,11 @@ class Docker(val context: Context) {
         log.debug { "user id: $userId" }
         check(userId > 0)
 
+        env.add("HOST_USER_ID=$userId")
+
         dockerCommandBuilder
                 .withCmd(command)
-                .withEnv("HOST_USER_ID=$userId")
+                .withEnv(*env.toTypedArray())
                 .withStdinOpen(true)
 
         if (volumes.isNotEmpty()) {

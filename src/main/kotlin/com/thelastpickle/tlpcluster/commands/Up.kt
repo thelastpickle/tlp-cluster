@@ -27,31 +27,11 @@ class Up(val context: Context) : ICommand {
             return
         }
 
-        terraform.cassandraIps().onSuccess {
-            File("hosts.txt").writeText(convertToUsefulFile(it))
-        }
-
-        terraform.cassandraInternalIps().onSuccess {
-            File("seeds.txt").writeText(convertToUsefulFile(it.lines().take(3).joinToString("\n")))
-        }
-
-        terraform.stressIps().onSuccess {
-            File("stress_ips.txt").writeText(it)
-        }
-
-        println("""Instances have been provisioned.  Cassandra hosts are located in hosts.txt.
-Seeds are using internal IPs and are located in seeds.txt.
-Stress nodes (if provisioned) are in stress.txt.
+        println("""Instances have been provisioned.
 
 You can edit the provisioning scripts before running them, they've been copied to ./provisioning.
 
 Next you'll probably want to run tlp-cluster build to create a new build, or use if you already have a Cassandra build you'd like to deploy.""")
     }
 
-    /**
-     * Cleans up the blah,\nblah2 style lines
-     */
-    internal fun convertToUsefulFile(output: String) : String {
-        return output.lines().map { it.replace(",", "") }.joinToString("\n")
-    }
 }

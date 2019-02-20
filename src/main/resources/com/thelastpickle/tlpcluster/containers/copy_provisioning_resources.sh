@@ -7,7 +7,7 @@ cd /local
 
 parallel-rsync \
     -avrz  \
-    -h hosts.txt -l ubuntu \
+    -H $PSSH_HOSTS -l ubuntu \
     -O StrictHostKeyChecking=no  \
     -O UserKnownHostsFile=/local/known_hosts \
     ./provisioning/ \

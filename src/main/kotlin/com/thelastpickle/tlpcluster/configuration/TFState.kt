@@ -7,6 +7,16 @@ import java.io.InputStream
 import java.util.LinkedHashMap
 
 
+typealias HostList = List<Host>
+
+/**
+ * Returns a list of IPs ready for PSSH's CSV format, exported as an ENV
+ */
+fun HostList.toEnv() : String {
+
+    val tmp = map { it.public }.joinToString(",")
+    return "PSSH_HOSTS=\"$tmp\""
+}
 
 class TFState(val context: Context,
               val file: InputStream) {
@@ -19,7 +29,7 @@ class TFState(val context: Context,
         }
     }
 
-    fun getHosts(serverType: ServerType) : List<Host> {
+    fun getHosts(serverType: ServerType) : HostList {
         val nodes = tree.path("modules")
                         .first()
                         .path("resources")

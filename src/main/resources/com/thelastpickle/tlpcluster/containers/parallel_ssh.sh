@@ -9,5 +9,5 @@ parallel-ssh \
     -ivl ubuntu \
     -O StrictHostKeyChecking=no \
     -O UserKnownHostsFile=/local/known_hosts \
-    -h /local/hosts.txt \
+    -H $PSSH_HOSTS  \
     ${1}

@@ -5,7 +5,14 @@ import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.Docker
 import com.thelastpickle.tlpcluster.Utils
 import com.thelastpickle.tlpcluster.VolumeMapping
+import com.thelastpickle.tlpcluster.configuration.ServerType
 
+import com.thelastpickle.tlpcluster.configuration.toEnv
+
+
+/**
+ * This is currently flawed in that it only allows for SSH'ing to Cassandra
+ */
 class Pssh(val context: Context, val sshKey: String) {
     private val docker = Docker(context)
     private val dockerImageTag = "thelastpickle/tlp-cluster_pssh"
@@ -45,6 +52,8 @@ class Pssh(val context: Context, val sshKey: String) {
 
         volumeMappings.add(VolumeMapping(scriptFile.absolutePath, scriptPathInContainer, AccessMode.rw))
 
-        return docker.runContainer(dockerImageTag, containerCommands, volumeMappings,"")
+        val hosts = context.tfstate.getHosts(ServerType.Cassandra).toEnv()
+
+        return docker.runContainer(dockerImageTag, containerCommands, volumeMappings,"", mutableListOf(hosts))
     }
 }
