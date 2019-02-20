@@ -64,7 +64,7 @@ Where:
 * `TICKET` - Jira ticket number associated with the work you are doing with `tlp-cluster`.
 * `PURPOSE` - Reason why you are creating the cluster.
 
-This will initialize the current directory with a variables file, `terraform.tfvars` and a configuration file, terraform.tf.json. Open them up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.
+This will initialize the current directory with a terraform.tf.json. You can open this up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.
 
 Certain instances types may not work with the ami that's hard coded.
 

@@ -9,7 +9,7 @@
 /build/
 .jira-url
 /test/
-/.terraform/
+/.terraform*
 /build_cassandra.sh*
 /copy_provisioning_resources.sh*
 /create_provisioning_resources.sh
