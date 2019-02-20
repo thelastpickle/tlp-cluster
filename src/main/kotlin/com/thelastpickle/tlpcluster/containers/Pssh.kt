@@ -8,6 +8,7 @@ import com.thelastpickle.tlpcluster.VolumeMapping
 import com.thelastpickle.tlpcluster.configuration.ServerType
 
 import com.thelastpickle.tlpcluster.configuration.toEnv
+import org.apache.logging.log4j.kotlin.logger
 
 
 /**
@@ -21,6 +22,7 @@ class Pssh(val context: Context, val sshKey: String) {
             VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
     private val provisionCommand = "cd provisioning; chmod +x install.sh; sudo ./install.sh"
 
+    val log = logger()
     init {
 
     }
@@ -53,6 +55,7 @@ class Pssh(val context: Context, val sshKey: String) {
         volumeMappings.add(VolumeMapping(scriptFile.absolutePath, scriptPathInContainer, AccessMode.rw))
 
         val hosts = context.tfstate.getHosts(ServerType.Cassandra).toEnv()
+        log.info("Starting container with $hosts")
 
         return docker.runContainer(dockerImageTag, containerCommands, volumeMappings,"", mutableListOf(hosts))
     }

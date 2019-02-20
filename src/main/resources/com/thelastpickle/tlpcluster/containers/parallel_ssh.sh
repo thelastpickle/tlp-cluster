@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -ex
+
 eval $(ssh-agent)
 ssh-add /root/.ssh/aws-private-key
 
@@ -9,5 +11,5 @@ parallel-ssh \
     -ivl ubuntu \
     -O StrictHostKeyChecking=no \
     -O UserKnownHostsFile=/local/known_hosts \
-    -H $PSSH_HOSTS  \
+    $PSSH_HOSTNAMES  \
     ${1}

@@ -64,6 +64,20 @@ class Docker(val context: Context) {
         return imageId
     }
 
+    fun getStdErrReader() : PipedOutputStream {
+        val tmp = PipedOutputStream()
+        val tmp2 = PipedInputStream(tmp)
+
+        thread(isDaemon = true) {
+            val buf = tmp2.bufferedReader()
+            while(true) {
+                log.error(buf.readLine())
+            }
+        }
+
+        return tmp
+    }
+
     fun runContainer(
             imageTag: String,
             command: MutableList<String>,
@@ -87,6 +101,8 @@ class Docker(val context: Context) {
         check(userId > 0)
 
         env.add("HOST_USER_ID=$userId")
+
+        log.info{ "docker environment variables: $env"}
 
         dockerCommandBuilder
                 .withCmd(command)
@@ -152,6 +168,8 @@ class Docker(val context: Context) {
             }
         }
 
+        val stdError = getStdErrReader()
+
         var framesRead = 0
         context.docker.attachContainerCmd(dockerContainer.id)
                 .withStdIn(stdInputPipeToContainer)
@@ -161,9 +179,14 @@ class Docker(val context: Context) {
                 .exec(object : AttachContainerResultCallback() {
                     override fun onNext(item: Frame?) {
                         // should only include standard out - please fix me
-                        if(item != null && item.streamType.name.equals("STDOUT")) {
+                        if(item == null) return
+
+                        framesRead++
+
+                        if(item.streamType.name.equals("STDOUT")) {
                             source.write(item.payload)
-                            framesRead++
+                        } else if(item.streamType.name.equals("STDERR")) {
+                            stdError.write(item.payload)
                         }
                     }
 
