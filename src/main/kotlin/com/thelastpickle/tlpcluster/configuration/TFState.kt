@@ -34,11 +34,8 @@ class TFState(val context: Context,
         val result = mutableListOf<Host>()
         val resources = context.json.convertValue(nodes, Map::class.java)
 
-        val hostRegex = """aws_instance\.(.*).(\d+)""".toRegex()
 
         for((name, resource) in resources.entries) {
-//            log.debug { "Resource ($name): $resource" }
-
             resource as Map<String, *>
 
             val attrs = (resource.get("primary") as LinkedHashMap<*, *>).get("attributes") as LinkedHashMap<String, String>
@@ -50,12 +47,7 @@ class TFState(val context: Context,
 
 
             if(serverName.contains(serverType.serverType)) {
-                log.debug { "Found instance $serverName ips: $private, $public" }
-
-                val tmp = hostRegex.find(serverName)!!.groups
-
-                log.debug { "Regex find: $tmp" }
-                val host = Host(public!!, private!!, tmp[1]?.value.toString() + tmp[2]?.value.toString())
+                val host = Host.fromTerraformString(serverName, public!!, private!!)
                 log.info { "Adding host: $host" }
                 result.add(host)
             }
@@ -63,4 +55,6 @@ class TFState(val context: Context,
         }
         return result
     }
+
+
 }
