@@ -4,6 +4,7 @@ import com.github.dockerjava.api.command.InspectContainerResponse
 import com.github.dockerjava.api.model.*
 import com.github.dockerjava.core.command.AttachContainerResultCallback
 import com.github.dockerjava.core.command.BuildImageResultCallback
+import com.github.dockerjava.core.command.PullImageResultCallback
 import org.apache.logging.log4j.kotlin.logger
 import java.io.Closeable
 import java.io.PipedOutputStream
@@ -24,12 +25,41 @@ class Docker(val context: Context) {
 
     }
 
+    fun pullImage(name: String) {
+        log.debug { "Creating pull object" }
+        context.docker.pullImageCmd(name).exec(
+                object : PullImageResultCallback() {
+
+                    override fun awaitStarted(): PullImageResultCallback {
+                        log.info { "Pulling image $name" }
+                        return super.awaitStarted()
+                    }
+
+                    override fun onNext(item: PullResponseItem?) {
+                        if(item != null) {
+
+                            item.progressDetail?.let {
+                                if(it.current != null && it.total != null)
+                                    println("Pulling: ${it.current} / ${it.total}")
+                            }
+                        }
+                        return super.onNext(item)
+                    }
+
+                }
+
+        ).awaitCompletion()
+
+        log.info{"Finished pulling $name"}
+    }
+
     fun buildContainer(dockerfileName : String, imageTag: String) : String {
         // The java-docker library we use can build an image from only a Dockerfile.
         // That is, there is no programmatic way to build an image using the API. So, we
         // need to copy the dockerfile in the JAR resources to a location it can read from.
         // To do this we will make a temporary file in the working directory that is
         // removed after the tlp-cluster command completes.
+
         val dockerfile = Utils.resourceToTempFile("containers/$dockerfileName", context.cwdPath)
 
         val dockerBuildCallback = object : BuildImageResultCallback() {

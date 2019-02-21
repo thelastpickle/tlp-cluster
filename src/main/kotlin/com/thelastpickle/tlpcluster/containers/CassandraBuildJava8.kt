@@ -16,6 +16,10 @@ class CassandraBuildJava8(val context: Context) {
     val builds = File(home, ".tlp-cluster/builds/")
     val mavenCache = File(home, ".tlp-cluster/maven-cache/").toString()
 
+    init {
+        docker.pullImage("ubuntu")
+    }
+
     fun buildContainer() : String {
         return docker.buildContainer("DockerfileCassandra", dockerImageTag)
     }

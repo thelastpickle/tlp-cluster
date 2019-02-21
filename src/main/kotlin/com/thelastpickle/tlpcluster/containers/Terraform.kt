@@ -13,7 +13,7 @@ class Terraform(val context: Context) {
     private var localDirectory = "/local"
 
     init {
-
+        docker.pullImage(dockerImageTag)
     }
 
     fun init() : Result<String> {
