@@ -24,7 +24,7 @@ class Pssh(val context: Context, val sshKey: String) {
 
     val log = logger()
     init {
-        docker.pullImage("ubuntu")
+        docker.pullImage("ubuntu:bionic")
     }
 
     fun buildContainer() : String {
