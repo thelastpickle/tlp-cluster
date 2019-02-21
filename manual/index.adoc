@@ -7,7 +7,7 @@ This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra des
 
 == Prerequisites
 
-There are some AWS resources tlp-cluster expects to exist:
+There are some AWS resources tlp-cluster expects to exist in us-west-2 (support for other regions will come soon):
 
 - A security group that allows inbound SSH traffic.
 - A key pair, private part of which should be present in your `~/.ssh` with `chmod 400` on it.
@@ -18,9 +18,9 @@ The cluster provisioning tool is somewhat self explanatory (hopefully).
 
 It launches Cassandra clusters in AWS. In addition to Cassandra, the tool can also launch stress nodes (soon) and a prometheus node to gather all the metrics.
 
-The tool itself is written in Kotlin, leveraging Docker and Docker Compose (for now).
+The tool itself is written in Kotlin, leveraging Docker containers to avoid too many external dependencies.
 
-To get started, add the bin directory in tlp-cluster to your $PATH.  For example:
+To get started, add the bin directory of tlp-cluster to your $PATH.  For example:
 
 [source,bash]
 ----
@@ -34,7 +34,7 @@ Now you can use the tool, yay.
 
 == Setup
 
-This tool requires a bit of bash and docker.  I don't know if will run on Windows.  We assume most people doing any serious Cassandra development will have access to a Linux box or virtual machine.
+I don't know if will run on Windows.  We assume most people doing any serious Cassandra development will have access to a Linux box or virtual machine.
 
 If you've never used to the tool before, run the tool without any parameters, `bin/tlp-cluster`.   You will be asked some questions to generate a configuration file which will be placed in your `$HOME/.tlp-cluster/user.yaml`.
 
