@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.io.FileFilter
+import java.io.FileNotFoundException
 import java.util.*
 
 @Parameters(commandDescription = "Use a Cassandra build")
@@ -25,6 +26,12 @@ class UseCassandra(val context: Context) : ICommand {
 
     override fun execute() {
         check(name.isNotBlank())
+        try {
+            context.tfstate
+        } catch (e: FileNotFoundException) {
+            println("Error: terraform config file not found.  Please run tlp-cluster up first to establish IP addresses for seed listing.")
+            System.exit(1)
+        }
 
         // setup the provisioning directory
         val artifactDest = File("provisioning/cassandra/")
