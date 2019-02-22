@@ -100,8 +100,9 @@ dependencies {
 
 }
 
-
-
+task docs(type:Exec) {
+    commandLine 'docker-compose', 'up', 'docs'
+}
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
