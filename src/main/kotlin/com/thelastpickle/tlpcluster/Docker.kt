@@ -31,7 +31,7 @@ class Docker(val context: Context) {
         var pullCommand = context.docker.pullImageCmd(name)
 
         if(tag.isNotBlank())
-            pullCommand.withTag(tag)
+            pullCommand = pullCommand.withTag(tag)
 
         pullCommand.exec(
                 object : PullImageResultCallback() {
