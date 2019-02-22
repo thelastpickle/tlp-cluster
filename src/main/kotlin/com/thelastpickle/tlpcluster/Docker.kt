@@ -25,9 +25,15 @@ class Docker(val context: Context) {
 
     }
 
-    fun pullImage(name: String) {
+    fun pullImage(name: String, tag: String = "") {
         log.debug { "Creating pull object" }
-        context.docker.pullImageCmd(name).exec(
+
+        var pullCommand = context.docker.pullImageCmd(name)
+
+        if(tag.isNotBlank())
+            pullCommand.withTag(tag)
+
+        pullCommand.exec(
                 object : PullImageResultCallback() {
 
                     override fun awaitStarted(): PullImageResultCallback {

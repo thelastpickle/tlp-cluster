@@ -25,7 +25,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
     var stressInstanceType = "c5d.2xlarge"
 
     // no way of enabling this right now
-    val monitoring = false
+    var monitoring = false
 
     private val config  = TerraformConfig(region, context.userConfig.awsAccessKey, context.userConfig.awsSecret)
 
@@ -75,6 +75,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
 
         setResource("cassandra", cassandraAMI, cassandraInstanceType, numCassandraInstances)
         setResource("stress", stressAMI, stressInstanceType, numStressInstances)
+        setResource("monitoring", cassandraAMI, cassandraInstanceType, if(monitoring) 1 else 0)
 
 
         return this

@@ -43,6 +43,8 @@ class Init(val context: Context) : ICommand {
     @Parameter(description = "Instance Type", names = ["--instance"])
     var instanceType =  "c5d.2xlarge"
 
+    @Parameter(description = "Enable monitoring (beta)", names = ["--monitoring", "-m"])
+    var enableMonitoring = false
 
     override fun execute() {
         println("Initializing directory")
@@ -86,6 +88,8 @@ class Init(val context: Context) : ICommand {
         config.stressAMI = "ami-51537029"
         config.stressInstanceType = instanceType
         config.cassandraInstanceType = instanceType
+
+        config.monitoring = enableMonitoring
 
         config.setVariable("client", client)
         config.setVariable("ticket", ticket)
