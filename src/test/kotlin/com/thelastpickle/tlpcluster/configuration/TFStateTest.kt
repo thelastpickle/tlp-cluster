@@ -2,10 +2,10 @@ package com.thelastpickle.tlpcluster.configuration
 
 import com.thelastpickle.tlpcluster.Context
 import org.apache.logging.log4j.kotlin.logger
-import org.junit.jupiter.api.Assertions.*
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.io.StringWriter
 
 internal class TFStateTest {
 
@@ -30,5 +30,16 @@ internal class TFStateTest {
     fun testWrongStuffIsntReturned() {
         val nodes = state.getHosts(ServerType.Monitoring)
         assertThat(nodes).isEmpty()
+    }
+
+    @Test
+    fun testWriteSSHConfig() {
+        val tmp = StringWriter()
+        val writer = tmp.buffered()
+        state.writeSshConfig(writer)
+        val result = tmp.buffer.toString()
+
+        log.info { result }
+        assertThat(result).contains("Host cassandra0")
     }
 }

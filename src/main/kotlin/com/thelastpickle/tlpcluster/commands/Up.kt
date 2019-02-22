@@ -32,6 +32,10 @@ class Up(val context: Context) : ICommand {
 You can edit the provisioning scripts before running them, they've been copied to ./provisioning.
 
 Next you'll probably want to run tlp-cluster build to create a new build, or use if you already have a Cassandra build you'd like to deploy.""")
+
+        val config = File("config").bufferedWriter()
+        context.tfstate.writeSshConfig(config)
+
     }
 
 }

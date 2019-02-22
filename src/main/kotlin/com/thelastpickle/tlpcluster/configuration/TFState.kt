@@ -2,6 +2,7 @@ package com.thelastpickle.tlpcluster.configuration
 
 import com.thelastpickle.tlpcluster.Context
 import org.apache.logging.log4j.kotlin.logger
+import java.io.BufferedWriter
 import java.io.File
 import java.io.InputStream
 import java.util.LinkedHashMap
@@ -25,6 +26,8 @@ class TFState(val context: Context,
             return TFState(context, path.inputStream())
         }
     }
+
+
 
     fun getHosts(serverType: ServerType) : HostList {
         val nodes = tree.path("modules")
@@ -54,6 +57,27 @@ class TFState(val context: Context,
 
         }
         return result
+    }
+
+    fun writeSshConfig(config: BufferedWriter) {
+        val cassandra = getHosts(ServerType.Cassandra)
+        val stress = getHosts(ServerType.Stress)
+
+        for (host in cassandra) {
+            // aliases
+            // adding node0 or c0 would be a reasonable time saver
+            config.appendln("Host ${host.alias}")
+            config.appendln("  Hostname ${host.public}")
+            config.appendln()
+        }
+
+        for(host in stress) {
+            config.appendln("Host ${host.alias}")
+            config.appendln("  Hostname ${host.public}")
+            config.appendln()
+        }
+        config.flush()
+
     }
 
 
