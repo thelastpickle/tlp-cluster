@@ -10,6 +10,6 @@ cd /local
 parallel-ssh \
     -ivl ubuntu \
     -O StrictHostKeyChecking=no \
-    -O UserKnownHostsFile=/local/known_hosts \
+    -O UserKnownHostsFile=/dev/null \
     $PSSH_HOSTNAMES  \
     ${1}

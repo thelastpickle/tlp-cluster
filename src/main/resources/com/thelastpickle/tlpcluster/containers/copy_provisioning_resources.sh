@@ -12,6 +12,6 @@ parallel-rsync \
      $PSSH_HOSTNAMES \
      -l ubuntu \
     -O StrictHostKeyChecking=no  \
-    -O UserKnownHostsFile=/local/known_hosts \
+    -O UserKnownHostsFile=/dev/null \
     ./provisioning/ \
     /home/ubuntu/provisioning/
