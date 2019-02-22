@@ -63,6 +63,10 @@ class TFState(val context: Context,
         val cassandra = getHosts(ServerType.Cassandra)
         val stress = getHosts(ServerType.Stress)
 
+        // write standard stuff first
+        config.appendln("StrictHostKeyChecking=no")
+        config.appendln("User ubuntu")
+
         for (host in cassandra) {
             // aliases
             // adding node0 or c0 would be a reasonable time saver

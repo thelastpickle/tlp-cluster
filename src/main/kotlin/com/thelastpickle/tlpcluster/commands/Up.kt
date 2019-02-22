@@ -33,7 +33,15 @@ You can edit the provisioning scripts before running them, they've been copied t
 
 Next you'll probably want to run tlp-cluster build to create a new build, or use if you already have a Cassandra build you'd like to deploy.""")
 
-        val config = File("config").bufferedWriter()
+        println("Writing ssh config file to sshConfig.")
+
+        println("""The following alias will allow you to easily ssh to the cluster:
+            |
+            |alias ssh="ssh -F sshConfig
+            |
+            |""".trimMargin())
+
+        val config = File("sshConfig").bufferedWriter()
         context.tfstate.writeSshConfig(config)
 
     }
