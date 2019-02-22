@@ -1,10 +1,7 @@
 package com.thelastpickle.tlpcluster.containers
 
 import com.github.dockerjava.api.model.AccessMode
-import com.thelastpickle.tlpcluster.Context
-import com.thelastpickle.tlpcluster.Docker
-import com.thelastpickle.tlpcluster.Utils
-import com.thelastpickle.tlpcluster.VolumeMapping
+import com.thelastpickle.tlpcluster.*
 import com.thelastpickle.tlpcluster.configuration.ServerType
 
 import com.thelastpickle.tlpcluster.configuration.toEnv
@@ -44,15 +41,17 @@ class Pssh(val context: Context, val sshKey: String) {
     }
 
     fun execute(scriptName: String, scriptCommand: String) : Result<String> {
-        val scriptFile = Utils.resourceToTempFile("containers/$scriptName", context.cwdPath)
-        val scriptPathInContainer = "/local/$scriptName"
+        val script = javaClass.getResource(scriptName)
+        val scriptFile = ResourceFile(script)
+
+        val scriptPathInContainer = "/scripts/$scriptName"
         val containerCommands = mutableListOf("/bin/sh", scriptPathInContainer)
 
         if (scriptCommand.isNotEmpty()) {
             containerCommands.add(scriptCommand)
         }
 
-        volumeMappings.add(VolumeMapping(scriptFile.absolutePath, scriptPathInContainer, AccessMode.rw))
+        volumeMappings.add(VolumeMapping(scriptFile.path, scriptPathInContainer, AccessMode.rw))
 
         val hosts = context.tfstate.getHosts(ServerType.Cassandra).toEnv()
         log.info("Starting container with $hosts")

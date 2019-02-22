@@ -12,7 +12,14 @@ import java.io.PipedInputStream
 import kotlin.concurrent.thread
 
 
-data class VolumeMapping(val source: String, val destination: String, val mode: AccessMode)
+data class VolumeMapping(val source: String, val destination: String, val mode: AccessMode) {
+    companion object {
+        val log = logger()
+    }
+    init {
+        log.info { "Creating volume mapping $source to $destination, mode: $mode" }
+    }
+}
 
 
 class Docker(val context: Context) {
