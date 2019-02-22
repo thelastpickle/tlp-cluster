@@ -21,6 +21,7 @@ class Utils {
             return tempFile
         }
 
+        @Deprecated(message = "Please use ResourceFile")
         fun resourceToTempFile(resourcePath: String, directory: String) : File {
             val resourceName = File(resourcePath).name
             val resourceStream = this::class.java.getResourceAsStream(resourcePath)
