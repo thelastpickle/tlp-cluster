@@ -9,7 +9,8 @@ This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra des
 
 There are some AWS resources tlp-cluster expects to exist in us-west-2 (support for other regions will come soon):
 
-- A security group that allows inbound SSH traffic.
+- An AWS access key and secret.  tlp-cluster uses https://www.terraform.io/[Terraform] to create and destroy instances.
+- A security group that allows inbound SSH traffic, and all machines in that group can talk to each other.
 - A key pair, private part of which should be present in your `~/.ssh` with `chmod 400` on it.
 
 == Installation
@@ -47,7 +48,11 @@ Running the command without any arguments will print out the usage:
 tlp-cluster
 ----
 
+You'll see the help.  It looks like this:
 
+```
+include::includes/help.txt[]
+```
 
 == Initialize a Cluster
 
