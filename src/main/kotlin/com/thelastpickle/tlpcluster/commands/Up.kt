@@ -37,7 +37,7 @@ Next you'll probably want to run tlp-cluster build to create a new build, or use
 
         println("""The following alias will allow you to easily ssh to the cluster:
             |
-            |alias ssh="ssh -F sshConfig
+            |alias ssh="ssh -F sshConfig"
             |
             |""".trimMargin())
 

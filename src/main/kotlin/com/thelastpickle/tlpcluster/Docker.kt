@@ -21,11 +21,11 @@ class Docker(val context: Context) {
         val log = logger()
     }
 
-    init {
-
-    }
-
-    fun pullImage(name: String, tag: String = "") {
+    /**
+     * Tag is required here, otherwise we pull every tag
+     * and that isn't fun
+     */
+    fun pullImage(name: String, tag: String) {
         log.debug { "Creating pull object" }
 
         var pullCommand = context.docker.pullImageCmd(name)

@@ -67,7 +67,7 @@ class CassandraUnpack(val context: Context,
         )
         log.debug { "Extracting config, volumes to map: $volumes" }
 
-        docker.pullImage("ubuntu:bionic")
+        docker.pullImage("ubuntu:bionic", "bionic")
         return docker.runContainer("ubuntu:bionic",
                 mutableListOf("sh", "/unpack_cassandra.sh", getFileName()),
                 volumes,
