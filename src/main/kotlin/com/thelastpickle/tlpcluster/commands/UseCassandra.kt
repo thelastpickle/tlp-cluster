@@ -26,7 +26,6 @@ class UseCassandra(val context: Context) : ICommand {
     override fun execute() {
         check(name.isNotBlank())
 
-
         // setup the provisioning directory
         val artifactDest = File("provisioning/cassandra/")
 
