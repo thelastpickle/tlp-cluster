@@ -35,7 +35,7 @@ fun main(arguments: Array<String>) {
     val commands = mapOf("init" to Init(context),
                          "up" to Up(context),
                          "start" to Start(context),
-                         "stop" to Stop(),
+                         "stop" to Stop(context),
                          "install" to Install(context),
                          "down" to Down(context),
                          "build" to BuildCassandra(context),

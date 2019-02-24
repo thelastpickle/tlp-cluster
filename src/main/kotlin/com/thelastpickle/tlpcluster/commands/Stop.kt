@@ -1,6 +1,8 @@
 package com.thelastpickle.tlpcluster.commands
 
-class Stop : ICommand {
+import com.thelastpickle.tlpcluster.Context
+
+class Stop(context: Context) : ICommand {
     override fun execute() {
         /*
         cassandra_ssh "sudo service cassandra stop"
