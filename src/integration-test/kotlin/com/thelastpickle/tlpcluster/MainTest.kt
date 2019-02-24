@@ -12,6 +12,7 @@ class MainTest {
         main(arrayOf("up",  "--yes"))
         main(arrayOf("start"))
         main(arrayOf("use", "3.11.4"))
+        main(arrayOf("down"))
     }
 
 
