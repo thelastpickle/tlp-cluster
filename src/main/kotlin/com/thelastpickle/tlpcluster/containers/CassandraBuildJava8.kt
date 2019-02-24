@@ -32,19 +32,14 @@ class CassandraBuildJava8(val context: Context) {
         val scriptFile = Utils.resourceToTempFile("containers/$scriptName", context.cwdPath)
         val scriptPathInContainer = "/local/$scriptName"
 
-        val volumes = mutableListOf(
-                VolumeMapping(location, "/cassandra", AccessMode.ro),
-                VolumeMapping(scriptFile.absolutePath, scriptPathInContainer, AccessMode.rw),
-                VolumeMapping(File(builds, name).toString(), "/builds/", AccessMode.rw),
-                VolumeMapping(mavenCache, "/root/.m2/", AccessMode.rw)
-        )
-
-        println("Volumes: $volumes")
-
-        return docker.runContainer(
+        return docker
+                .addVolume(VolumeMapping(location, "/cassandra", AccessMode.ro))
+                .addVolume(VolumeMapping(scriptFile.absolutePath, scriptPathInContainer, AccessMode.rw))
+                .addVolume(VolumeMapping(File(builds, name).toString(), "/builds/", AccessMode.rw))
+                .addVolume(VolumeMapping(mavenCache, "/root/.m2/", AccessMode.rw))
+                .runContainer(
                 dockerImageTag,
                 mutableListOf("/bin/sh", scriptPathInContainer),
-                volumes,
                 "/cassandra"
         )
     }
