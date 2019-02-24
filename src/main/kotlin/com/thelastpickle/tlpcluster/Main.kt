@@ -62,7 +62,7 @@ fun main(arguments: Array<String>) {
 
     println("Done")
 
-    // currently this is a work around to break out of a thread (netty?) that is never shut down.
-    System.exit(0)
+    // currently this is a work around to break out of a docker thread (netty?) that is never shut down.
+    context.shutdown()
 }
 

@@ -25,6 +25,10 @@ data class Context(val tlpclusterUserDirectory: File,
         File(buildLocation, "deb").mkdirs()
     }
 
+    fun shutdown() {
+        netty.close()
+    }
+
     /**
      * Please use this for reading and writing yaml to objects
      *
@@ -52,9 +56,14 @@ data class Context(val tlpclusterUserDirectory: File,
                 .withDockerHost("unix:///var/run/docker.sock")
                 .build()
 
+
         DockerClientBuilder.getInstance(dockerConfig)
-                .withDockerCmdExecFactory(NettyDockerCmdExecFactory())
+                .withDockerCmdExecFactory(netty)
                 .build()
+    }
+
+    private val netty by lazy  {
+        NettyDockerCmdExecFactory()
     }
 
     val cwdPath = System.getProperty("user.dir")
