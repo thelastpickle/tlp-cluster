@@ -20,6 +20,8 @@ class Pssh(val context: Context, val sshKey: String) {
     val log = logger()
     init {
         docker.pullImage("ubuntu:bionic", "bionic")
+        docker.addVolume(VolumeMapping(sshKey, "/root/.ssh/aws-private-key", AccessMode.ro))
+        docker.addVolume(VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
     }
 
     fun buildContainer() : String {
@@ -54,8 +56,6 @@ class Pssh(val context: Context, val sshKey: String) {
 
         return docker
                 .addVolume(VolumeMapping(scriptFile.path, scriptPathInContainer, AccessMode.rw))
-                .addVolume(VolumeMapping(sshKey, "/root/.ssh/aws-private-key", AccessMode.ro))
-                .addVolume(VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
                 .addEnv(hosts)
                 .runContainer(dockerImageTag, containerCommands, "")
     }

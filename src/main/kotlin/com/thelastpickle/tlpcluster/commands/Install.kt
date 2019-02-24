@@ -37,7 +37,8 @@ class Install(val context: Context) : ICommand {
         // we only want to run the install if the copy was successful
         parallelSsh.copyProvisioningResources().fold(
             {
-                parallelSsh.provisionNode("cassandra").fold(
+                // need to create a new instance here b/c of duplicate volume mapping issues
+                Pssh(context, sshKey).provisionNode("cassandra").fold(
                     { println(successMessage) },
                     { println("Failed to provision all nodes. " + it.message + retryMessage) }
                 )
