@@ -27,3 +27,4 @@
 /DockerfileCassandra_*
 /logs/
 sshConfig
+/scripts
