@@ -61,16 +61,12 @@ class CassandraUnpack(val context: Context,
 
         val shellScript = ResourceFile(javaClass.getResource("unpack_cassandra.sh"))
 
-        val volumes = mutableListOf(
-                VolumeMapping(dest.toAbsolutePath().toString(), "/working", AccessMode.rw),
-                VolumeMapping(shellScript.path, "/unpack_cassandra.sh", AccessMode.ro)
-        )
-        log.debug { "Extracting config, volumes to map: $volumes" }
-
         docker.pullImage("ubuntu:bionic", "bionic")
-        return docker.runContainer("ubuntu:bionic",
+        return docker
+                .addVolume(VolumeMapping(dest.toAbsolutePath().toString(), "/working", AccessMode.rw))
+                .addVolume(VolumeMapping(shellScript.path, "/unpack_cassandra.sh", AccessMode.ro))
+                .runContainer("ubuntu:bionic",
                 mutableListOf("sh", "/unpack_cassandra.sh", getFileName()),
-                volumes,
                 "/working/"
         )
 

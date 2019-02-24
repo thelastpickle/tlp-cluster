@@ -36,21 +36,12 @@ class Terraform(val context: Context) {
         return execute(*commands.toTypedArray())
     }
 
-    fun cassandraIps(): Result<String> {
-        return execute("output", "cassandra_ips")
-    }
-
-    fun cassandraInternalIps(): Result<String> {
-        return execute("output", "cassandra_internal_ips")
-    }
-
-    fun stressIps() : Result<String> {
-        return execute("output", "stress_ips")
-    }
 
     private fun execute(vararg command: String) : Result<String> {
         val args = command.toMutableList()
-        return docker.runContainer(dockerImageTag, args, volumeMapping, localDirectory)
+        return docker
+                .addVolume(VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
+                .runContainer(dockerImageTag, args, localDirectory)
 
     }
 

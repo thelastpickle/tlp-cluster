@@ -28,6 +28,14 @@ class Docker(val context: Context) {
         val log = logger()
     }
 
+    val volumes = mutableListOf<VolumeMapping>()
+
+    fun addVolume(vol: VolumeMapping) : Docker {
+        log.info { "adding volume: $vol" }
+        volumes.add(vol)
+        return this
+    }
+
     /**
      * Tag is required here, otherwise we pull every tag
      * and that isn't fun
@@ -124,7 +132,6 @@ class Docker(val context: Context) {
     fun runContainer(
             imageTag: String,
             command: MutableList<String>,
-            volumes: MutableList<VolumeMapping>,
             workingDirectory : String,
             env: MutableList<String> = mutableListOf()) : Result<String> {
 

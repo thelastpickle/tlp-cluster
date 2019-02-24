@@ -51,11 +51,11 @@ class Pssh(val context: Context, val sshKey: String) {
             containerCommands.add(scriptCommand)
         }
 
-        volumeMappings.add(VolumeMapping(scriptFile.path, scriptPathInContainer, AccessMode.rw))
-
         val hosts = context.tfstate.getHosts(ServerType.Cassandra).toEnv()
         log.info("Starting container with $hosts")
 
-        return docker.runContainer(dockerImageTag, containerCommands, volumeMappings,"", mutableListOf(hosts))
+        return docker
+                .addVolume(VolumeMapping(scriptFile.path, scriptPathInContainer, AccessMode.rw))
+                .runContainer(dockerImageTag, containerCommands, "", mutableListOf(hosts))
     }
 }
