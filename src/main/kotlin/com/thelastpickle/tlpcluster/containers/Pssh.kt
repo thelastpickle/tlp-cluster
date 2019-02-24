@@ -14,9 +14,7 @@ import org.apache.logging.log4j.kotlin.logger
 class Pssh(val context: Context, val sshKey: String) {
     private val docker = Docker(context)
     private val dockerImageTag = "thelastpickle/tlp-cluster_pssh"
-    private val volumeMappings = mutableListOf(
-            VolumeMapping(sshKey, "/root/.ssh/aws-private-key", AccessMode.ro),
-            VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
+
     private val provisionCommand = "cd provisioning; chmod +x install.sh; sudo ./install.sh"
 
     val log = logger()
@@ -56,6 +54,8 @@ class Pssh(val context: Context, val sshKey: String) {
 
         return docker
                 .addVolume(VolumeMapping(scriptFile.path, scriptPathInContainer, AccessMode.rw))
+                .addVolume(VolumeMapping(sshKey, "/root/.ssh/aws-private-key", AccessMode.ro))
+                .addVolume(VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
                 .addEnv(hosts)
                 .runContainer(dockerImageTag, containerCommands, "")
     }
