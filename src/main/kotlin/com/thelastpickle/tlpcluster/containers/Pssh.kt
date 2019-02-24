@@ -56,6 +56,7 @@ class Pssh(val context: Context, val sshKey: String) {
 
         return docker
                 .addVolume(VolumeMapping(scriptFile.path, scriptPathInContainer, AccessMode.rw))
-                .runContainer(dockerImageTag, containerCommands, "", mutableListOf(hosts))
+                .addEnv(hosts)
+                .runContainer(dockerImageTag, containerCommands, "")
     }
 }
