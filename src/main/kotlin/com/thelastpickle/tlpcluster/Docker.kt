@@ -21,7 +21,6 @@ data class VolumeMapping(val source: String, val destination: String, val mode: 
     }
 }
 
-
 class Docker(val context: Context) {
 
     companion object {
@@ -122,20 +121,6 @@ class Docker(val context: Context) {
         return imageId
     }
 
-    fun getStdErrReader() : PipedOutputStream {
-        val tmp = PipedOutputStream()
-        val tmp2 = PipedInputStream(tmp)
-
-        thread(isDaemon = true) {
-            val buf = tmp2.bufferedReader()
-            while(true) {
-                log.error(buf.readLine())
-            }
-        }
-
-        return tmp
-    }
-
     fun runContainer(
             imageTag: String,
             command: MutableList<String>,
@@ -192,43 +177,25 @@ class Docker(val context: Context) {
 
         var containerState : InspectContainerResponse.ContainerState
 
-        // first, handle stdin.  the PipedOutputStream will accept data and
+        // handle stdin.  the PipedOutputStream will accept data and
         // feed it to PipedInputStream, which then goes to docker
         // it looks like this, essentially
-        // stdInputPipe -> stdInputPipeToContainer -> terraform container
+        // stdInputPipe -> PipedInputStream(stdInputPipe) -> terraform container
         val stdInputPipe = PipedOutputStream()
-        val stdInputPipeToContainer = PipedInputStream(stdInputPipe)
 
         // now a means of reading from stdin
         val stdIn = System.`in`.bufferedReader()
 
-        // dealing with standard output from the docker container
-        // this works, don't fuck with it, Jon
-        val source = PipedOutputStream() // we're going to feed the frames to here
-        val stdOutReader = PipedInputStream(source).bufferedReader()
-
-        // We put this on a different thread because I have no idea what input it's going to ask for
-        // and the operations are blocking
-        val outputThread = thread {
-            do {
-                val message = stdOutReader.readLine()
-                println(message)
-                capturedStdOut.appendln(message)
-            } while(true)
-        }
-
-        val redirectStdInputThread = thread {
+        val redirectStdInputThread = thread(isDaemon = true) {
             while(true) {
                 val line = stdIn.readLine() + "\n"
                 stdInputPipe.write(line.toByteArray())
             }
         }
 
-        val stdError = getStdErrReader()
-
         var framesRead = 0
         context.docker.attachContainerCmd(dockerContainer.id)
-                .withStdIn(stdInputPipeToContainer)
+                .withStdIn(PipedInputStream(stdInputPipe))
                 .withStdOut(true)
                 .withStdErr(true)
                 .withFollowStream(true)
@@ -238,11 +205,14 @@ class Docker(val context: Context) {
                         if(item == null) return
 
                         framesRead++
+                        val payloadStr = String(item.payload)
 
                         if(item.streamType.name.equals("STDOUT")) {
-                            source.write(item.payload)
+                            // no need to use println - payloadStr already has carriage returns
+                            print(payloadStr)
+                            capturedStdOut.append(payloadStr)
                         } else if(item.streamType.name.equals("STDERR")) {
-                            stdError.write(item.payload)
+                            log.error(payloadStr)
                         }
                     }
 
@@ -260,10 +230,21 @@ class Docker(val context: Context) {
             containerState = context.docker.inspectContainerCmd(dockerContainer.id).exec().state
         } while (containerState.running == true)
 
-        println("Container exited with exit code ${containerState.exitCode}, ${containerState.error}, frames read: $framesRead")
 
-        // let the threads finish reading... this is a really bad way of solving the problem, ugly hack for now.
-        Thread.sleep(1000)
+        val returnMessage: String by lazy {
+            var errorMessage = ""
+
+            if (!containerState.error.isNullOrEmpty()) {
+                errorMessage = ", ${containerState.error}"
+            }
+
+            "Container exited with exit code ${containerState.exitCode}$errorMessage, frames read: $framesRead"
+        }
+
+        println(returnMessage)
+
+        // close the stdin pipe otherwise we will never exit back to the commandline
+        stdInputPipe.close()
 
         // clean up after ourselves
         context.docker.removeContainerCmd(dockerContainer.id)
