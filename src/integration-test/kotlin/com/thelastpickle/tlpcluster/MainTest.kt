@@ -10,9 +10,11 @@ class MainTest {
     fun basicTest() {
         main(arrayOf("init", "test", "test", "test"))
         main(arrayOf("up",  "--yes"))
-        main(arrayOf("start"))
         main(arrayOf("use", "3.11.4"))
-        main(arrayOf("down"))
+        main(arrayOf("install"))
+        main(arrayOf("start"))
+        main(arrayOf("down",  "--yes"))
+        main(arrayOf("clean"))
     }
 
 
