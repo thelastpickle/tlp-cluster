@@ -16,6 +16,7 @@ import java.nio.file.Files
 data class Context(val tlpclusterUserDirectory: File,
                    val cassandraRepo: Cassandra) {
     val cassandraBuildDir = File(tlpclusterUserDirectory, "builds")
+    var nettyInitialised = false
 
     fun createBuildSkeleton(name: String) {
 
@@ -26,7 +27,8 @@ data class Context(val tlpclusterUserDirectory: File,
     }
 
     fun shutdown() {
-        netty.close()
+        if (nettyInitialised)
+            netty.close()
     }
 
     /**
@@ -51,6 +53,7 @@ data class Context(val tlpclusterUserDirectory: File,
     }
 
     val docker by lazy {
+        nettyInitialised = true
 
         val dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
                 .withDockerHost("unix:///var/run/docker.sock")
