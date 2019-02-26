@@ -26,7 +26,7 @@ data class User(
             val region = Utils.prompt("What AWS region do you prefer?", "us-west-2")
             val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
             val keyName = Utils.prompt("What AWS SSH key pair do you use?", "")
-            val sshKeyPath = Utils.prompt("What is the path to the private key associated with your AWS SSH key pair?", default = "")
+            val sshKeyPath = Utils.resolveSshKeyPath(Utils.prompt("What is the path to the private key associated with your AWS SSH key pair?", default = ""))
             val awsAccessKey = Utils.prompt("AWS Access Key?", "")
             val awsSecret = Utils.prompt("Aws Secret?", "")
 

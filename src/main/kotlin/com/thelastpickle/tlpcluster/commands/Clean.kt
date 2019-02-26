@@ -12,7 +12,8 @@ class Clean : ICommand {
                 "stress_ips.txt",
                 "hosts.txt",
                 "terraform.tf.json",
-                "terraform.tfvars"
+                "terraform.tfvars",
+                "sshConfig"
         )
 
         for(f in toDelete) {

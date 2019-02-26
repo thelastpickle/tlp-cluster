@@ -4,24 +4,76 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.containers.Pssh
+import com.thelastpickle.tlpcluster.configuration.ServerType
 import java.io.File
 
 @Parameters(commandDescription = "Start cassandra on all nodes via service command")
 class Start(val context: Context) : ICommand {
-    @Parameter(description = "Private key used in keypair", names = ["--sshkey", "-k"])
-    var sshKey: String = File(System.getProperty("user.home"), "/.ssh/id_rsa").absolutePath
+
+    @Parameter(description = "Start all services on all instances. This overrides all other options", names = ["--all", "-a"])
+    var startAll = false
+
+    @Parameter(description = "Start services on monitoring instances", names = ["--monitoring", "-m"])
+    var startMonitoring = false
 
     override fun execute() {
-        check(sshKey.isNotBlank())
+        val sshKeyPath = context.userConfig.sshKeyPath
 
-        if (!File(sshKey).exists()) {
-            println("Unable to find SSH key $sshKey.")
+        check(sshKeyPath.isNotBlank())
+
+        if (!File(sshKeyPath).exists()) {
+            println("Unable to find SSH key $sshKeyPath. Aborting start.")
+            return
+        }
+
+        if (startAll) {
+            startMonitoring = true
         }
 
         println("Starting all nodes.")
-        val parallelSsh = Pssh(context, sshKey)
+        val parallelSsh = Pssh(context, sshKeyPath)
+        val successMessage = "service successfully started"
+        val failureMessage = "service failed to started"
 
-        parallelSsh.buildContainer()
-        parallelSsh.startService("cassandra")
+        var serviceName = "cassandra"
+        parallelSsh.startService(ServerType.Cassandra, serviceName).fold({
+            println("$serviceName $successMessage")}, {
+            println("$serviceName $failureMessage. ${it.message}")
+            return
+        })
+
+        val monitoringHost = context.tfstate.getHosts(ServerType.Monitoring)
+
+        if (startMonitoring && (monitoringHost.count() > 0)) {
+
+            serviceName = "prometheus"
+            parallelSsh.startService(ServerType.Monitoring, serviceName).fold({
+                println("$serviceName $successMessage")
+
+                serviceName = "grafana-server"
+                parallelSsh.startService(ServerType.Monitoring, serviceName).fold({
+
+                    println("$serviceName $successMessage")
+                    println("Creating Grafana dashboards")
+                    parallelSsh.createGrafanaDashboard().fold({
+                        println("Dashboards created!")
+                        println()
+                        println("""
+You can access the monitoring UI using the following URLs:
+ - Prometheus: http://${monitoringHost.first().public}:9090
+ - Grafana:    http://${monitoringHost.first().public}:3000
+                        """)
+                    }, {
+                        println("Failed to create dashboards. ${it.message}")
+                    })
+                }, {
+                    // error starting grafana
+                    println("$serviceName $failureMessage. ${it.message}")
+                })
+            }, {
+                // error starting prometheus
+                println("$serviceName $failureMessage. ${it.message}")
+            })
+        }
     }
 }
