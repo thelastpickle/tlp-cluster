@@ -10,6 +10,7 @@ data class User(
     var region: String,
     var securityGroup: String,
     var keyName: String,
+    var sshKeyPath: String,
     var awsAccessKey: String,
     var awsSecret: String
 ) {
@@ -24,15 +25,14 @@ data class User(
             val email = Utils.prompt("What's your email?", "")
             val region = Utils.prompt("What AWS region do you prefer?", "us-west-2")
             val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
-            val keyName = Utils.prompt("What AWS key pair do you use?", "")
-
+            val keyName = Utils.prompt("What AWS SSH key pair do you use?", "")
+            val sshKeyPath = Utils.prompt("What is the path to the private key associated with your AWS SSH key pair?", default = "")
             val awsAccessKey = Utils.prompt("AWS Access Key?", "")
             val awsSecret = Utils.prompt("Aws Secret?", "")
 
-            val user = User(email, region, securityGroup, keyName, awsAccessKey, awsSecret)
+            val user = User(email, region, securityGroup, keyName, sshKeyPath, awsAccessKey, awsSecret)
 
             context.yaml.writeValue(location, user)
-
         }
 
     }
