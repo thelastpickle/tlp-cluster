@@ -10,7 +10,6 @@ import java.io.InputStream
 class Yaml(val parser: JsonNode) {
 
     companion object {
-        val yamlFactory = YAMLFactory()
         val mapper = ObjectMapper(YAMLFactory())
 
         fun create(fp: File) : Yaml {
@@ -34,6 +33,19 @@ class Yaml(val parser: JsonNode) {
         val tmp = seedNode as ObjectNode
         val seedList = seeds.joinToString(",")
         tmp.put("seeds", seedList)
+    }
+
+    fun setHosts(nodeType: ServerType, hosts: List<String>, port: String) {
+        val jobTargets = parser
+                .get("scrape_configs")
+                .filter { node: JsonNode -> node.get("job_name").textValue() == nodeType.serverType}
+                .first()
+                .get("static_configs")
+                .filter { node: JsonNode -> node.fieldNames().next() == "targets" }
+                .first()
+
+        val tmp = (jobTargets as ObjectNode).putArray("targets")
+        hosts.forEach { tmp.add("$it:$port") }
     }
 
     /**

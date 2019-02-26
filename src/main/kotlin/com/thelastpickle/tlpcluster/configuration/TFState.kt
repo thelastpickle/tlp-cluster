@@ -10,12 +10,6 @@ import java.util.LinkedHashMap
 
 typealias HostList = List<Host>
 
-/**
- * Returns a list of IPs ready for PSSH's -H format, exported as an ENV
- */
-fun HostList.toEnv() = "PSSH_HOSTNAMES=" + map { "-H ${it.public}" }.joinToString(" ")
-
-
 class TFState(val context: Context,
               val file: InputStream) {
 

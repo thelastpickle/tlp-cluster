@@ -11,5 +11,5 @@ parallel-ssh \
     -ivl ubuntu \
     -O StrictHostKeyChecking=no \
     -O UserKnownHostsFile=/dev/null \
-    $PSSH_HOSTNAMES  \
+    -H "${PSSH_HOSTNAMES}" \
     ${1}

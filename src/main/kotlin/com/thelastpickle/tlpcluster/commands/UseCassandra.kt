@@ -3,7 +3,6 @@ package com.thelastpickle.tlpcluster.commands
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Context
-import com.thelastpickle.tlpcluster.configuration.Seeds
 import com.thelastpickle.tlpcluster.configuration.ServerType
 import com.thelastpickle.tlpcluster.configuration.Yaml
 import com.thelastpickle.tlpcluster.containers.CassandraUnpack
@@ -89,30 +88,45 @@ class UseCassandra(val context: Context) : ICommand {
 
 
         // update the seeds list
-        val yamlLocation = "provisioning/cassandra/conf/cassandra.yaml"
-        val envLocation = "provisioning/cassandra/conf/cassandra-env.sh"
+        val cassandraYamlLocation = "provisioning/cassandra/conf/cassandra.yaml"
+        val cassandraEnvLocation = "provisioning/cassandra/conf/cassandra-env.sh"
+        val cassandraYaml = Yaml.create(File(cassandraYamlLocation))
 
-        val fp = File(yamlLocation)
-        val yaml = Yaml.create(fp)
+        cassandraYaml.setProperty("endpoint_snitch", "Ec2Snitch")
 
-        yaml.setProperty("endpoint_snitch", "Ec2Snitch")
+        val cassandraHosts = context.tfstate.getHosts(ServerType.Cassandra)
+        val seeds = cassandraHosts.take(3)
 
-        val seeds = context.tfstate.getHosts(ServerType.Cassandra).take(3)
-
-        yaml.setSeeds(seeds.map { it.private })
-
+        cassandraYaml.setSeeds(seeds.map { it.private })
 
         configSettings.forEach {
             val keyValue = it.split(":")
             if (keyValue.count() > 1) {
-                yaml.setProperty(keyValue[0], keyValue[1])
+                cassandraYaml.setProperty(keyValue[0], keyValue[1])
             }
         }
 
-        log.debug { "Writing YAML to $yamlLocation" }
-        yaml.write(yamlLocation)
+        log.debug { "Writing Cassandra YAML to $cassandraYamlLocation" }
+        cassandraYaml.write(cassandraYamlLocation)
 
-        val env = File(envLocation)
+        // if using a monitoring instance, set the hosts to pull metrics from
+        if (context.tfstate.getHosts(ServerType.Monitoring).count() > 0) {
+            val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
+            val prometheusYaml = Yaml.create(File(prometheusYamlLocation))
+
+            // port values are hard coded. We should probably make this configurable at some point.
+            prometheusYaml.setHosts(ServerType.Cassandra, cassandraHosts.map { it.private }, "9500")
+
+            if (context.tfstate.getHosts(ServerType.Stress).count() > 0) {
+                val stressHosts = context.tfstate.getHosts(ServerType.Stress)
+                prometheusYaml.setHosts(ServerType.Stress, stressHosts.map { it.private }, "9501")
+            }
+
+            log.debug { "Writing Prometheus YAML to $prometheusYamlLocation" }
+            prometheusYaml.write(prometheusYamlLocation)
+        }
+
+        val env = File(cassandraEnvLocation)
         env.appendText("\nJVM_OPTS=\"\$JVM_OPTS -Dcassandra.consistent.rangemovement=false\"\n")
 
 

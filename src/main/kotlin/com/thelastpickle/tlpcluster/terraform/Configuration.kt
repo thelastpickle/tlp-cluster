@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.thelastpickle.tlpcluster.Context
+import com.thelastpickle.tlpcluster.configuration.ServerType
 import java.io.File
 
 class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
@@ -13,7 +14,7 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
 
     var numCassandraInstances = 3
     val usEebs = false
-    var email = ""
+    var email = context.userConfig.email
 
 
     var cassandraInstanceType = "m5d.xlarge"
@@ -24,8 +25,10 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
     var stressAMI = "ami-51537029"
     var stressInstanceType = "c5d.2xlarge"
 
-    // no way of enabling this right now
+    //monitoring
     var monitoring = false
+    var monitoringAMI = "ami-51537029"
+    var monitoringInstanceType = "c5d.2xlarge"
 
     private val config  = TerraformConfig(region, context.userConfig.awsAccessKey, context.userConfig.awsSecret)
 
@@ -46,10 +49,30 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
         return this
     }
 
-    fun setResource(key: String, ami: String, instanceType: String, count: Int) : Configuration {
+    private fun setResource(key: String,
+                            ami: String,
+                            instanceType: String,
+                            count: Int,
+                            tags: MutableMap<String, String>) : Configuration {
         val conf = Resource(ami, instanceType, tags, count = count)
         config.resource.aws_instance[key] = conf
         return this
+    }
+
+    private fun setTagName(tags: MutableMap<String, String>, nodeType: ServerType) : MutableMap<String, String> {
+        val newTags = HashMap<String, String>(tags).toMutableMap()
+        val ticketTag by lazy {
+            var tagValue = tags.getOrDefault("ticket", "")
+
+            if (tagValue.isNotEmpty()) {
+                tagValue = "${tagValue}_"
+            }
+
+            tagValue
+        }
+
+        newTags["Name"] = "${ticketTag}${nodeType.serverType}"
+        return newTags
     }
 
 
@@ -58,25 +81,20 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
         // update tags
         // Name = "${var.email} {$var.ticket} stress"
 
-        val name = "${tags.getOrDefault("email", "")} ${tags.getOrDefault("ticket", "")}"
-
-        tags["Name"] = name
-
         setVariable("cassandra_instance_type", cassandraInstanceType)
         setVariable("stress_instance_type", stressInstanceType)
         setVariable("email", email)
         setVariable("security_groups", Variable(listOf(context.userConfig.securityGroup), "list"))
         setVariable("key_name", context.userConfig.keyName)
+        setVariable("key_path", context.userConfig.sshKeyPath)
         setVariable("cassandra_instance_name", "cassandra-node")
         setVariable("stress_instance_name", "stress-instance")
         setVariable("region", region)
         setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
 
-
-        setResource("cassandra", cassandraAMI, cassandraInstanceType, numCassandraInstances)
-        setResource("stress", stressAMI, stressInstanceType, numStressInstances)
-        setResource("monitoring", cassandraAMI, cassandraInstanceType, if(monitoring) 1 else 0)
-
+        setResource("cassandra", cassandraAMI, cassandraInstanceType, numCassandraInstances, setTagName(tags, ServerType.Cassandra))
+        setResource("stress", stressAMI, stressInstanceType, numStressInstances, setTagName(tags, ServerType.Stress))
+        setResource("monitoring", monitoringAMI, monitoringInstanceType, if (monitoring) 1 else 0, setTagName(tags, ServerType.Monitoring))
 
         return this
     }

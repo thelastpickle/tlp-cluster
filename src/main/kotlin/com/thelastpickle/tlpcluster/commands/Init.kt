@@ -8,9 +8,6 @@ import org.reflections.scanners.ResourcesScanner
 import java.io.File
 import org.apache.commons.io.FileUtils
 import com.thelastpickle.tlpcluster.terraform.Configuration
-import com.github.dockerjava.core.command.BuildImageResultCallback
-import com.github.dockerjava.api.command.InspectContainerResponse
-import com.github.dockerjava.api.model.*
 import com.thelastpickle.tlpcluster.containers.Terraform
 
 
@@ -31,6 +28,9 @@ class Init(val context: Context) : ICommand {
     @Parameter(description = "Number of stress instances", names = ["--stress", "-s"])
     var stressInstances = 0
 
+    @Parameter(description = "Enable monitoring (beta)", names = ["--monitoring", "-m"])
+    var monitoringEnabled = false
+
     @Parameter(description = "Start instances automatically", names = ["--up"])
     var start = false
 
@@ -42,9 +42,6 @@ class Init(val context: Context) : ICommand {
 
     @Parameter(description = "Instance Type", names = ["--instance"])
     var instanceType =  "c5d.2xlarge"
-
-    @Parameter(description = "Enable monitoring (beta)", names = ["--monitoring", "-m"])
-    var enableMonitoring = false
 
     override fun execute() {
         println("Initializing directory")
@@ -86,13 +83,13 @@ class Init(val context: Context) : ICommand {
 
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
+        config.monitoring = monitoringEnabled
 
         config.region = region
         config.stressAMI = "ami-51537029"
         config.stressInstanceType = instanceType
         config.cassandraInstanceType = instanceType
-
-        config.monitoring = enableMonitoring
+        config.monitoringInstanceType = instanceType
 
         config.setVariable("client", client)
         config.setVariable("ticket", ticket)

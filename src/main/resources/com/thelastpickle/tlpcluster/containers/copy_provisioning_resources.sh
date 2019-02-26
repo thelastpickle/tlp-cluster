@@ -9,8 +9,8 @@ cd /local
 
 parallel-rsync \
     -avrz  \
-     $PSSH_HOSTNAMES \
-     -l ubuntu \
+    -H "${PSSH_HOSTNAMES}" \
+    -l ubuntu \
     -O StrictHostKeyChecking=no  \
     -O UserKnownHostsFile=/dev/null \
     ./provisioning/ \

@@ -173,7 +173,7 @@ class Docker(val context: Context) {
 
         val dockerContainer = dockerCommandBuilder.exec()
 
-        println("Starting $imageTag container")
+        println("Starting $imageTag container (${dockerContainer.id.substring(0,12)})")
 
         var containerState : InspectContainerResponse.ContainerState
 

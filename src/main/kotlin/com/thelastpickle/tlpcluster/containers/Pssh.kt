@@ -4,7 +4,6 @@ import com.github.dockerjava.api.model.AccessMode
 import com.thelastpickle.tlpcluster.*
 import com.thelastpickle.tlpcluster.configuration.ServerType
 
-import com.thelastpickle.tlpcluster.configuration.toEnv
 import org.apache.logging.log4j.kotlin.logger
 
 
@@ -12,35 +11,46 @@ import org.apache.logging.log4j.kotlin.logger
  * This is currently flawed in that it only allows for SSH'ing to Cassandra
  */
 class Pssh(val context: Context, val sshKey: String) {
-    private val docker = Docker(context)
     private val dockerImageTag = "thelastpickle/tlp-cluster_pssh"
 
     private val provisionCommand = "cd provisioning; chmod +x install.sh; sudo ./install.sh"
 
     val log = logger()
     init {
+        val docker = Docker(context)
         docker.pullImage("ubuntu:bionic", "bionic")
-        docker.addVolume(VolumeMapping(sshKey, "/root/.ssh/aws-private-key", AccessMode.ro))
-        docker.addVolume(VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
+        docker.buildContainer("DockerfileSSH", dockerImageTag)
     }
 
-    fun buildContainer() : String {
-        return docker.buildContainer("DockerfileSSH", dockerImageTag)
+    fun createGrafanaDashboard() : Result<String> {
+        return execute("create_dashboard.sh", "", ServerType.Monitoring)
     }
 
-    fun copyProvisioningResources() : Result<String> {
-        return execute("copy_provisioning_resources.sh", "")
+
+    fun copyProvisioningResources(nodeType: ServerType) : Result<String> {
+        return execute("copy_provisioning_resources.sh", "", nodeType)
     }
 
-    fun provisionNode(nodeType: String) : Result<String> {
-        return execute("parallel_ssh.sh", "$provisionCommand $nodeType")
+    fun provisionNode(nodeType: ServerType) : Result<String> {
+        return execute("parallel_ssh.sh", "$provisionCommand ${nodeType.serverType}", nodeType)
     }
 
-    fun startService(nodeType: String) : Result<String> {
-        return execute("parallel_ssh.sh", "sudo service $nodeType start")
+    fun startService(nodeType: ServerType, serviceName: String) : Result<String> {
+        return serviceCommand(nodeType, serviceName, "start")
     }
 
-    fun execute(scriptName: String, scriptCommand: String) : Result<String> {
+    fun stopService(nodeType: ServerType, serviceName: String) : Result<String> {
+        return serviceCommand(nodeType, serviceName, "stop")
+    }
+
+    private fun serviceCommand(nodeType: ServerType, serviceName: String, command: String) : Result<String> {
+        return execute("parallel_ssh.sh",
+                "sudo service $serviceName $command && sleep 5 && sudo service $serviceName status",
+                nodeType)
+    }
+
+    private fun execute(scriptName: String, scriptCommand: String, nodeType: ServerType) : Result<String> {
+        val docker = Docker(context)
         val script = javaClass.getResource(scriptName)
         val scriptFile = ResourceFile(script)
 
@@ -51,10 +61,12 @@ class Pssh(val context: Context, val sshKey: String) {
             containerCommands.add(scriptCommand)
         }
 
-        val hosts = context.tfstate.getHosts(ServerType.Cassandra).toEnv()
+        val hosts = "PSSH_HOSTNAMES=${context.tfstate.getHosts(nodeType).map { it.public }.joinToString(" ")}"
         log.info("Starting container with $hosts")
 
         return docker
+                .addVolume(VolumeMapping(sshKey, "/root/.ssh/aws-private-key", AccessMode.ro))
+                .addVolume(VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
                 .addVolume(VolumeMapping(scriptFile.path, scriptPathInContainer, AccessMode.rw))
                 .addEnv(hosts)
                 .runContainer(dockerImageTag, containerCommands, "")

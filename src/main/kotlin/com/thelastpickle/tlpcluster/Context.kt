@@ -7,7 +7,6 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientBuilder
 import com.github.dockerjava.netty.NettyDockerCmdExecFactory
-import com.thelastpickle.tlpcluster.configuration.Host
 import com.thelastpickle.tlpcluster.configuration.TFState
 import com.thelastpickle.tlpcluster.configuration.User
 import java.io.File
@@ -16,6 +15,7 @@ import java.nio.file.Files
 data class Context(val tlpclusterUserDirectory: File,
                    val cassandraRepo: Cassandra) {
     val cassandraBuildDir = File(tlpclusterUserDirectory, "builds")
+    var profilesDir = File(tlpclusterUserDirectory, "profiles")
     var nettyInitialised = false
 
     fun createBuildSkeleton(name: String) {
@@ -41,11 +41,12 @@ data class Context(val tlpclusterUserDirectory: File,
     val yaml = ObjectMapper(YAMLFactory()).registerKotlinModule()
     val json = ObjectMapper()
 
-    private val userConfigFile = File(System.getProperty("user.home"), ".tlp-cluster/user.yaml")
+    private val userConfigFile = File(profilesDir, "default.yaml")
 
     // this will let us write out the yaml
     val userConfig by lazy {
         if(!userConfigFile.exists()) {
+            profilesDir.mkdirs()
             User.createInteractively(this, userConfigFile)
         }
 
@@ -80,8 +81,8 @@ data class Context(val tlpclusterUserDirectory: File,
          * Used only for testing
          */
         fun testContext() : Context {
-            var testTempDirectory = Files.createTempDirectory("tlpcluster")
-            var testTempDirectoryCassandra = Files.createTempDirectory("tlpcluster")
+            val testTempDirectory = Files.createTempDirectory("tlpcluster")
+            val testTempDirectoryCassandra = Files.createTempDirectory("tlpcluster")
             return Context(testTempDirectory.toFile(), Cassandra(testTempDirectoryCassandra.toFile()))
         }
     }
