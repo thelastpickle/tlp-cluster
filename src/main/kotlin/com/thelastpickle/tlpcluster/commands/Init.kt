@@ -57,6 +57,9 @@ class Init(val context: Context) : ICommand {
         check(ticket.isNotBlank())
         check(purpose.isNotBlank())
 
+        // Added because if we're reusing a directory, we don't want any of the previous state
+        Clean().execute()
+
         // copy provisioning over
         val reflections = Reflections("com.thelastpickle.tlpcluster.commands.origin", ResourcesScanner())
 
