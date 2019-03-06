@@ -113,6 +113,7 @@ data class Resource(val ami: String = "ami-5153702",
                     val tags: Map<String, String> = mapOf(),
                     val security_groups : String = "\${var.security_groups}",
                     val key_name : String = "\${var.key_name}",
+                    val availability_zone: String = "\${element(var.zones, count.index)}",
                     val count : Int
 )
 
