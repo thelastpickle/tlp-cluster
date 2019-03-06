@@ -54,28 +54,19 @@ class TFState(val context: Context,
     }
 
     fun writeSshConfig(config: BufferedWriter) {
-        val cassandra = getHosts(ServerType.Cassandra)
-        val stress = getHosts(ServerType.Stress)
-
         // write standard stuff first
         config.appendln("StrictHostKeyChecking=no")
         config.appendln("User ubuntu")
 
-        for (host in cassandra) {
-            // aliases
-            // adding node0 or c0 would be a reasonable time saver
-            config.appendln("Host ${host.alias}")
-            config.appendln("  Hostname ${host.public}")
-            config.appendln()
-        }
-
-        for(host in stress) {
-            config.appendln("Host ${host.alias}")
-            config.appendln("  Hostname ${host.public}")
-            config.appendln()
+        // get each server type and get the hosts for type and add it to the sshConfig.
+        ServerType.values().forEach {
+            getHosts(it).forEach {
+                config.appendln("Host ${it.alias}")
+                config.appendln(" Hostname ${it.public}")
+                config.appendln()
+            }
         }
         config.flush()
-
     }
 
 
