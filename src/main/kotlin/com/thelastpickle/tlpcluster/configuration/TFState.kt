@@ -57,6 +57,7 @@ class TFState(val context: Context,
         // write standard stuff first
         config.appendln("StrictHostKeyChecking=no")
         config.appendln("User ubuntu")
+        config.appendln("IdentityFile ${context.userConfig.sshKeyPath}")
 
         // get each server type and get the hosts for type and add it to the sshConfig.
         ServerType.values().forEach {
