@@ -10,12 +10,6 @@ import java.io.File
 @Parameters(commandDescription = "Start cassandra on all nodes via service command")
 class Start(val context: Context) : ICommand {
 
-    @Parameter(description = "Start all services on all instances. This overrides all other options", names = ["--all", "-a"])
-    var startAll = false
-
-    @Parameter(description = "Start services on monitoring instances", names = ["--monitoring", "-m"])
-    var startMonitoring = false
-
     override fun execute() {
         val sshKeyPath = context.userConfig.sshKeyPath
 
@@ -24,10 +18,6 @@ class Start(val context: Context) : ICommand {
         if (!File(sshKeyPath).exists()) {
             println("Unable to find SSH key $sshKeyPath. Aborting start.")
             return
-        }
-
-        if (startAll) {
-            startMonitoring = true
         }
 
         println("Starting all nodes.")
@@ -44,7 +34,7 @@ class Start(val context: Context) : ICommand {
 
         val monitoringHost = context.tfstate.getHosts(ServerType.Monitoring)
 
-        if (startMonitoring && (monitoringHost.count() > 0)) {
+        if (monitoringHost.count() > 0) {
 
             serviceName = "prometheus"
             parallelSsh.startService(ServerType.Monitoring, serviceName).fold({
