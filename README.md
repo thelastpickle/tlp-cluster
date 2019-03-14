@@ -8,5 +8,5 @@ If you aren't comfortable digging into code, this tool probably isn't for you, a
 
 Please refer to the project [documentation](http://thelastpickle.com/tlp-cluster/) for usage instructions.
 
-
+Interested in contributing?  Check out the [good first issue tag](https://github.com/thelastpickle/tlp-cluster/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) first!
 
