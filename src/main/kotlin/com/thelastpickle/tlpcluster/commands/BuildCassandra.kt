@@ -2,31 +2,27 @@ package com.thelastpickle.tlpcluster.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
+import com.beust.jcommander.converters.FileConverter
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.containers.CassandraBuildJava8
 import java.io.File
+import java.lang.Exception
 
-@Parameters(commandDescription = "Build Cassandra (either tag or custom dir)")
+class CassandraDirectoryNotFound : Exception()
+
+@Parameters(commandDescription = "Create a custom named Cassandra build from a working directory.")
 class BuildCassandra(val context: Context)  : ICommand {
 
-    @Parameter(description = "build_name [path | tag]")
-    var params: List<String> = mutableListOf()
+    @Parameter(description = "Name of build", names = ["-n"])
+    lateinit var name : String
+
+    @Parameter(description = "Path to build", converter = FileConverter::class)
+    lateinit var location : File
 
     override fun execute() {
 
-        val name = params[0]
-        val pathOrVersion = params[1]
-
-        val tmp = File(pathOrVersion)
-
-        // is this a directory?
-        val location = if(tmp.exists()) {
-            tmp
-        } else {
-            // not a dir, must be a tag
-            println("Directory not found, attempting to build ref $pathOrVersion")
-            context.cassandraRepo.checkoutVersion(pathOrVersion)
-            context.cassandraRepo.gitLocation
+        if(!location.exists()) {
+            throw CassandraDirectoryNotFound()
         }
 
         context.createBuildSkeleton(name)
