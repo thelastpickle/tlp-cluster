@@ -460,7 +460,13 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra designed for developers looking to both benchmark and test the correctness of Apache Cassandra.  It assists with builds and starting instances on AWS.</p>
+<p>This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra designed for developers looking to benchmark and test Apache Cassandra.  It assists with builds and starting instances on AWS.</p>
+</div>
+<div class="paragraph">
+<p>If you are looking for a tool to aid in benchmarking these clusters please see the companion project <a href="http://thelastpickle.com/tlp-stress/">tlp-stress</a>.</p>
+</div>
+<div class="paragraph">
+<p>If you&#8217;re looking for tools to help manage Cassandra in <em>production</em> environments please see the <a href="http://cassandra-reaper.io/">Reaper</a> project and <a href="https://github.com/spotify/cstar">cstar</a></p>
 </div>
 </div>
 </div>
@@ -476,10 +482,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>An AWS access key and secret.  tlp-cluster uses <a href="https://www.terraform.io/">Terraform</a> to create and destroy instances.</p>
 </li>
 <li>
-<p>A security group that allows inbound SSH traffic, and all machines in that group can talk to each other.</p>
-</li>
-<li>
-<p>A key pair, private part of which should be present in your <code>~/.ssh</code> with <code>chmod 400</code> on it.</p>
+<p>A security group that allows inbound SSH traffic, and all machines in that group can talk to each other.  This requirement will be lifted soon (see <a href="https://github.com/thelastpickle/tlp-cluster/issues/42">Issue #42</a>).</p>
 </li>
 </ul>
 </div>
@@ -492,7 +495,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <p>The cluster provisioning tool is somewhat self explanatory (hopefully).</p>
 </div>
 <div class="paragraph">
-<p>It launches Cassandra clusters in AWS. In addition to Cassandra, the tool can also launch stress nodes (soon) and a prometheus node to gather all the metrics.</p>
+<p>It launches Cassandra clusters in AWS. In addition to Cassandra, the tool can also launch stress nodes and a prometheus node to gather all the metrics.</p>
 </div>
 <div class="paragraph">
 <p>The tool itself is written in Kotlin, leveraging Docker containers to avoid too many external dependencies.</p>
@@ -507,19 +510,16 @@ cd /path/to/tlp-cluster
 ./gradlew assemble</code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Now you can use the tool, yay.</p>
-</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_setup">Setup</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>I don&#8217;t know if will run on Windows.  We assume most people doing any serious Cassandra development will have access to a Linux box or virtual machine.</p>
+<p>We currently have a dependency on shell scripts meaning you&#8217;ll need a Mac or Linux box to use this tool.</p>
 </div>
 <div class="paragraph">
-<p>If you&#8217;ve never used to the tool before, run the tool without any parameters, <code>bin/tlp-cluster</code>.   You will be asked some questions to generate a configuration file which will be placed in your <code>$HOME/.tlp-cluster/user.yaml</code>.</p>
+<p>If you&#8217;ve never used to the tool before, the first time you run a command you&#8217;ll be asked to supply some information, which will generate a configuration file which will be placed in your <code>$HOME/.tlp-cluster/profiles/default/settings.yaml</code>.</p>
 </div>
 <div class="admonitionblock important">
 <table>
@@ -546,8 +546,7 @@ We currently only support the ubuntu 16 ami in us-west-2.  We&#8217;d love a pul
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>$ tlp-cluster
-Usage: tlp-cluster [options] [command] [command options]
+<pre class="highlight"><code>Usage: tlp-cluster [options] [command] [command options]
   Options:
     --help, -h
       Shows this help.
@@ -565,6 +564,9 @@ Usage: tlp-cluster [options] [command] [command options]
           --instance
             Instance Type
             Default: c5d.2xlarge
+          --monitoring, -m
+            Enable monitoring (beta)
+            Default: false
           --region
             Region
             Default: us-west-2
@@ -585,19 +587,27 @@ Usage: tlp-cluster [options] [command] [command options]
     start      Start cassandra on all nodes via service command
       Usage: start [options]
         Options:
-          --sshkey, -k
-            Private key used in keypair
-            Default: /Users/jhaddad/.ssh/id_rsa
+          --all, -a
+            Start all services on all instances. This overrides all other
+            options
+            Default: false
+          --monitoring, -m
+            Start services on monitoring instances
+            Default: false
 
-    stop      null
-      Usage: stop
+    stop      Stop cassandra on all nodes via service command
+      Usage: stop [options]
+        Options:
+          --all, -a
+            Start all services on all instances. This overrides all other
+            options
+            Default: false
+          --monitoring, -m
+            Start services on monitoring instances
+            Default: false
 
     install      Install Everything
-      Usage: install [options]
-        Options:
-          --sshkey, -k
-            Private key used in keypair
-            Default: /Users/jhaddad/.ssh/id_rsa
+      Usage: install
 
     down      Shut down a cluster
       Usage: down [options]
@@ -606,8 +616,11 @@ Usage: tlp-cluster [options] [command] [command options]
             Auto approve changes
             Default: false
 
-    build      Build Cassandra (either tag or custom dir)
-      Usage: build build_name [path | tag]
+    build      Create a custom named Cassandra build from a working directory.
+      Usage: build [options] Path to build
+        Options:
+          -n
+            Name of build
 
     ls      List available builds
       Usage: ls
@@ -636,7 +649,7 @@ Done</code></pre>
 <h2 id="_initialize_a_cluster">Initialize a Cluster</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The tool uses the current working directory as a project, of sorts. To get started, run the following, substituting your customer, ticket and purpose.  This is an artifact of how we work on projects at TLP.</p>
+<p>The tool uses the current working directory as a project, of sorts. To get started, run the following, substituting your customer / project, ticket and purpose.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -649,10 +662,10 @@ Done</code></pre>
 <div class="ulist">
 <ul>
 <li>
-<p><code>CLIENT</code> - Name of the customer or client associated with the work you are doing with <code>tlp-cluster</code>.</p>
+<p><code>CLIENT</code> - Name of the customer, client, or project associated with the work you are doing with <code>tlp-cluster</code>.</p>
 </li>
 <li>
-<p><code>TICKET</code> - Jira ticket number associated with the work you are doing with <code>tlp-cluster</code>.</p>
+<p><code>TICKET</code> - Jira or github ticket number associated with the work you are doing with <code>tlp-cluster</code>.</p>
 </li>
 <li>
 <p><code>PURPOSE</code> - Reason why you are creating the cluster.</p>
@@ -660,10 +673,10 @@ Done</code></pre>
 </ul>
 </div>
 <div class="paragraph">
-<p>This will initialize the current directory with a terraform.tf.json. You can open this up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.</p>
+<p>This will initialize the current directory with a terraform.tf.json. You can open this up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.  Generally speaking though, you shouldn&#8217;t have to do this.  If you find yourself doing it often, please submit an <a href="https://github.com/thelastpickle/tlp-cluster/issues">issue</a> describing your requirements and we&#8217;ll work with you to solve the problem.</p>
 </div>
 <div class="paragraph">
-<p>Certain instances types may not work with the ami that&#8217;s hard coded.</p>
+<p>Certain instances types may not work with the ami that&#8217;s hard coded at the moment, we&#8217;re looking to fix / improve this.</p>
 </div>
 </div>
 </div>
@@ -710,13 +723,10 @@ tlp-cluster start</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Build the version you need and give it a build name (optional).</p>
+<p>Build the version you need and give it a build name (optional)</p>
 </li>
 <li>
-<p>Select the build name you want install.</p>
-</li>
-<li>
-<p>Install the selected build.</p>
+<p>Tell tlp-cluster to use the custom build</p>
 </li>
 </ol>
 </div>
@@ -728,7 +738,7 @@ tlp-cluster start</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster build BUILD_NAME [CASSANDRA_TAG | CASSANDRA_LOCAL_REPO]</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster build -n BUILD_NAME /path/to/repo</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -740,10 +750,7 @@ tlp-cluster start</code></pre>
 <p><code>BUILD_NAME</code> - Name you want to give the build e.g. my-build-cass-4.0.</p>
 </li>
 <li>
-<p><code>CASSANDRA_TAG</code> - The version number of a tagged Cassandra build e.g. <code>3.11.3</code>. Use this if you want to deploy already existing released version of Cassandra to your cluster.</p>
-</li>
-<li>
-<p><code>CASSANDRA_LOCAL_REPO</code> - Full path to clone of the Cassandra repository. Use this if you want to deploy a custom version of Cassandra to your cluster.</p>
+<p><code>/path/to/repo</code> - Full path to clone of the Cassandra repository.</p>
 </li>
 </ul>
 </div>
@@ -766,7 +773,7 @@ tlp-cluster start</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster install -k SSH_KEY_PATH</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster install</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -788,7 +795,7 @@ tlp-cluster start</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-02-22 01:59:22 UTC
+Last updated 2019-03-16 01:20:28 UTC
 </div>
 </div>
 </body>

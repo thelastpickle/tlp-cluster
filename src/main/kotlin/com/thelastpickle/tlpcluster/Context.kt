@@ -12,11 +12,18 @@ import com.thelastpickle.tlpcluster.configuration.User
 import java.io.File
 import java.nio.file.Files
 
-data class Context(val tlpclusterUserDirectory: File,
-                   val cassandraRepo: Cassandra) {
+data class Context(val tlpclusterUserDirectory: File) {
+
     val cassandraBuildDir = File(tlpclusterUserDirectory, "builds")
     var profilesDir = File(tlpclusterUserDirectory, "profiles")
+    var profileDir = File(profilesDir, "default")
+
     var nettyInitialised = false
+    val cassandraRepo = Cassandra()
+
+    init {
+        profileDir.mkdirs()
+    }
 
     fun createBuildSkeleton(name: String) {
 
@@ -41,7 +48,7 @@ data class Context(val tlpclusterUserDirectory: File,
     val yaml = ObjectMapper(YAMLFactory()).registerKotlinModule()
     val json = ObjectMapper()
 
-    private val userConfigFile = File(profilesDir, "default.yaml")
+    private val userConfigFile = File(profileDir, "settings.yaml")
 
     // this will let us write out the yaml
     val userConfig by lazy {
@@ -82,8 +89,7 @@ data class Context(val tlpclusterUserDirectory: File,
          */
         fun testContext() : Context {
             val testTempDirectory = Files.createTempDirectory("tlpcluster")
-            val testTempDirectoryCassandra = Files.createTempDirectory("tlpcluster")
-            return Context(testTempDirectory.toFile(), Cassandra(testTempDirectoryCassandra.toFile()))
+            return Context(testTempDirectory.toFile())
         }
     }
 }
