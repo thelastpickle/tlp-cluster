@@ -28,6 +28,7 @@
 logs/
 sshConfig
 /scripts
+logs
 
 
 # Created by https://www.gitignore.io/api/eclipse
