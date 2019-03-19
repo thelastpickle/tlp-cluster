@@ -93,7 +93,8 @@ data class User(
                     "us-west-2",
                     securityGroup,
                     keyName,
-                    secret.absolutePath, "",
+                    secret.absolutePath,
+                    "", // future compatibility, when we start allowing people to use their existing AWS creds they've already set up.
                     awsAccessKey,
                     awsSecret)
 
