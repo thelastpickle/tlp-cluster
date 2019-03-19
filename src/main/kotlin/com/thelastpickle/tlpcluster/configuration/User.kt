@@ -2,17 +2,18 @@ package com.thelastpickle.tlpcluster.configuration
 
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.Utils
-import org.apache.http.impl.client.BasicCredentialsProvider
+import org.apache.logging.log4j.kotlin.logger
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
-import software.amazon.awssdk.auth.credentials.AwsCredentials
-import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ec2.Ec2Client
 import java.io.File
-import software.amazon.awssdk.services.ec2.model.CreateKeyPairResponse
 import software.amazon.awssdk.services.ec2.model.CreateKeyPairRequest
+import java.nio.file.Files
 import java.util.*
+import java.nio.file.attribute.PosixFilePermission
+import java.util.HashSet
+
+
 
 
 data class User(
@@ -31,6 +32,9 @@ data class User(
     var awsSecret: String
 ) {
     companion object {
+
+        val log = logger()
+
         /**
          * Asks a bunch of questions and generates the user file
          */
@@ -74,9 +78,15 @@ data class User(
             val secret = File(context.profileDir, "secret.pem")
             secret.writeText(response.keyMaterial())
 
+            // set permissions
+            val perms = HashSet<PosixFilePermission>()
+            perms.add(PosixFilePermission.OWNER_READ)
+            perms.add(PosixFilePermission.OWNER_WRITE)
+
+            log.info { "Setting secret file permissions $perms"}
+            Files.setPosixFilePermissions(secret.toPath(), perms)
 
             val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
-            //val sshKeyPath = Utils.resolveSshKeyPath(Utils.prompt("What is the path to the private key associated with your AWS SSH key pair?", default = ""))
 
 
             val user = User(email,
