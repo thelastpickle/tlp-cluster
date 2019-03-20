@@ -25,7 +25,7 @@
 /terraform.tfstate.backup
 /DockerfileSSH*
 /DockerfileCassandra_*
-/logs/
+logs/
 sshConfig
 /scripts
 

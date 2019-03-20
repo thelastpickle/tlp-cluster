@@ -5,7 +5,7 @@ import java.io.File
 /**
  * Manages a the Cassandra build process
  */
-class Cassandra(val gitLocation: File) {
+class Cassandra {
 
     // FIXME: un-hardcode
     val buildDir = File(System.getProperty("user.home"), "/.tlp-cluster/builds")

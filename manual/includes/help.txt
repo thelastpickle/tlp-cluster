@@ -1,4 +1,3 @@
-$ tlp-cluster
 Usage: tlp-cluster [options] [command] [command options]
   Options:
     --help, -h
@@ -17,6 +16,9 @@ Usage: tlp-cluster [options] [command] [command options]
           --instance
             Instance Type
             Default: c5d.2xlarge
+          --monitoring, -m
+            Enable monitoring (beta)
+            Default: false
           --region
             Region
             Default: us-west-2
@@ -37,19 +39,27 @@ Usage: tlp-cluster [options] [command] [command options]
     start      Start cassandra on all nodes via service command
       Usage: start [options]
         Options:
-          --sshkey, -k
-            Private key used in keypair
-            Default: /Users/jhaddad/.ssh/id_rsa
+          --all, -a
+            Start all services on all instances. This overrides all other 
+            options 
+            Default: false
+          --monitoring, -m
+            Start services on monitoring instances
+            Default: false
 
-    stop      null
-      Usage: stop
+    stop      Stop cassandra on all nodes via service command
+      Usage: stop [options]
+        Options:
+          --all, -a
+            Start all services on all instances. This overrides all other 
+            options 
+            Default: false
+          --monitoring, -m
+            Start services on monitoring instances
+            Default: false
 
     install      Install Everything
-      Usage: install [options]
-        Options:
-          --sshkey, -k
-            Private key used in keypair
-            Default: /Users/jhaddad/.ssh/id_rsa
+      Usage: install
 
     down      Shut down a cluster
       Usage: down [options]
@@ -58,8 +68,11 @@ Usage: tlp-cluster [options] [command] [command options]
             Auto approve changes
             Default: false
 
-    build      Build Cassandra (either tag or custom dir)
-      Usage: build build_name [path | tag]
+    build      Create a custom named Cassandra build from a working directory.
+      Usage: build [options] Path to build
+        Options:
+          -n
+            Name of build
 
     ls      List available builds
       Usage: ls

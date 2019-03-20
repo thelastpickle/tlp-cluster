@@ -3,21 +3,24 @@ Jon Haddad <jon@thelastpickle.com>
 :toc: left
 :icons: font
 
-This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra designed for developers looking to both benchmark and test the correctness of Apache Cassandra.  It assists with builds and starting instances on AWS.
+This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra designed for developers looking to benchmark and test Apache Cassandra.  It assists with builds and starting instances on AWS.
+
+If you are looking for a tool to aid in benchmarking these clusters please see the companion project http://thelastpickle.com/tlp-stress/[tlp-stress].
+
+If you're looking for tools to help manage Cassandra in _production_ environments please see the http://cassandra-reaper.io/[Reaper] project and https://github.com/spotify/cstar[cstar]
 
 == Prerequisites
 
 There are some AWS resources tlp-cluster expects to exist in us-west-2 (support for other regions will come soon):
 
 - An AWS access key and secret.  tlp-cluster uses https://www.terraform.io/[Terraform] to create and destroy instances.
-- A security group that allows inbound SSH traffic, and all machines in that group can talk to each other.
-- A key pair, private part of which should be present in your `~/.ssh` with `chmod 400` on it.
+- A security group that allows inbound SSH traffic, and all machines in that group can talk to each other.  This requirement will be lifted soon (see https://github.com/thelastpickle/tlp-cluster/issues/42[Issue #42]).
 
 == Installation
 
 The cluster provisioning tool is somewhat self explanatory (hopefully).
 
-It launches Cassandra clusters in AWS. In addition to Cassandra, the tool can also launch stress nodes (soon) and a prometheus node to gather all the metrics.
+It launches Cassandra clusters in AWS. In addition to Cassandra, the tool can also launch stress nodes and a prometheus node to gather all the metrics.
 
 The tool itself is written in Kotlin, leveraging Docker containers to avoid too many external dependencies.
 
@@ -30,14 +33,11 @@ cd /path/to/tlp-cluster
 ./gradlew assemble
 ----
 
-Now you can use the tool, yay.
-
-
 == Setup
 
-I don't know if will run on Windows.  We assume most people doing any serious Cassandra development will have access to a Linux box or virtual machine.
+We currently have a dependency on shell scripts meaning you'll need a Mac or Linux box to use this tool.
 
-If you've never used to the tool before, run the tool without any parameters, `bin/tlp-cluster`.   You will be asked some questions to generate a configuration file which will be placed in your `$HOME/.tlp-cluster/user.yaml`.
+If you've never used to the tool before, the first time you run a command you'll be asked to supply some information, which will generate a configuration file which will be placed in your `$HOME/.tlp-cluster/profiles/default/settings.yaml`.
 
 IMPORTANT: We currently only support the ubuntu 16 ami in us-west-2.  We'd love a pull request to improve this!
 
@@ -56,7 +56,7 @@ include::includes/help.txt[]
 
 == Initialize a Cluster
 
-The tool uses the current working directory as a project, of sorts. To get started, run the following, substituting your customer, ticket and purpose.  This is an artifact of how we work on projects at TLP.
+The tool uses the current working directory as a project, of sorts. To get started, run the following, substituting your customer / project, ticket and purpose.
 
 [source,bash]
 ----
@@ -65,13 +65,13 @@ tlp-cluster init CLIENT TICKET PURPOSE
 
 Where:
 
-* `CLIENT` - Name of the customer or client associated with the work you are doing with `tlp-cluster`.
-* `TICKET` - Jira ticket number associated with the work you are doing with `tlp-cluster`.
+* `CLIENT` - Name of the customer, client, or project associated with the work you are doing with `tlp-cluster`.
+* `TICKET` - Jira or github ticket number associated with the work you are doing with `tlp-cluster`.
 * `PURPOSE` - Reason why you are creating the cluster.
 
-This will initialize the current directory with a terraform.tf.json. You can open this up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.
+This will initialize the current directory with a terraform.tf.json. You can open this up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.  Generally speaking though, you shouldn't have to do this.  If you find yourself doing it often, please submit an https://github.com/thelastpickle/tlp-cluster/issues[issue] describing your requirements and we'll work with you to solve the problem.
 
-Certain instances types may not work with the ami that's hard coded.
+Certain instances types may not work with the ami that's hard coded at the moment, we're looking to fix / improve this.
 
 
 == Launch Instances
@@ -108,9 +108,8 @@ Simply replace 3.11.4 with the release version.
 
 To install Cassandra on your instances, you will need to follow these steps:
 
-1. Build the version you need and give it a build name (optional).
-2. Select the build name you want install.
-3. Install the selected build.
+1. Build the version you need and give it a build name (optional)
+2. Tell tlp-cluster to use the custom build
 
 The first step is optional because you may already have a build in the `~/.tlp-cluster/build` directory that you want to use.
 
@@ -118,14 +117,13 @@ If you have no builds you will need to run the following:
 
 [source,bash]
 ----
-tlp-cluster build BUILD_NAME [CASSANDRA_TAG | CASSANDRA_LOCAL_REPO]
+tlp-cluster build -n BUILD_NAME /path/to/repo
 ----
 
 Where:
 
 * `BUILD_NAME` - Name you want to give the build e.g. my-build-cass-4.0.
-* `CASSANDRA_TAG` - The version number of a tagged Cassandra build e.g. `3.11.3`. Use this if you want to deploy already existing released version of Cassandra to your cluster.
-* `CASSANDRA_LOCAL_REPO` - Full path to clone of the Cassandra repository. Use this if you want to deploy a custom version of Cassandra to your cluster.
+* `/path/to/repo` - Full path to clone of the Cassandra repository.
 
 If you already have a build that you would like to use you can run the following:
 
@@ -142,7 +140,7 @@ To provision the instances run the following:
 
 [source,bash]
 ----
-tlp-cluster install -k SSH_KEY_PATH
+tlp-cluster install
 ----
 
 Where:
