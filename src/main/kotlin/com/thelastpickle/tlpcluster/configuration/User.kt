@@ -10,6 +10,7 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider
 import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.ec2.Ec2Client
+import software.amazon.awssdk.services.ec2.model.AuthorizeSecurityGroupEgressRequest
 import java.io.File
 import software.amazon.awssdk.services.ec2.model.CreateKeyPairResponse
 import software.amazon.awssdk.services.ec2.model.CreateKeyPairRequest
@@ -63,16 +64,17 @@ data class User(
             // TODO: Abstract the provider out
             // tlp cluster should have its own provider that uses the following order:
             // tlp-cluster config, AWS config
+            val uuid = UUID.randomUUID().toString()
+
             val ec2 = Ec2Client.builder().region(region)
                     .credentialsProvider { creds }
                     .build()
 
-            val keyName = "tlp-cluster-${UUID.randomUUID()}"
+            val keyName = "tlp-cluster-$uuid"
             val request = CreateKeyPairRequest.builder()
                     .keyName(keyName).build()
 
             val response = ec2.createKeyPair(request)
-
 
 
             // write the private key into the ~/.tlp-cluster/profiles/<profile>/ dir
@@ -81,13 +83,16 @@ data class User(
             secret.writeText(response.keyMaterial())
 
 
-            val securityGroup = email + UUID.randomUUID().toString()
+            val securityGroup = "$email-$uuid"
             val scRequest = CreateSecurityGroupRequest.builder()
                     .groupName(email)
                     .description("tlp-cluster security group")
                     .build()
+
             log.info { "Creating security group $scRequest" }
-            ec2.createSecurityGroup(scRequest)
+            val newSG = ec2.createSecurityGroup(scRequest)
+
+            AuthorizeSecurityGroupEgressRequest
 
             //val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
             //val sshKeyPath = Utils.resolveSshKeyPath(Utils.prompt("What is the path to the private key associated with your AWS SSH key pair?", default = ""))
