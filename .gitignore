@@ -25,9 +25,10 @@
 /terraform.tfstate.backup
 /DockerfileSSH*
 /DockerfileCassandra_*
-/logs/
+logs/
 sshConfig
 /scripts
+logs
 
 
 # Created by https://www.gitignore.io/api/eclipse

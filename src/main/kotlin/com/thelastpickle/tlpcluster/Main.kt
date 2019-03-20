@@ -18,14 +18,7 @@ fun main(arguments: Array<String>) {
 
     val logger = logger("com.thelastpickle.tlpcluster.MainKt")
 
-
-    // this will automatically clone the C* repo
-    val cassFp = File(System.getProperty("user.home"), "/.tlp-cluster/cassandra")
-    val cass = Cassandra(cassFp)
-
-    // make sure we can do cassandra builds
-
-    val context = Context(tlpclusterUserDirectory, cass)
+    val context = Context(tlpclusterUserDirectory)
 
     val jcommander = JCommander.newBuilder().programName("tlp-cluster")
 
