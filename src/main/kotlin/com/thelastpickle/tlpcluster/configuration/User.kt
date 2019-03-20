@@ -3,6 +3,7 @@ package com.thelastpickle.tlpcluster.configuration
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.Utils
 import org.apache.http.impl.client.BasicCredentialsProvider
+import org.apache.logging.log4j.kotlin.logger
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.AwsCredentials
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider
@@ -12,6 +13,7 @@ import software.amazon.awssdk.services.ec2.Ec2Client
 import java.io.File
 import software.amazon.awssdk.services.ec2.model.CreateKeyPairResponse
 import software.amazon.awssdk.services.ec2.model.CreateKeyPairRequest
+import software.amazon.awssdk.services.ec2.model.CreateSecurityGroupRequest
 import java.util.*
 
 
@@ -31,6 +33,8 @@ data class User(
     var awsSecret: String
 ) {
     companion object {
+
+        var log = logger()
         /**
          * Asks a bunch of questions and generates the user file
          */
@@ -69,13 +73,23 @@ data class User(
 
             val response = ec2.createKeyPair(request)
 
+
+
             // write the private key into the ~/.tlp-cluster/profiles/<profile>/ dir
 
             val secret = File(context.profileDir, "secret.pem")
             secret.writeText(response.keyMaterial())
 
 
-            val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
+            val securityGroup = email + UUID.randomUUID().toString()
+            val scRequest = CreateSecurityGroupRequest.builder()
+                    .groupName(email)
+                    .description("tlp-cluster security group")
+                    .build()
+            log.info { "Creating security group $scRequest" }
+            ec2.createSecurityGroup(scRequest)
+
+            //val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
             //val sshKeyPath = Utils.resolveSshKeyPath(Utils.prompt("What is the path to the private key associated with your AWS SSH key pair?", default = ""))
 
 
