@@ -7,15 +7,21 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.configuration.ServerType
 import java.io.File
+import java.net.URL
 
-class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
+class Configuration(val ticket: String,
+                    val client: String,
+                    val purpose: String,
                     var region: String = "us-west-2",
                     var context: Context) {
 
     var numCassandraInstances = 3
-    val usEebs = false
     var email = context.userConfig.email
 
+    val tags = mutableMapOf("ticket" to ticket,
+        "client" to client,
+        "purpose" to purpose,
+        "email" to email)
 
     var cassandraInstanceType = "m5d.xlarge"
     val cassandraAMI = "ami-51537029"
@@ -49,29 +55,29 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
         return this
     }
 
-    private fun setResource(key: String,
-                            ami: String,
-                            instanceType: String,
-                            count: Int,
-                            tags: MutableMap<String, String>) : Configuration {
-        val conf = Resource(ami, instanceType, tags, count = count)
+    private fun getExternalIpAddress() : String {
+        return URL("http://api.ipify.org/").readText()
+    }
+
+    private fun setInstanceResource(key: String,
+                                    ami: String,
+                                    instanceType: String,
+                                    count: Int,
+                                    securityGroups: List<String>,
+                                    tags: MutableMap<String, String>) : Configuration {
+        val conf = InstanceResource(ami, instanceType, tags, security_groups = securityGroups, count = count)
         config.resource.aws_instance[key] = conf
+        return this
+    }
+
+    private fun setSecurityGroupResource(securityGroup: SecurityGroupResource) : Configuration {
+        config.resource.aws_security_group[securityGroup.name] = securityGroup
         return this
     }
 
     private fun setTagName(tags: MutableMap<String, String>, nodeType: ServerType) : MutableMap<String, String> {
         val newTags = HashMap<String, String>(tags).toMutableMap()
-        val ticketTag by lazy {
-            var tagValue = tags.getOrDefault("ticket", "")
-
-            if (tagValue.isNotEmpty()) {
-                tagValue = "${tagValue}_"
-            }
-
-            tagValue
-        }
-
-        newTags["Name"] = "${ticketTag}${nodeType.serverType}"
+        newTags["Name"] = "${ticket}_${nodeType.serverType}"
         return newTags
     }
 
@@ -92,9 +98,39 @@ class Configuration(val tags: MutableMap<String, String> = mutableMapOf(),
         setVariable("region", region)
         setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
 
-        setResource("cassandra", cassandraAMI, cassandraInstanceType, numCassandraInstances, setTagName(tags, ServerType.Cassandra))
-        setResource("stress", stressAMI, stressInstanceType, numStressInstances, setTagName(tags, ServerType.Stress))
-        setResource("monitoring", monitoringAMI, monitoringInstanceType, if (monitoring) 1 else 0, setTagName(tags, ServerType.Monitoring))
+        val externalCidr = listOf("${getExternalIpAddress()}/32")
+        val instanceSg = SecurityGroupResource.Builder()
+            .newSecurityGroupResource("${ticket}_TlpClusterSG","tlp-cluster ${ticket} security group", tags)
+            .withOutboundRule(0, 65535, "tcp", listOf("0.0.0.0/0"), "All traffic")
+            .withInboundRule(22, 22, "tcp", externalCidr, "SSH")
+            .withInboundSelfRule(0, 65535, "tcp", "Intra node")
+            .withInboundRule(9090, 9090, "tcp", externalCidr, "Prometheus GUI")
+            .withInboundRule(3000, 3000, "tcp", externalCidr, "Grafana GUI")
+            .build()
+
+        setSecurityGroupResource(instanceSg)
+
+        setInstanceResource(
+            "cassandra",
+            cassandraAMI,
+            cassandraInstanceType,
+            numCassandraInstances,
+            listOf(instanceSg.name),
+            setTagName(tags, ServerType.Cassandra))
+        setInstanceResource(
+            "stress",
+            stressAMI,
+            stressInstanceType,
+            numStressInstances,
+            listOf(instanceSg.name),
+            setTagName(tags, ServerType.Stress))
+        setInstanceResource(
+            "monitoring",
+            monitoringAMI,
+            monitoringInstanceType,
+            if (monitoring) 1 else 0,
+            listOf(instanceSg.name),
+            setTagName(tags, ServerType.Monitoring))
 
         return this
     }
@@ -119,22 +155,85 @@ class TerraformConfig(@JsonIgnore val region: String,
     val resource = AWSResource()
 }
 
-
 data class Provider(val region: String,
                     val access_key: String,
                     val secret_key: String)
 
 data class Variable(val default: Any?, val type: String? = null)
 
-data class Resource(val ami: String = "ami-5153702",
-                    val instance_type: String = "m5d.xlarge",
-                    val tags: Map<String, String> = mapOf(),
-                    val security_groups : String = "\${var.security_groups}",
-                    val key_name : String = "\${var.key_name}",
-                    val availability_zone: String = "\${element(var.zones, count.index)}",
-                    val count : Int
+data class InstanceResource(
+    val ami: String = "ami-5153702",
+    val instance_type: String = "m5d.xlarge",
+    val tags: Map<String, String> = mapOf(),
+    val security_groups : List<String> = listOf(),
+    val key_name : String = "\${var.key_name}",
+    val availability_zone: String = "\${element(var.zones, count.index)}",
+    val count : Int
 )
 
-data class AWSResource(var aws_instance : MutableMap<String, Resource> = mutableMapOf() )
+data class SecurityGroupRule(
+    val description: String,
+    val from_port : Int,
+    val to_port: Int,
+    val protocol: String = "tcp",
+    val self: Boolean = false,
+    val cidr_blocks: List<String> = listOf()
+)
 
+data class SecurityGroupResource(
+    val name: String,
+    val description : String,
+    val tags: Map<String, String>,
+    val ingress: List<SecurityGroupRule>,
+    val egress: List<SecurityGroupRule>
+) {
+    class Builder {
+        private var name: String = ""
+        private var description: String = ""
+        private var tags: Map<String, String> = mutableMapOf()
+        private var ingress: MutableList<SecurityGroupRule> = mutableListOf()
+        private var egress: MutableList<SecurityGroupRule> = mutableListOf()
 
+        fun newSecurityGroupResource(name: String, description: String, tags: Map<String, String>) : Builder {
+            this.name = name
+            this.description = description
+            this.tags = tags
+
+            return this
+        }
+
+        fun withInboundSelfRule(from_port: Int, to_port: Int, protocol: String, description: String) : Builder {
+            this.ingress.add(SecurityGroupRule(description, from_port, to_port, protocol, self = true))
+            return this
+        }
+
+        fun withInboundRule(
+            from_port: Int,
+            to_port: Int,
+            protocol: String,
+            cidr_blocks: List<String>,
+            description: String) : Builder {
+
+            this.ingress.add(SecurityGroupRule(description, from_port, to_port, protocol, cidr_blocks = cidr_blocks))
+            return this
+        }
+
+        fun withOutboundRule(
+            from_port: Int,
+            to_port: Int,
+            protocol: String,
+            cidr_blocks: List<String>,
+            description: String) : Builder {
+
+            this.egress.add(SecurityGroupRule(description, from_port, to_port, protocol, cidr_blocks = cidr_blocks))
+            return this
+        }
+
+        fun build () = SecurityGroupResource(name, description, tags, ingress, egress)
+    }
+}
+
+data class AWSResource(
+    var aws_instance : MutableMap<String, InstanceResource> = mutableMapOf(),
+    var aws_security_group : MutableMap<String, SecurityGroupResource> = mutableMapOf()
+)
