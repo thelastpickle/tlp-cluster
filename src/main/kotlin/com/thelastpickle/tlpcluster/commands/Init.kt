@@ -75,11 +75,7 @@ class Init(val context: Context) : ICommand {
             FileUtils.copyInputStreamToFile(input, output)
         }
 
-        val configTags = mutableMapOf("ticket" to ticket,
-                    "client" to client,
-                    "purpose" to purpose)
-
-        val config = Configuration(configTags, region = context.userConfig.region, context = context)
+        val config = Configuration(ticket, client, purpose, region = context.userConfig.region, context = context)
 
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
