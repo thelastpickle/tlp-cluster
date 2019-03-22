@@ -93,75 +93,42 @@ class Configuration(val ticket: String,
         setVariable("region", region)
         setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
 
-        val vpcInteralCidr = listOf("172.31.0.0/16")
-        val allTrafficCidr = listOf("0.0.0.0/0")
-
-        val outboundAllTrafficRule = SecurityGroupRule(
-            0,
-            65535,
-            "tcp",
-            allTrafficCidr,
-            "All traffic",
-            SecurityGroupRule.Direction.Outbound)
-
-        val inboundSshTrafficRule = SecurityGroupRule(
-            22,
-            22,
-            "tcp",
-            allTrafficCidr,
-            "SSH",
-            SecurityGroupRule.Direction.Inbound)
-
-        val cassandraSg = SecurityGroupResource.Builder()
-            .newSecurityGroupResource("${ticket}_CassandraSG","Cassandra instance security group", tags)
-            .withRule(outboundAllTrafficRule)
-            .withRule(inboundSshTrafficRule)
-            .withRule(7000, 7001, "tcp", vpcInteralCidr, "Intra node", SecurityGroupRule.Direction.Inbound)
-            .withRule(7199, 7199, "tcp", vpcInteralCidr, "JMX", SecurityGroupRule.Direction.Inbound)
-            .withRule(9042, 9042,"tcp", vpcInteralCidr, "Native transport", SecurityGroupRule.Direction.Inbound)
-            .withRule(9160, 9160,"tcp", vpcInteralCidr, "Thrift", SecurityGroupRule.Direction.Inbound)
+        val instanceSg = SecurityGroupResource.Builder()
+            .newSecurityGroupResource("${ticket}_TlpClusterSG","tlp-cluster ${ticket} security group", tags)
+            .withRule(0, 65535, "tcp", listOf("0.0.0.0/0"), "All traffic", SecurityGroupRule.Direction.Outbound)
+            .withRule(22, 22, "tcp", listOf("0.0.0.0/0"), "SSH", SecurityGroupRule.Direction.Inbound)
+            .withRule(7000, 7001, "tcp", listOf("172.31.0.0/16"), "Intra node", SecurityGroupRule.Direction.Inbound)
+            .withRule(7199, 7199, "tcp", listOf("172.31.0.0/16"), "JMX", SecurityGroupRule.Direction.Inbound)
+            .withRule(9042, 9042,"tcp", listOf("172.31.0.0/16"), "Native transport", SecurityGroupRule.Direction.Inbound)
+            .withRule(9160, 9160,"tcp", listOf("172.31.0.0/16"), "Thrift", SecurityGroupRule.Direction.Inbound)
+            .withRule(9090, 9090, "tcp", listOf("0.0.0.0/0"), "Prometheus GUI", SecurityGroupRule.Direction.Inbound)
+            .withRule(3000, 3000, "tcp", listOf("0.0.0.0/0"), "Grafana GUI", SecurityGroupRule.Direction.Inbound)
+            .withRule(9500, 9500,"tcp", listOf("172.31.0.0/16"), "Prometheus C* agent", SecurityGroupRule.Direction.Inbound)
+            .withRule(9501, 9501,"tcp", listOf("172.31.0.0/16"), "Prometheus Stress agent", SecurityGroupRule.Direction.Inbound)
             .build()
 
-        val monitoringSg = SecurityGroupResource.Builder()
-            .newSecurityGroupResource("${ticket}_MonitoringSG","Monitoring instance security group", tags)
-            .withRule(outboundAllTrafficRule)
-            .withRule(inboundSshTrafficRule)
-            .withRule(9090, 9090, "tcp", allTrafficCidr, "Prometheus GUI", SecurityGroupRule.Direction.Inbound)
-            .withRule(3000, 3000, "tcp", allTrafficCidr, "Grafana GUI", SecurityGroupRule.Direction.Inbound)
-            .withRule(9500, 9500,"tcp", vpcInteralCidr, "Prometheus C* agent", SecurityGroupRule.Direction.Inbound)
-            .withRule(9501, 9501,"tcp", vpcInteralCidr, "Prometheus Stress agent", SecurityGroupRule.Direction.Inbound)
-            .build()
-
-        val stressSg = SecurityGroupResource.Builder()
-            .newSecurityGroupResource("${ticket}_StressSG","tlp-stress instance security group", tags)
-            .withRule(outboundAllTrafficRule)
-            .withRule(inboundSshTrafficRule)
-            .build()
-
-        setSecurityGroupResource(cassandraSg)
-        setSecurityGroupResource(monitoringSg)
-        setSecurityGroupResource(stressSg)
+        setSecurityGroupResource(instanceSg)
 
         setInstanceResource(
             "cassandra",
             cassandraAMI,
             cassandraInstanceType,
             numCassandraInstances,
-            listOf(cassandraSg.name),
+            listOf(instanceSg.name),
             setTagName(tags, ServerType.Cassandra))
         setInstanceResource(
             "stress",
             stressAMI,
             stressInstanceType,
             numStressInstances,
-            listOf(stressSg.name),
+            listOf(instanceSg.name),
             setTagName(tags, ServerType.Stress))
         setInstanceResource(
             "monitoring",
             monitoringAMI,
             monitoringInstanceType,
             if (monitoring) 1 else 0,
-            listOf(monitoringSg.name),
+            listOf(instanceSg.name),
             setTagName(tags, ServerType.Monitoring))
 
         return this
