@@ -95,16 +95,11 @@ class Configuration(val ticket: String,
 
         val instanceSg = SecurityGroupResource.Builder()
             .newSecurityGroupResource("${ticket}_TlpClusterSG","tlp-cluster ${ticket} security group", tags)
-            .withRule(0, 65535, "tcp", listOf("0.0.0.0/0"), "All traffic", SecurityGroupRule.Direction.Outbound)
-            .withRule(22, 22, "tcp", listOf("0.0.0.0/0"), "SSH", SecurityGroupRule.Direction.Inbound)
-            .withRule(7000, 7001, "tcp", listOf("172.31.0.0/16"), "Intra node", SecurityGroupRule.Direction.Inbound)
-            .withRule(7199, 7199, "tcp", listOf("172.31.0.0/16"), "JMX", SecurityGroupRule.Direction.Inbound)
-            .withRule(9042, 9042,"tcp", listOf("172.31.0.0/16"), "Native transport", SecurityGroupRule.Direction.Inbound)
-            .withRule(9160, 9160,"tcp", listOf("172.31.0.0/16"), "Thrift", SecurityGroupRule.Direction.Inbound)
-            .withRule(9090, 9090, "tcp", listOf("0.0.0.0/0"), "Prometheus GUI", SecurityGroupRule.Direction.Inbound)
-            .withRule(3000, 3000, "tcp", listOf("0.0.0.0/0"), "Grafana GUI", SecurityGroupRule.Direction.Inbound)
-            .withRule(9500, 9500,"tcp", listOf("172.31.0.0/16"), "Prometheus C* agent", SecurityGroupRule.Direction.Inbound)
-            .withRule(9501, 9501,"tcp", listOf("172.31.0.0/16"), "Prometheus Stress agent", SecurityGroupRule.Direction.Inbound)
+            .withRule(0, 65535, "tcp", listOf("0.0.0.0/0"), false, "All traffic",  SecurityGroupRule.Direction.Outbound)
+            .withRule(22, 22, "tcp", listOf("0.0.0.0/0"), false, "SSH", SecurityGroupRule.Direction.Inbound)
+            .withRule(0, 65535, "tcp", listOf("172.31.0.0/16"), true, "Intra node", SecurityGroupRule.Direction.Inbound)
+            .withRule(9090, 9090, "tcp", listOf("0.0.0.0/0"), true, "Prometheus GUI", SecurityGroupRule.Direction.Inbound)
+            .withRule(3000, 3000, "tcp", listOf("0.0.0.0/0"), true, "Grafana GUI", SecurityGroupRule.Direction.Inbound)
             .build()
 
         setSecurityGroupResource(instanceSg)
@@ -175,6 +170,7 @@ data class SecurityGroupRule(
     val to_port: Int,
     val protocol: String = "tcp",
     val cidr_blocks: List<String> = listOf(),
+    val self: Boolean = false,
     val description : String,
     @JsonIgnore val direction: Direction
 ) {
@@ -211,12 +207,14 @@ data class SecurityGroupResource(
             to_port: Int,
             protocol: String,
             cidr_blocks: List<String>,
+            self: Boolean,
             description: String,
             direction: SecurityGroupRule.Direction) : Builder {
-            val sgRule = SecurityGroupRule(from_port, to_port, protocol, cidr_blocks, description, direction)
+            val sgRule = SecurityGroupRule(from_port, to_port, protocol, cidr_blocks, self, description, direction)
 
             return withRule(sgRule)
         }
+
 
         fun withRule(sgRule: SecurityGroupRule) : Builder {
 
