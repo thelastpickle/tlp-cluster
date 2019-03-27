@@ -19,7 +19,6 @@ import java.util.HashSet
 data class User(
     var email : String,
     var region: String,
-    var securityGroup: String,
     var keyName: String,
     var sshKeyPath: String,
 
@@ -86,17 +85,14 @@ data class User(
             log.info { "Setting secret file permissions $perms"}
             Files.setPosixFilePermissions(secret.toPath(), perms)
 
-            val securityGroup = Utils.prompt("What security group can we put our instances in?  (Must already exist.)", "")
-
-
-            val user = User(email,
-                    "us-west-2",
-                    securityGroup,
-                    keyName,
-                    secret.absolutePath,
-                    "", // future compatibility, when we start allowing people to use their existing AWS creds they've already set up.
-                    awsAccessKey,
-                    awsSecret)
+            val user = User(
+                email,
+                "us-west-2",
+                keyName,
+                secret.absolutePath,
+                "", // future compatibility, when we start allowing people to use their existing AWS creds they've already set up.
+                awsAccessKey,
+                awsSecret)
 
             context.yaml.writeValue(location, user)
         }
