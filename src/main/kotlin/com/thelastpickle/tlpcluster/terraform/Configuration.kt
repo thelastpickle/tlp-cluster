@@ -83,18 +83,9 @@ class Configuration(val ticket: String,
 
 
     private fun build() : Configuration {
-        // set all the configuration variables
-        // update tags
-        // Name = "${var.email} {$var.ticket} stress"
-
-        setVariable("cassandra_instance_type", cassandraInstanceType)
-        setVariable("stress_instance_type", stressInstanceType)
         setVariable("email", email)
-        setVariable("security_groups", Variable(listOf(context.userConfig.securityGroup), "list"))
         setVariable("key_name", context.userConfig.keyName)
         setVariable("key_path", context.userConfig.sshKeyPath)
-        setVariable("cassandra_instance_name", "cassandra-node")
-        setVariable("stress_instance_name", "stress-instance")
         setVariable("region", region)
         setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
 
