@@ -1,0 +1,11 @@
+---
+regions:
+  us-west-2:
+    amis:
+      ebs: ami-0013ea6a76d3b8874
+      instance: ami-0fdf0d5b47d0cba88
+    azs:
+      - us-west-2a
+      - us-west-2b
+      - us-west-2c
+      - us-west-2d

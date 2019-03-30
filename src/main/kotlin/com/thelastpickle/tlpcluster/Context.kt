@@ -10,6 +10,7 @@ import com.github.dockerjava.netty.NettyDockerCmdExecFactory
 import com.thelastpickle.tlpcluster.configuration.TFState
 import com.thelastpickle.tlpcluster.configuration.User
 import org.apache.logging.log4j.kotlin.logger
+import com.thelastpickle.tlpcluster.configuration.Yaml
 import java.io.File
 import java.nio.file.Files
 
@@ -48,8 +49,8 @@ data class Context(val tlpclusterUserDirectory: File) {
      *
      * val state = mapper.readValue<MyStateObject>(json)
      */
-    val yaml = ObjectMapper(YAMLFactory()).registerKotlinModule()
     val json = ObjectMapper()
+    val yaml : ObjectMapper by YamlDelegate()
 
     private val userConfigFile = File(profileDir, "settings.yaml")
 
