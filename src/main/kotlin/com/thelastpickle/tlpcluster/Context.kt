@@ -9,6 +9,7 @@ import com.github.dockerjava.core.DockerClientBuilder
 import com.github.dockerjava.netty.NettyDockerCmdExecFactory
 import com.thelastpickle.tlpcluster.configuration.TFState
 import com.thelastpickle.tlpcluster.configuration.User
+import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.nio.file.Files
 
@@ -24,6 +25,8 @@ data class Context(val tlpclusterUserDirectory: File) {
     init {
         profileDir.mkdirs()
     }
+
+    val log = logger()
 
     fun createBuildSkeleton(name: String) {
 
@@ -53,6 +56,7 @@ data class Context(val tlpclusterUserDirectory: File) {
     // this will let us write out the yaml
     val userConfig by lazy {
         if(!userConfigFile.exists()) {
+            log.debug { "$userConfigFile not found, going through interactive setup" }
             profilesDir.mkdirs()
             User.createInteractively(this, userConfigFile)
         }
@@ -89,7 +93,13 @@ data class Context(val tlpclusterUserDirectory: File) {
          */
         fun testContext() : Context {
             val testTempDirectory = Files.createTempDirectory("tlpcluster")
-            return Context(testTempDirectory.toFile())
+            // create a default profile
+            // generate a fake key
+            val user = User("test@thelastpickle.com", "us-west-2", "test", "test", "test", "test", "test")
+
+            val context = Context(testTempDirectory.toFile())
+            context.yaml.writeValue(context.userConfigFile, user)
+            return context
         }
     }
 }
