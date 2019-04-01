@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.apache.logging.log4j.kotlin.logger
+import java.io.File
 import java.util.zip.GZIPInputStream
 
 /**
@@ -30,15 +31,23 @@ class Instances(val instances : List<Instance>) {
 
 
     companion object {
-        fun load() : Instances {
+        val json = ObjectMapper().registerKotlinModule()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+
+        fun loadFromCSV() : Instances {
             val log = logger()
-            val json = ObjectMapper().registerKotlinModule()
-                    .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
             log.debug { "Loading instance data" }
 
             val url = GZIPInputStream(this::class.java.getResource("instances.json.gz").openStream())
 
             return Instances(json.readValue(url))
         }
+
     }
+
+    fun saveJson(fp: File) {
+        json.writeValue(fp, instances)
+    }
+
 }
