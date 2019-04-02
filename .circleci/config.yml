@@ -20,4 +20,4 @@ jobs:
       - checkout
       - run: ./gradlew test --stacktrace
       - store_test_results:
-          path: /home/circleci/repo/build/reports/tests/test/
+          path: build/reports/tests/test
