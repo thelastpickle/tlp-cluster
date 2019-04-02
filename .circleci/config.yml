@@ -19,3 +19,5 @@ jobs:
       - run: sudo apt-get install docker-ce docker-ce-cli containerd.io
       - checkout
       - run: ./gradlew test
+      - store_test_results:
+          path: /home/circleci/repo/build/reports/tests/test/
