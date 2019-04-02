@@ -18,4 +18,4 @@ jobs:
       - run: sudo apt-get update
       - run: sudo apt-get install docker-ce docker-ce-cli containerd.io
       - checkout
-      - run: ./gradlew test -i
+      - run: ./gradlew test
