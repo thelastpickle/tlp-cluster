@@ -16,12 +16,14 @@ class BuildCassandra(val context: Context)  : ICommand {
     @Parameter(description = "Name of build", names = ["-n"])
     lateinit var name : String
 
-    @Parameter(description = "Path to build", converter = FileConverter::class)
-    lateinit var location : File
+    @Parameter(description = "Path to build")
+    lateinit var location : String
 
     override fun execute() {
 
-        if(!location.exists()) {
+        val dir = File(location)
+
+        if(!dir.exists()) {
             throw CassandraDirectoryNotFound()
         }
 
@@ -33,6 +35,6 @@ class BuildCassandra(val context: Context)  : ICommand {
         cassandraBuilder.buildContainer()
         println("Starting cassandra build process")
         
-        cassandraBuilder.runBuild(location.absolutePath, name)
+        cassandraBuilder.runBuild(dir.absolutePath, name)
     }
 }
