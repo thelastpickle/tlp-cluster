@@ -22,7 +22,7 @@ class ResourceFile(val resource: URL) {
 
         if(!tmpDir.exists()) {
             log.debug { "Creating temporary directory at $tmpDir" }
-            tmpDir.mkdir()
+            tmpDir.mkdirs()
         }
 
 
