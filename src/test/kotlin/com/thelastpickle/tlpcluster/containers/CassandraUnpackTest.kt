@@ -25,6 +25,15 @@ internal class CassandraUnpackTest {
         downloadDirFile.mkdirs()
 
         downloadDir = Files.createTempDirectory(downloadDirFile.toPath(), "test")
+
+        val downloadLocation = File("test/unpack")
+        downloadLocation.mkdirs()
+
+        if(!downloadLocation.exists()) {
+            throw Exception("Unpack directory $downloadLocation does not exist")
+        }
+
+        downloadDir = Files.createTempDirectory(downloadLocation.toPath(),  "test")
         unpacker = CassandraUnpack(context, "2.1.14", downloadDir)
     }
 
