@@ -5,12 +5,13 @@ import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
 import org.apache.logging.log4j.kotlin.logger
 import java.io.File
+import java.io.InputStream
 import java.net.URL
 
 /**
  * Creates a temporary file from a resource location
  */
-class ResourceFile(val resource: URL) {
+class ResourceFile(val resource: InputStream) {
 
     val fp: File
     val log = logger()
@@ -25,14 +26,12 @@ class ResourceFile(val resource: URL) {
             tmpDir.mkdirs()
         }
 
-
-
         fp = File.createTempFile(
-                FilenameUtils.getBaseName(resource.file),
-                FilenameUtils.getExtension(resource.file),
+                FilenameUtils.getBaseName("resource"),
+                FilenameUtils.getExtension("tmp"),
                 tmpDir)
 
-        IOUtils.copy(resource.openStream(), FileUtils.openOutputStream(fp))
+        IOUtils.copy(resource, FileUtils.openOutputStream(fp))
 
     }
 
