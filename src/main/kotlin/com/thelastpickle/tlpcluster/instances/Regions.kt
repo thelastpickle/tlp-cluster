@@ -9,8 +9,13 @@ import org.apache.logging.log4j.kotlin.logger
 /**
  * Container and loader for region specific information
  * Here we can grab all the regions and their cooresponding amis and azs
+ *
+ * This file is generated from other locations
  */
 data class Regions(val regions: Map<String, Region>) {
+
+    data class Ami(val ebs: String, val instance: String)
+    data class Region(val azs: List<String>, val amis: Ami)
 
     companion object {
         val log = logger()
@@ -26,3 +31,4 @@ data class Regions(val regions: Map<String, Region>) {
     }
 
 }
+
