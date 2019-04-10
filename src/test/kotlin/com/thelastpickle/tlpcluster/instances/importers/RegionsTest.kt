@@ -1,8 +1,7 @@
-package com.thelastpickle.tlpcluster.instances
+package com.thelastpickle.tlpcluster.instances.importers
 
-import com.thelastpickle.tlpcluster.Context
+import com.thelastpickle.tlpcluster.instances.Regions
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

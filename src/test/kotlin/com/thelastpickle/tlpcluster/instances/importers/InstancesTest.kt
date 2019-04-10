@@ -1,4 +1,4 @@
-package com.thelastpickle.tlpcluster.instances
+package com.thelastpickle.tlpcluster.instances.importers
 
 import org.junit.jupiter.api.Test
 

@@ -1,4 +1,4 @@
-package com.thelastpickle.tlpcluster.instances
+package com.thelastpickle.tlpcluster.instances.importers
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
