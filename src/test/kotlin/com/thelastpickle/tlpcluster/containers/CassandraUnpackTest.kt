@@ -21,7 +21,10 @@ internal class CassandraUnpackTest {
     @BeforeEach
     fun setupUnpacker() {
         context = Context.testContext()
-        downloadDir = Files.createTempDirectory("test")
+        val downloadDirFile = File("test/downloads")
+        downloadDirFile.mkdirs()
+
+        downloadDir = Files.createTempDirectory(downloadDirFile.toPath(), "test")
         unpacker = CassandraUnpack(context, "2.1.14", downloadDir)
     }
 

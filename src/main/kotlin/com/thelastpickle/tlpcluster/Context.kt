@@ -12,6 +12,7 @@ import com.thelastpickle.tlpcluster.configuration.User
 import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 
 data class Context(val tlpclusterUserDirectory: File) {
 
@@ -92,7 +93,11 @@ data class Context(val tlpclusterUserDirectory: File) {
          * Used only for testing
          */
         fun testContext() : Context {
-            val testTempDirectory = Files.createTempDirectory("tlpcluster")
+            File("build/testContext")
+            val tmpContentParent = File("test/contexts")
+            tmpContentParent.mkdirs()
+
+            val testTempDirectory = Files.createTempDirectory(tmpContentParent.toPath(), "tlpcluster")
             // create a default profile
             // generate a fake key
             val user = User("test@thelastpickle.com", "us-west-2", "test", "test", "test", "test", "test")
