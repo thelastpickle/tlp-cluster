@@ -21,17 +21,19 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 data class UbuntuImporter(val aaData: List<Ami>) {
 
     val image = "bionic"
+    val targetReleaseDate = "20190320"
 
     @JsonDeserialize(using = AmiDeserializer::class)
     data class Ami(val region: String,
                    val release: String,
+                   val releaseDate: String,
                    val instance_type: String,
                    val ami: String)
 
     class AmiDeserializer : JsonDeserializer<Ami>() {
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Ami {
             val data = json.readValue(p, List::class.java).map { it.toString() }
-            return Ami(data[0], data[1], data[4], extractAmi(data[6]))
+            return Ami(data[0], data[1], data[5], data[4], extractAmi(data[6]))
         }
 
     }
@@ -56,7 +58,9 @@ data class UbuntuImporter(val aaData: List<Ami>) {
 
     fun getAmis(region: String) : List<Ami> {
        return aaData.filter {
-           it.region == region && it.release == image
+           it.region == region
+                   && it.release == image
+                   && it.releaseDate == targetReleaseDate
        }
     }
 
