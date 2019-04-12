@@ -65,7 +65,7 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
 
         val yaml : ObjectMapper by YamlDelegate(true)
         /**
-         *
+         * used for building out the regions.yaml and instances.yaml
          */
         fun loadFromCompressedCSV() : InstancesImporter {
             val log = logger()
