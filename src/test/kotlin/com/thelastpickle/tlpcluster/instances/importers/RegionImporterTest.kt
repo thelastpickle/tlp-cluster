@@ -9,6 +9,5 @@ internal class RegionImporterTest {
     @Test
     fun testLoad() {
         val data = RegionImporter.loadFromJson()
-        println(data)
     }
 }
