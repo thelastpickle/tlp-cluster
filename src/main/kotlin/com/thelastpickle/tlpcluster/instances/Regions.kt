@@ -7,6 +7,7 @@ import com.thelastpickle.tlpcluster.instances.importers.InstancesImporter
 import com.thelastpickle.tlpcluster.instances.importers.RegionImporter
 import com.thelastpickle.tlpcluster.instances.importers.UbuntuImporter
 import org.apache.logging.log4j.kotlin.logger
+import java.io.File
 import java.io.OutputStream
 import java.util.NoSuchElementException
 
@@ -73,11 +74,24 @@ data class Regions(val regions: Map<String, Region>) {
         }
 
 
+
+
     }
 
     operator fun get(region: String) : Region? {
         return regions[region]
     }
 
+    fun write() {
+        val fp = File("src/main/resources/com/thelastpickle/tlpcluster/instances/regions.yaml")
+        yaml.writeValue(fp, this)
+    }
 }
 
+/**
+ * convenience function to regenerate the regions.yaml
+ */
+fun main() {
+    val regions = Regions.createRegions()
+    regions.write()
+}
