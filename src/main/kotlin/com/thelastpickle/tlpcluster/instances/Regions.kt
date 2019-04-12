@@ -17,8 +17,8 @@ import org.apache.logging.log4j.kotlin.logger
  */
 data class Regions(val regions: Map<String, Region>) {
 
-    data class Ami(val ebs: String, val instance: String)
     data class Region(val azs: List<String>, val amis: Ami)
+    data class Ami(val ebs: String, val instance: String)
 
     companion object {
         val log = logger()
@@ -38,9 +38,18 @@ data class Regions(val regions: Map<String, Region>) {
             val ubuntu = UbuntuImporter.loadFromResource()
             val instances = InstancesImporter.loadFromCSV()
 
+            for(region in regionImporter.regions) {
+                // get all the AZs
+                // for each instance type get the right ami
+            }
+
         }
 
 
+    }
+
+    operator fun get(region: String) : Region? {
+        return regions[region]
     }
 
 }
