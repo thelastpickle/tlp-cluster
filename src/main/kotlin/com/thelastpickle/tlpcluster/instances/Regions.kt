@@ -8,7 +8,6 @@ import com.thelastpickle.tlpcluster.instances.importers.RegionImporter
 import com.thelastpickle.tlpcluster.instances.importers.UbuntuImporter
 import org.apache.logging.log4j.kotlin.logger
 import java.io.File
-import java.io.OutputStream
 import java.util.NoSuchElementException
 
 
@@ -40,7 +39,7 @@ data class Regions(val regions: Map<String, Region>) {
         fun createRegions() : Regions {
             val regionImporter = RegionImporter.loadFromJson()
             val ubuntu = UbuntuImporter.loadFromResource()
-            val instances = InstancesImporter.loadFromCSV()
+            val instances = InstancesImporter.loadFromCompressedCSV()
 
             val regions = mutableMapOf<String, Region>()
 

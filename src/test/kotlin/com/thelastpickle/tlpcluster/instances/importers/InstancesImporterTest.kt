@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 internal class InstancesImporterTest {
     @Test
     fun testLoad() {
-        val data = InstancesImporter.loadFromCSV()
+        val data = InstancesImporter.loadFromCompressedCSV()
         println(data.instances.first())
 
 

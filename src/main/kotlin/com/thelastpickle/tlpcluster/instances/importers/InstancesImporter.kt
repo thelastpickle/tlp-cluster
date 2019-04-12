@@ -61,7 +61,10 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
         val json = ObjectMapper().registerKotlinModule()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-        fun loadFromCSV() : InstancesImporter {
+        /**
+         *
+         */
+        fun loadFromCompressedCSV() : InstancesImporter {
             val log = logger()
 
             log.debug { "Loading instance data" }
