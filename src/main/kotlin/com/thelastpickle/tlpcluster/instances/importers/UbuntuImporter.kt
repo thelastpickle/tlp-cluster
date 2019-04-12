@@ -18,7 +18,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 // "<a href=\"https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-71e2b40e\">ami-71e2b40e</a>",
 // "hvm"
 
-data class Ubuntu(val aaData: List<Ami>) {
+data class UbuntuImporter(val aaData: List<Ami>) {
 
     @JsonDeserialize(using = AmiDeserializer::class)
     data class Ami(val region: String,
@@ -37,7 +37,7 @@ data class Ubuntu(val aaData: List<Ami>) {
         val json = ObjectMapper().registerKotlinModule()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-        fun loadFromResource() : Ubuntu {
+        fun loadFromResource() : UbuntuImporter {
             val data = this::class.java.getResourceAsStream("ubuntu.json")
             return json.readValue(data)
         }

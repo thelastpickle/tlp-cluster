@@ -17,7 +17,7 @@ import java.util.zip.GZIPInputStream
  * compressed with gzip -9 instances.json
  *
  */
-class Instances(val instances : List<Instance>) {
+class InstancesImporter(val instances : List<Instance>) {
     data class Instance(val instance_type: String,
                         val memory: Double,
                         val ebs_optimized: Boolean,
@@ -34,14 +34,14 @@ class Instances(val instances : List<Instance>) {
         val json = ObjectMapper().registerKotlinModule()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-        fun loadFromCSV() : Instances {
+        fun loadFromCSV() : InstancesImporter {
             val log = logger()
 
             log.debug { "Loading instance data" }
 
             val url = GZIPInputStream(this::class.java.getResource("instances.json.gz").openStream())
 
-            return Instances(json.readValue(url))
+            return InstancesImporter(json.readValue(url))
         }
 
     }

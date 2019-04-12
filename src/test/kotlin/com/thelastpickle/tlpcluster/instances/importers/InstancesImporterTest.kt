@@ -2,10 +2,10 @@ package com.thelastpickle.tlpcluster.instances.importers
 
 import org.junit.jupiter.api.Test
 
-internal class InstancesTest {
+internal class InstancesImporterTest {
     @Test
     fun testLoad() {
-        val data = Instances.loadFromCSV()
+        val data = InstancesImporter.loadFromCSV()
         println(data.instances.first())
     }
 }

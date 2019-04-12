@@ -27,7 +27,7 @@ class Up(val context: Context) : ICommand {
             return
         }
 
-        println("""Instances have been provisioned.
+        println("""InstancesImporter have been provisioned.
 
 You can edit the provisioning scripts before running them, they've been copied to ./provisioning.
 
