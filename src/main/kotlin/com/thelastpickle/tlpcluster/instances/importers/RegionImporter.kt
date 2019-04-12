@@ -5,8 +5,27 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
+/**
+ * Pulled from https://raw.githubusercontent.com/jsonmaur/aws-regions/master/regions.json
+ * Saved as regions.json
+  */
+//
 data class RegionImporter(val regions: List<Region>) {
 
+    /**
+     * Example:
+     * name = "N. Virginia"
+     * full_name = "US East (N. Virginia)"
+     * code = "us-east-1"
+     * public = true
+     * zones = {ArrayList@2691}  size = 6
+     *  0 = "us-east-1a"
+     *  1 = "us-east-1b"
+     *  2 = "us-east-1c"
+     *  3 = "us-east-1d"
+     *  4 = "us-east-1e"
+     *  5 = "us-east-1f"
+     */
     data class Region(val name: String,
                       val full_name: String,
                       val code: String,
@@ -21,6 +40,13 @@ data class RegionImporter(val regions: List<Region>) {
             val stream = this::class.java.getResourceAsStream("regions.json")
             return RegionImporter(json.readValue(stream))
         }
+    }
+
+    fun getRegion(shortname: String) : Region {
+        //regions.
+        return regions.filter {
+            it.code == shortname
+        }.first()
     }
 
 }

@@ -41,6 +41,7 @@ data class Regions(val regions: Map<String, Region>) {
             for(region in regionImporter.regions) {
                 // get all the AZs
                 // for each instance type get the right ami
+//                val azs = regionImporter.regions.
             }
 
         }
