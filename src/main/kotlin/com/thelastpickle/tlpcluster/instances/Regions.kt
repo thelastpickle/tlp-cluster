@@ -56,7 +56,8 @@ data class Regions(val regions: Map<String, Region>) {
                     // if not, we just skip it.
                     // cn-north-1 is an example as of this writing
                     try {
-                        amis[instance.instance_type] = ubuntu.getAmi(region.code, instance.isInstanceRootVolume).ami
+                        val newAmi = ubuntu.getAmi(region.code, instance.isInstanceRootVolume).ami
+                        amis[instance.instance_type] = newAmi
                     } catch (e: NoSuchElementException) {
                         continue
                     }

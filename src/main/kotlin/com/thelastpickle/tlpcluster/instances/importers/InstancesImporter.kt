@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.thelastpickle.tlpcluster.YamlDelegate
 import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.util.zip.GZIPInputStream
@@ -61,6 +62,7 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
         val json = ObjectMapper().registerKotlinModule()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
+        val yaml : ObjectMapper by YamlDelegate()
         /**
          *
          */
@@ -86,5 +88,14 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
         }.first()
     }
 
+    fun write() {
+        val fp = File("src/main/resources/com/thelastpickle/tlpcluster/instances/instances.yaml")
+        yaml.writeValue(fp, this)
+    }
 
+}
+
+fun main() {
+    val instances = InstancesImporter.loadFromCompressedCSV()
+    instances.write()
 }

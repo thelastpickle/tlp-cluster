@@ -1,0 +1,2256 @@
+---
+instances:
+- instance_type: "c5d.xlarge"
+  memory: 8.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 100
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "m5a.2xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "c5.9xlarge"
+  memory: 72.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 36
+  instanceRootVolume: false
+- instance_type: "m5.24xlarge"
+  memory: 384.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 96
+  instanceRootVolume: false
+- instance_type: "m5d.12xlarge"
+  memory: 192.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 48
+  instanceRootVolume: true
+- instance_type: "c5.large"
+  memory: 4.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "c5n.large"
+  memory: 5.25
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "i2.xlarge"
+  memory: 30.5
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 800
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "t2.micro"
+  memory: 1.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low to Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 1
+  instanceRootVolume: false
+- instance_type: "d2.8xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2676v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 24
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 2000
+    ssd: false
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 36
+  instanceRootVolume: true
+- instance_type: "z1d.3xlarge"
+  memory: 96.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8151"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 450
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 12
+  instanceRootVolume: true
+- instance_type: "m5.2xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "c5.18xlarge"
+  memory: 144.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 72
+  instanceRootVolume: false
+- instance_type: "x1e.16xlarge"
+  memory: 1952.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "High Frequency Intel Xeon E7-8880 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 1920
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 64
+  instanceRootVolume: true
+- instance_type: "i2.8xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 8
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 800
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 32
+  instanceRootVolume: true
+- instance_type: "i2.2xlarge"
+  memory: 61.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 800
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "m5a.xlarge"
+  memory: 16.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "p3.2xlarge"
+  memory: 61.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "t2.2xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "h1.8xlarge"
+  memory: 128.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 4
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 2000
+    ssd: false
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 32
+  instanceRootVolume: true
+- instance_type: "r5d.24xlarge"
+  memory: 768.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 4
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 96
+  instanceRootVolume: true
+- instance_type: "r4.8xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 32
+  instanceRootVolume: false
+- instance_type: "t2.large"
+  memory: 8.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low to Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "x1.16xlarge"
+  memory: 976.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "High"
+  physical_processor: "High Frequency Intel Xeon E7-8880 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 1920
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 64
+  instanceRootVolume: true
+- instance_type: "c5d.18xlarge"
+  memory: 144.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 72
+  instanceRootVolume: true
+- instance_type: "r5a.large"
+  memory: 16.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "c3.large"
+  memory: 3.75
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2680 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 16
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "r5a.24xlarge"
+  memory: 768.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "20 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 96
+  instanceRootVolume: false
+- instance_type: "g3.16xlarge"
+  memory: 488.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "20 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 64
+  instanceRootVolume: false
+- instance_type: "c4.xlarge"
+  memory: 7.5
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2666 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "x1e.4xlarge"
+  memory: 488.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "High Frequency Intel Xeon E7-8880 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 480
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "c5n.18xlarge"
+  memory: 192.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "100 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 72
+  instanceRootVolume: false
+- instance_type: "m4.large"
+  memory: 8.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2676 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "h1.4xlarge"
+  memory: 64.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 2000
+    ssd: false
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "x1e.xlarge"
+  memory: 122.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "High Frequency Intel Xeon E7-8880 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 120
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "m5.large"
+  memory: 8.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "c5.4xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "m5d.24xlarge"
+  memory: 384.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 4
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 96
+  instanceRootVolume: true
+- instance_type: "r3.large"
+  memory: 15.25
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 32
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "c4.large"
+  memory: 3.75
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2666 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "r5d.xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 150
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "m5d.large"
+  memory: 8.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 75
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "r5.2xlarge"
+  memory: 64.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "m3.2xlarge"
+  memory: 30.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge/Sandy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 80
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "m5d.2xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 300
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "m4.10xlarge"
+  memory: 160.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2676 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 40
+  instanceRootVolume: false
+- instance_type: "c5d.large"
+  memory: 4.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 50
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "x1.32xlarge"
+  memory: 1952.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "High"
+  physical_processor: "High Frequency Intel Xeon E7-8880 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 1920
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 128
+  instanceRootVolume: true
+- instance_type: "c5n.2xlarge"
+  memory: 21.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "m5d.xlarge"
+  memory: 16.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 150
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "m5.12xlarge"
+  memory: 192.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 48
+  instanceRootVolume: false
+- instance_type: "p3.16xlarge"
+  memory: 488.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 64
+  instanceRootVolume: false
+- instance_type: "m3.large"
+  memory: 7.5
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge/Sandy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 32
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "c5d.4xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 400
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "r5.24xlarge"
+  memory: 768.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 96
+  instanceRootVolume: false
+- instance_type: "r4.large"
+  memory: 15.25
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "r3.xlarge"
+  memory: 30.5
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 80
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "x1e.32xlarge"
+  memory: 3904.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "High Frequency Intel Xeon E7-8880 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 1920
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 128
+  instanceRootVolume: true
+- instance_type: "c5n.xlarge"
+  memory: 10.5
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "m5a.4xlarge"
+  memory: 64.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "t2.xlarge"
+  memory: 16.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "p2.16xlarge"
+  memory: 768.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "20 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 64
+  instanceRootVolume: false
+- instance_type: "c3.8xlarge"
+  memory: 60.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2680 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 320
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 32
+  instanceRootVolume: true
+- instance_type: "m3.medium"
+  memory: 3.75
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge/Sandy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 4
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 1
+  instanceRootVolume: true
+- instance_type: "x1e.2xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "High Frequency Intel Xeon E7-8880 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 240
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "r5a.2xlarge"
+  memory: 64.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "m5a.12xlarge"
+  memory: 192.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 48
+  instanceRootVolume: false
+- instance_type: "t2.small"
+  memory: 2.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low to Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 1
+  instanceRootVolume: false
+- instance_type: "d2.xlarge"
+  memory: 30.5
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2676v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 3
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 2000
+    ssd: false
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "c5.2xlarge"
+  memory: 16.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "t3.medium"
+  memory: 4.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low to Moderate"
+  physical_processor: "Intel Skylake E5 2686 v5 (2.5 GHz)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "m1.xlarge"
+  memory: 15.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "High"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage:
+    devices: 4
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 420
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "c5d.2xlarge"
+  memory: 16.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 200
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "m3.xlarge"
+  memory: 15.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge/Sandy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 40
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "m1.medium"
+  memory: 3.75
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 410
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 1
+  instanceRootVolume: true
+- instance_type: "r4.16xlarge"
+  memory: 488.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "20 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 64
+  instanceRootVolume: false
+- instance_type: "i3.xlarge"
+  memory: 30.5
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 950
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "z1d.2xlarge"
+  memory: 64.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8151"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 300
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "c3.xlarge"
+  memory: 7.5
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon E5-2680 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 40
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "c3.2xlarge"
+  memory: 15.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2680 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 80
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "r3.2xlarge"
+  memory: 61.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 160
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "r4.2xlarge"
+  memory: 61.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "p2.8xlarge"
+  memory: 488.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 32
+  instanceRootVolume: false
+- instance_type: "m5.xlarge"
+  memory: 16.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "c4.8xlarge"
+  memory: 60.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2666 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 36
+  instanceRootVolume: false
+- instance_type: "c5n.9xlarge"
+  memory: 96.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "50 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 36
+  instanceRootVolume: false
+- instance_type: "d2.2xlarge"
+  memory: 61.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2676v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 6
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 2000
+    ssd: false
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "d2.4xlarge"
+  memory: 122.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2676v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 12
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 2000
+    ssd: false
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "c5.xlarge"
+  memory: 8.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "m5d.4xlarge"
+  memory: 64.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 300
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "m4.xlarge"
+  memory: 16.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2676 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "r5a.4xlarge"
+  memory: 128.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "t3.xlarge"
+  memory: 16.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Moderate"
+  physical_processor: "Intel Skylake E5 2686 v5 (2.5 GHz)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "z1d.12xlarge"
+  memory: 384.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8151"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 48
+  instanceRootVolume: true
+- instance_type: "m4.16xlarge"
+  memory: 256.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "20 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 64
+  instanceRootVolume: false
+- instance_type: "r5.12xlarge"
+  memory: 384.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 48
+  instanceRootVolume: false
+- instance_type: "m4.4xlarge"
+  memory: 64.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2676 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "r4.xlarge"
+  memory: 30.5
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "m1.small"
+  memory: 1.7
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: true
+    nvme_ssd: false
+    size: 160
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 1
+  instanceRootVolume: true
+- instance_type: "a1.xlarge"
+  memory: 8.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "AWS Processor"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "z1d.6xlarge"
+  memory: 192.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8151"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 24
+  instanceRootVolume: true
+- instance_type: "r5d.4xlarge"
+  memory: 128.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 300
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "p2.xlarge"
+  memory: 61.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "c3.4xlarge"
+  memory: 30.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2680 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 160
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "r4.4xlarge"
+  memory: 122.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "r5a.xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "h1.2xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 2000
+    ssd: false
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "f1.4xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "FPGA Instances"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 940
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "r5a.12xlarge"
+  memory: 384.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 48
+  instanceRootVolume: false
+- instance_type: "g2.2xlarge"
+  memory: 15.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2670 (Sandy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 60
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "c4.2xlarge"
+  memory: 15.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2666 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "x1e.8xlarge"
+  memory: 976.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "High Frequency Intel Xeon E7-8880 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 960
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 32
+  instanceRootVolume: true
+- instance_type: "m5.4xlarge"
+  memory: 64.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "h1.16xlarge"
+  memory: 256.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 8
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 2000
+    ssd: false
+    storage_needs_initialization: false
+    trim_support: false
+  vcpu: 64
+  instanceRootVolume: true
+- instance_type: "z1d.xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8151"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 150
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "a1.2xlarge"
+  memory: 16.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "AWS Processor"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "t3.2xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Moderate"
+  physical_processor: "Intel Skylake E5 2686 v5 (2.5 GHz)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "g3.8xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 32
+  instanceRootVolume: false
+- instance_type: "i3.metal"
+  memory: 512.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 8
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 1900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 72
+  instanceRootVolume: true
+- instance_type: "m4.2xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2676 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 8
+  instanceRootVolume: false
+- instance_type: "r5.4xlarge"
+  memory: 128.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "r5d.2xlarge"
+  memory: 64.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 300
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "r5.large"
+  memory: 16.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "i3.large"
+  memory: 15.25
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 475
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "z1d.large"
+  memory: 16.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8151"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 75
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "i3.16xlarge"
+  memory: 488.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "20 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 8
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 1900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 64
+  instanceRootVolume: true
+- instance_type: "i2.4xlarge"
+  memory: 122.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 4
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 800
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "c5d.9xlarge"
+  memory: 72.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 36
+  instanceRootVolume: true
+- instance_type: "r5.xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "i3.2xlarge"
+  memory: 61.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 1900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "r5d.large"
+  memory: 16.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 75
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "g3.4xlarge"
+  memory: 122.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "r5d.12xlarge"
+  memory: 384.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8175"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 48
+  instanceRootVolume: true
+- instance_type: "g2.8xlarge"
+  memory: 60.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2670 (Sandy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 120
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 32
+  instanceRootVolume: true
+- instance_type: "i3.4xlarge"
+  memory: 122.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 1900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "c5n.4xlarge"
+  memory: 42.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Up to 25 Gigabit"
+  physical_processor: "Intel Xeon Platinum 8124M"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "r3.4xlarge"
+  memory: 122.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 320
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 16
+  instanceRootVolume: true
+- instance_type: "m1.large"
+  memory: 7.5
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 420
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "m2.4xlarge"
+  memory: 68.4
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 840
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "r3.8xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2670 v2 (Ivy Bridge)"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 320
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 32
+  instanceRootVolume: true
+- instance_type: "p3.8xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 32
+  instanceRootVolume: false
+- instance_type: "m2.xlarge"
+  memory: 17.1
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 420
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "c1.medium"
+  memory: 1.7
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: true
+    nvme_ssd: false
+    size: 350
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 2
+  instanceRootVolume: true
+- instance_type: "cc2.8xlarge"
+  memory: 60.5
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2670"
+  ebs_as_nvme: false
+  storage:
+    devices: 4
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 840
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 32
+  instanceRootVolume: true
+- instance_type: "c1.xlarge"
+  memory: 7.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage:
+    devices: 4
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 420
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "m2.2xlarge"
+  memory: 34.2
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 850
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 4
+  instanceRootVolume: true
+- instance_type: "m5a.large"
+  memory: 8.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "i3.8xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 4
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 1900
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 32
+  instanceRootVolume: true
+- instance_type: "cr1.8xlarge"
+  memory: 244.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2670"
+  ebs_as_nvme: false
+  storage:
+    devices: 2
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 120
+    ssd: true
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 32
+  instanceRootVolume: true
+- instance_type: "m5a.24xlarge"
+  memory: 384.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "20 Gigabit"
+  physical_processor: "AMD EPYC 7571"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 96
+  instanceRootVolume: false
+- instance_type: "c4.4xlarge"
+  memory: 30.0
+  ebs_optimized: false
+  family: "Compute optimized"
+  network_performance: "High"
+  physical_processor: "Intel Xeon E5-2666 v3 (Haswell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "t3.small"
+  memory: 2.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low to Moderate"
+  physical_processor: "Intel Skylake E5 2686 v5 (2.5 GHz)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "f1.16xlarge"
+  memory: 976.0
+  ebs_optimized: false
+  family: "FPGA Instances"
+  network_performance: "20 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 4
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 940
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 64
+  instanceRootVolume: true
+- instance_type: "t3.micro"
+  memory: 1.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low to Moderate"
+  physical_processor: "Intel Skylake E5 2686 v5 (2.5 GHz)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "t3.large"
+  memory: 8.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low to Moderate"
+  physical_processor: "Intel Skylake E5 2686 v5 (2.5 GHz)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "g3s.xlarge"
+  memory: 30.5
+  ebs_optimized: false
+  family: "GPU instance"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 4
+  instanceRootVolume: false
+- instance_type: "f1.2xlarge"
+  memory: 122.0
+  ebs_optimized: false
+  family: "FPGA Instances"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "Intel Xeon E5-2686 v4 (Broadwell)"
+  ebs_as_nvme: false
+  storage:
+    devices: 1
+    includes_swap_partition: false
+    nvme_ssd: true
+    size: 470
+    ssd: true
+    storage_needs_initialization: false
+    trim_support: true
+  vcpu: 8
+  instanceRootVolume: true
+- instance_type: "a1.medium"
+  memory: 2.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "AWS Processor"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 1
+  instanceRootVolume: false
+- instance_type: "t2.medium"
+  memory: 4.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low to Moderate"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "a1.large"
+  memory: 4.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "AWS Processor"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "hs1.8xlarge"
+  memory: 117.0
+  ebs_optimized: false
+  family: "Storage optimized"
+  network_performance: "10 Gigabit"
+  physical_processor: "Intel Xeon E5-2650"
+  ebs_as_nvme: false
+  storage:
+    devices: 24
+    includes_swap_partition: false
+    nvme_ssd: false
+    size: 2000
+    ssd: false
+    storage_needs_initialization: true
+    trim_support: false
+  vcpu: 17
+  instanceRootVolume: true
+- instance_type: "t1.micro"
+  memory: 0.613
+  ebs_optimized: false
+  family: "Micro instances"
+  network_performance: "Very Low"
+  physical_processor: "Variable"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 1
+  instanceRootVolume: false
+- instance_type: "u-6tb1.metal"
+  memory: 6144.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Scalable (Skylake) processors"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 448
+  instanceRootVolume: false
+- instance_type: "a1.4xlarge"
+  memory: 32.0
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Up to 10 Gigabit"
+  physical_processor: "AWS Processor"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 16
+  instanceRootVolume: false
+- instance_type: "t3.nano"
+  memory: 0.5
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low"
+  physical_processor: "Intel Skylake E5 2686 v5 (2.5 GHz)"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 2
+  instanceRootVolume: false
+- instance_type: "t2.nano"
+  memory: 0.5
+  ebs_optimized: false
+  family: "General purpose"
+  network_performance: "Low"
+  physical_processor: "Intel Xeon Family"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 1
+  instanceRootVolume: false
+- instance_type: "u-9tb1.metal"
+  memory: 9216.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Scalable (Skylake) processors"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 448
+  instanceRootVolume: false
+- instance_type: "u-12tb1.metal"
+  memory: 12288.0
+  ebs_optimized: false
+  family: "Memory optimized"
+  network_performance: "25 Gigabit"
+  physical_processor: "Intel Xeon Scalable (Skylake) processors"
+  ebs_as_nvme: false
+  storage: null
+  vcpu: 448
+  instanceRootVolume: false
