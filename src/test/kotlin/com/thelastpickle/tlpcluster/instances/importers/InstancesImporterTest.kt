@@ -7,5 +7,7 @@ internal class InstancesImporterTest {
     fun testLoad() {
         val data = InstancesImporter.loadFromCSV()
         println(data.instances.first())
+
+
     }
 }

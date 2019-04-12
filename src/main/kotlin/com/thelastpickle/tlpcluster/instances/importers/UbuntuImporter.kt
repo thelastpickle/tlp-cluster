@@ -30,6 +30,7 @@ data class UbuntuImporter(val aaData: List<Ami>) {
                    val instance_type: String,
                    val ami: String)
 
+
     class AmiDeserializer : JsonDeserializer<Ami>() {
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Ami {
             val data = json.readValue(p, List::class.java).map { it.toString() }
@@ -37,6 +38,7 @@ data class UbuntuImporter(val aaData: List<Ami>) {
         }
 
     }
+
 
     companion object {
 

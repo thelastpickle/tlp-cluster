@@ -27,9 +27,29 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
                         val network_performance: String,
                         val physical_processor: String,
                         val vCPU: Int,
-                        val ebs_as_nvme: Boolean)
+                        val ebs_as_nvme: Boolean,
+                        val storage: Storage?)
 
 
+    /**
+     * Storage
+     * "storage": {
+        "devices": 2,
+        "includes_swap_partition": false,
+        "nvme_ssd": true,
+        "size": 1900,
+        "ssd": true,
+        "storage_needs_initialization": false,
+        "trim_support": true
+        },
+     */
+    data class Storage(val devices: Int,
+                       val includes_swap_partition: Boolean,
+                       val nvme_ssd: Boolean,
+                       val size: Int,
+                       val ssd: Boolean,
+                       val storage_needs_initialization: Boolean,
+                       val trim_support: Boolean)
 
 
     companion object {
