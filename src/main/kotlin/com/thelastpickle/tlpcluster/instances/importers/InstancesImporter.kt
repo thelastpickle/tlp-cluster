@@ -19,7 +19,9 @@ import java.util.zip.GZIPInputStream
  */
 class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImporter.Instance> {
 
-
+    /**
+     * "instance_type": "c5d.xlarge"
+     */
     data class Instance(val instance_type: String,
                         val memory: Double,
                         val ebs_optimized: Boolean,
@@ -28,7 +30,10 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
                         val physical_processor: String,
                         val vCPU: Int,
                         val ebs_as_nvme: Boolean,
-                        val storage: Storage?)
+                        val storage: Storage?) {
+
+        val isInstanceRootVolume get() = this.storage != null
+    }
 
 
     /**
@@ -71,5 +76,12 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
     override fun iterator(): Iterator<Instance> {
         return instances.iterator()
     }
+
+    fun getInstance(name: String): Instance {
+        return instances.filter {
+            it.instance_type == name
+        }.first()
+    }
+
 
 }
