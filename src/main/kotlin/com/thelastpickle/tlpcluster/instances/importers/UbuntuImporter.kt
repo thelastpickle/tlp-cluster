@@ -20,6 +20,8 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
 data class UbuntuImporter(val aaData: List<Ami>) {
 
+    val image = "bionic"
+
     @JsonDeserialize(using = AmiDeserializer::class)
     data class Ami(val region: String,
                    val release: String,
@@ -34,6 +36,8 @@ data class UbuntuImporter(val aaData: List<Ami>) {
     }
 
     companion object {
+
+
         val json = ObjectMapper().registerKotlinModule()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
@@ -41,6 +45,14 @@ data class UbuntuImporter(val aaData: List<Ami>) {
             val data = this::class.java.getResourceAsStream("ubuntu.json")
             return json.readValue(data)
         }
+
+        fun extractAmi(link: String) : String {
+            return ""
+        }
+    }
+
+    fun getAmi(region: String) : String {
+       return ""
     }
 
 
