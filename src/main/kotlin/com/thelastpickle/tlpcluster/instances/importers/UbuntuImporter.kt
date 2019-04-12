@@ -65,4 +65,10 @@ data class UbuntuImporter(val aaData: List<Ami>) {
     }
 
 
+    fun getAmi(region: String) : Ami {
+        val amis = getAmis(region)
+        return amis.first()
+    }
+
+
 }

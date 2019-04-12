@@ -17,7 +17,9 @@ import java.util.zip.GZIPInputStream
  * compressed with gzip -9 instances.json
  *
  */
-class InstancesImporter(val instances : List<Instance>) {
+class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImporter.Instance> {
+
+
     data class Instance(val instance_type: String,
                         val memory: Double,
                         val ebs_optimized: Boolean,
@@ -46,8 +48,8 @@ class InstancesImporter(val instances : List<Instance>) {
 
     }
 
-    fun saveJson(fp: File) {
-        json.writeValue(fp, instances)
+    override fun iterator(): Iterator<Instance> {
+        return instances.iterator()
     }
 
 }

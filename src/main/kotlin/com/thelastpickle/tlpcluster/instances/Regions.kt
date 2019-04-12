@@ -7,6 +7,7 @@ import com.thelastpickle.tlpcluster.instances.importers.InstancesImporter
 import com.thelastpickle.tlpcluster.instances.importers.RegionImporter
 import com.thelastpickle.tlpcluster.instances.importers.UbuntuImporter
 import org.apache.logging.log4j.kotlin.logger
+import java.io.OutputStream
 
 
 /**
@@ -32,16 +33,19 @@ data class Regions(val regions: Map<String, Region>) {
 
         /**
          * Regenerates the local file
+         * This is done here to an OutputStream to facilitate testing
          */
-        fun regenerate() {
+        fun regenerate(stream: OutputStream) {
             val regionImporter = RegionImporter.loadFromJson()
             val ubuntu = UbuntuImporter.loadFromResource()
             val instances = InstancesImporter.loadFromCSV()
 
             for(region in regionImporter.regions) {
-                // get all the AZs
+                // get all the AZs - region.zones
                 // for each instance type get the right ami
-//                val azs = regionImporter.regions.
+                for(instance in instances) {
+
+                }
             }
 
         }
