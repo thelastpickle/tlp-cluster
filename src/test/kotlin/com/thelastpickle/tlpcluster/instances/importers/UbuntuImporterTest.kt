@@ -18,4 +18,10 @@ internal class UbuntuImporterTest {
         assertThat(ami).isEqualTo("ami-01a05ad286059d905")
     }
 
+    @Test
+    fun testGetAmis() {
+        val result = UbuntuImporter.loadFromResource().getAmis("us-west-2")
+        assertThat(result.size).isGreaterThan(1)
+    }
+
 }

@@ -25,12 +25,13 @@ data class UbuntuImporter(val aaData: List<Ami>) {
     @JsonDeserialize(using = AmiDeserializer::class)
     data class Ami(val region: String,
                    val release: String,
-                   val instance_type: String)
+                   val instance_type: String,
+                   val ami: String)
 
     class AmiDeserializer : JsonDeserializer<Ami>() {
         override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Ami {
             val data = json.readValue(p, List::class.java).map { it.toString() }
-            return Ami(data[0], data[1], data[2])
+            return Ami(data[0], data[1], data[4], extractAmi(data[6]))
         }
 
     }
@@ -47,12 +48,16 @@ data class UbuntuImporter(val aaData: List<Ami>) {
         }
 
         fun extractAmi(link: String) : String {
-            return ""
+            val regex = ">(ami-[^<]+)".toRegex()
+            val match = regex.find(link)!!
+            return match.groupValues[1]
         }
     }
 
-    fun getAmi(region: String) : String {
-       return ""
+    fun getAmis(region: String) : List<Ami> {
+       return aaData.filter {
+           it.region == region && it.release == image
+       }
     }
 
 
