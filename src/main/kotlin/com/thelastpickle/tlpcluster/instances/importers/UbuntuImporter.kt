@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import org.apache.logging.log4j.kotlin.logger
 
 //"us-east-1",
 // "artful",
@@ -51,6 +52,8 @@ data class UbuntuImporter(val aaData: List<Ami>) {
         val image = "bionic"
         val targetReleaseDate = "20190320"
 
+        val log = logger()
+
         fun loadFromResource() : UbuntuImporter {
             val data = this::class.java.getResourceAsStream("ubuntu.json")
             val tmp = json.readValue<UbuntuImporter>(data)
@@ -76,6 +79,7 @@ data class UbuntuImporter(val aaData: List<Ami>) {
 
 
     fun getAmi(region: String, instanceRoot: Boolean) : Ami {
+        log.debug("Looking up ami for region $region, using instance storage: $instanceRoot")
         return getAmis(region).filter {
             it.isInstanceRootVolume == instanceRoot
         }.first()

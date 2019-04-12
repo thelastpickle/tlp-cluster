@@ -8,6 +8,7 @@ import com.thelastpickle.tlpcluster.instances.importers.RegionImporter
 import com.thelastpickle.tlpcluster.instances.importers.UbuntuImporter
 import org.apache.logging.log4j.kotlin.logger
 import java.io.OutputStream
+import java.util.NoSuchElementException
 
 
 /**
@@ -45,13 +46,26 @@ data class Regions(val regions: Map<String, Region>) {
             for(region in regionImporter.regions) {
                 // get all the AZs - region.zones
                 // for each instance type get the right ami
+                // we're not launching in the government regions
+                if(region.code.contains("gov"))
+                    continue
                 val amis = mutableMapOf<String, String>()
 
                 for(instance in instances) {
-                    amis[instance.instance_type] = ubuntu.getAmi(region.code, instance.isInstanceRootVolume).ami
+                    // it's possible we don't have an instance for a region
+                    // if not, we just skip it.
+                    // cn-north-1 is an example as of this writing
+                    try {
+                        amis[instance.instance_type] = ubuntu.getAmi(region.code, instance.isInstanceRootVolume).ami
+                    } catch (e: NoSuchElementException) {
+                        continue
+                    }
+                }
+                if(amis.size > 0) {
+                    val r = Region(region.zones, amis)
+                    regions[region.code] = r
                 }
 
-                val r = Region(region.zones, amis)
             }
 
             return Regions(regions)
