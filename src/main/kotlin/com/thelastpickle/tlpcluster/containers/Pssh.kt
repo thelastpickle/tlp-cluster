@@ -51,7 +51,7 @@ class Pssh(val context: Context, val sshKey: String) {
 
     private fun execute(scriptName: String, scriptCommand: String, nodeType: ServerType) : Result<String> {
         val docker = Docker(context)
-        val script = javaClass.getResource(scriptName)
+        val script = javaClass.getResourceAsStream(scriptName)
         val scriptFile = ResourceFile(script)
 
         val scriptPathInContainer = "/scripts/$scriptName"
