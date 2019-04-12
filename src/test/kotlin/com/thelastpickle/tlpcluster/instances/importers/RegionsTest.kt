@@ -18,8 +18,6 @@ internal class RegionsTest {
     fun testLoading() {
         assertThat(regions.regions).containsKey("us-west-2")
 
-        assertThat(regions.regions.get("us-west-2")!!.amis.ebs).isEqualTo("ami-0013ea6a76d3b8874")
-
     }
 
 

@@ -17,8 +17,8 @@ import org.apache.logging.log4j.kotlin.logger
  */
 data class Regions(val regions: Map<String, Region>) {
 
-    data class Region(val azs: List<String>, val amis: Ami)
-    data class Ami(val ebs: String, val instance: String)
+    // maps instance type to ami
+    data class Region(val azs: List<String>, val amis: Map<String, String>)
 
     companion object {
         val log = logger()
