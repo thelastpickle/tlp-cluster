@@ -1,5 +1,6 @@
 package com.thelastpickle.tlpcluster.instances.importers
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -62,7 +63,7 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
         val json = ObjectMapper().registerKotlinModule()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
-        val yaml : ObjectMapper by YamlDelegate()
+        val yaml : ObjectMapper by YamlDelegate(true)
         /**
          *
          */
@@ -74,6 +75,11 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
             val url = GZIPInputStream(this::class.java.getResource("instances.json.gz").openStream())
 
             return InstancesImporter(json.readValue(url))
+        }
+
+        fun loadFromYaml() : InstancesImporter {
+            val resource = this::class.java.getResourceAsStream("/com/thelastpickle/tlpcluster/instances/instances.yaml")
+            return InstancesImporter(yaml.readValue(resource))
         }
 
     }
@@ -90,7 +96,7 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
 
     fun write() {
         val fp = File("src/main/resources/com/thelastpickle/tlpcluster/instances/instances.yaml")
-        yaml.writeValue(fp, this)
+        yaml.writeValue(fp, this.instances)
     }
 
 }

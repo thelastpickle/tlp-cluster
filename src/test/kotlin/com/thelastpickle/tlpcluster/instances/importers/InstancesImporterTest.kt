@@ -16,4 +16,9 @@ internal class InstancesImporterTest {
         assertThat(data.getInstance("m5.xlarge").isInstanceRootVolume).isFalse()
 
     }
+
+    @Test
+    fun testLoadFromYaml() {
+        val data = InstancesImporter.loadFromYaml()
+    }
 }
