@@ -35,18 +35,26 @@ data class Regions(val regions: Map<String, Region>) {
          * Regenerates the local file
          * This is done here to an OutputStream to facilitate testing
          */
-        fun regenerate(stream: OutputStream) {
+        fun createRegions() : Regions {
             val regionImporter = RegionImporter.loadFromJson()
             val ubuntu = UbuntuImporter.loadFromResource()
             val instances = InstancesImporter.loadFromCSV()
 
+            val regions = mutableMapOf<String, Region>()
+
             for(region in regionImporter.regions) {
                 // get all the AZs - region.zones
                 // for each instance type get the right ami
-                for(instance in instances) {
+                val amis = mutableMapOf<String, String>()
 
+                for(instance in instances) {
+                    amis[instance.instance_type] = ubuntu.getAmi(region.code, instance.isInstanceRootVolume).ami
                 }
+
+                val r = Region(region.zones, amis)
             }
+
+            return Regions(regions)
 
         }
 

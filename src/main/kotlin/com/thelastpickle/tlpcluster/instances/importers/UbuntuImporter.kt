@@ -20,15 +20,17 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 
 data class UbuntuImporter(val aaData: List<Ami>) {
 
-    val image = "bionic"
-    val targetReleaseDate = "20190320"
 
     @JsonDeserialize(using = AmiDeserializer::class)
     data class Ami(val region: String,
                    val release: String,
                    val releaseDate: String,
-                   val instance_type: String,
-                   val ami: String)
+                   val instance_type: String, // hvm:instance-store or hvm:ebs
+                   val ami: String) {
+
+        val isInstanceRootVolume get() = this.instance_type.contains("instance-store")
+
+    }
 
 
     class AmiDeserializer : JsonDeserializer<Ami>() {
@@ -46,9 +48,17 @@ data class UbuntuImporter(val aaData: List<Ami>) {
         val json = ObjectMapper().registerKotlinModule()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
+        val image = "bionic"
+        val targetReleaseDate = "20190320"
+
         fun loadFromResource() : UbuntuImporter {
             val data = this::class.java.getResourceAsStream("ubuntu.json")
-            return json.readValue(data)
+            val tmp = json.readValue<UbuntuImporter>(data)
+
+            // get rid of the images we don't use
+            return UbuntuImporter( tmp.aaData.filter {
+                it.release == image && it.releaseDate == targetReleaseDate
+            })
         }
 
         fun extractAmi(link: String) : String {
@@ -61,15 +71,14 @@ data class UbuntuImporter(val aaData: List<Ami>) {
     fun getAmis(region: String) : List<Ami> {
        return aaData.filter {
            it.region == region
-                   && it.release == image
-                   && it.releaseDate == targetReleaseDate
        }
     }
 
 
-    fun getAmi(region: String) : Ami {
-        val amis = getAmis(region)
-        return amis.first()
+    fun getAmi(region: String, instanceRoot: Boolean) : Ami {
+        return getAmis(region).filter {
+            it.isInstanceRootVolume == instanceRoot
+        }.first()
     }
 
 

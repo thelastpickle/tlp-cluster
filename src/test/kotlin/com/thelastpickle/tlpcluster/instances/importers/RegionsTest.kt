@@ -20,6 +20,12 @@ internal class RegionsTest {
 
     }
 
+    @Test
+    fun testCreateRegions() {
+        val data = Regions.createRegions()
+        println("hello")
+    }
+
 
 
 }
