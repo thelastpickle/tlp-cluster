@@ -13,5 +13,7 @@ internal class InstancesImporterTest {
         val instance = data.getInstance("i3.2xlarge")
         assertThat(instance.isInstanceRootVolume).isTrue()
 
+        assertThat(data.getInstance("m5.xlarge").isInstanceRootVolume).isFalse()
+
     }
 }
