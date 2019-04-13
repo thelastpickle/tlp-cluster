@@ -49,9 +49,6 @@ class Init(val context: Context) : ICommand {
         val ticket = tags[1]
         val purpose = tags[2]
 
-
-        val regionInfo = Regions.load()
-
         check(client.isNotBlank())
         check(ticket.isNotBlank())
         check(purpose.isNotBlank())

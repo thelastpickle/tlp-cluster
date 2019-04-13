@@ -69,7 +69,7 @@ class Configuration(val ticket: String,
                                     instanceType: String,
                                     count: Int,
                                     securityGroups: List<String>,
-                                    tags: MutableMap<String, String>) : Configuration {
+                                    tags: Map<String, String>) : Configuration {
         val conf = InstanceResource(ami, instanceType, tags, security_groups = securityGroups, count = count)
         config.resource.aws_instance[key] = conf
         return this
@@ -80,7 +80,7 @@ class Configuration(val ticket: String,
         return this
     }
 
-    private fun setTagName(tags: MutableMap<String, String>, nodeType: ServerType) : MutableMap<String, String> {
+    private fun setTagName(tags: Map<String, String>, nodeType: ServerType) : MutableMap<String, String> {
         val newTags = HashMap<String, String>(tags).toMutableMap()
         newTags["Name"] = "${ticket}_${nodeType.serverType}"
         return newTags
@@ -92,7 +92,10 @@ class Configuration(val ticket: String,
         setVariable("key_name", context.userConfig.keyName)
         setVariable("key_path", context.userConfig.sshKeyPath)
         setVariable("region", region)
-        setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
+
+        val azs = regionLookup.getAzs(region)
+
+        setVariable("zones", Variable(azs))
 
         val externalCidr = listOf("${getExternalIpAddress()}/32")
         val instanceSg = SecurityGroupResource.Builder()

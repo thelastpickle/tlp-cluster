@@ -78,6 +78,10 @@ data class Regions(val regions: Map<String, Region>) {
 
     }
 
+    fun getAzs(region: String) : List<String> {
+        return regions.getValue(region).azs
+    }
+
     operator fun get(region: String) : Region? {
         return regions[region]
     }
