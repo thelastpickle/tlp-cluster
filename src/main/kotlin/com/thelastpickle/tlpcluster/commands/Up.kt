@@ -2,6 +2,7 @@ package com.thelastpickle.tlpcluster.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
+import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.containers.Terraform
 import java.io.File
@@ -27,19 +28,21 @@ class Up(val context: Context) : ICommand {
             return
         }
 
-        println("""InstancesImporter have been provisioned.
+        with(TermColors()) {
+            println("""InstancesImporter have been provisioned.
 
 You can edit the provisioning scripts before running them, they've been copied to ./provisioning.
 
-Next you'll probably want to run tlp-cluster build to create a new build, or use if you already have a Cassandra build you'd like to deploy.""")
+Next you'll probably want to run tlp-cluster build to create a new build, or ${green("tlp-cluster use <version>")} if you already have a Cassandra build you'd like to deploy.""")
 
-        println("Writing ssh config file to sshConfig.")
+            println("Writing ssh config file to sshConfig.")
 
-        println("""The following alias will allow you to easily ssh to the cluster:
+            println("""The following alias will allow you to easily ssh to the cluster:
             |
             |alias ssh="ssh -F sshConfig"
             |
             |""".trimMargin())
+        }
 
         val config = File("sshConfig").bufferedWriter()
         context.tfstate.writeSshConfig(config)

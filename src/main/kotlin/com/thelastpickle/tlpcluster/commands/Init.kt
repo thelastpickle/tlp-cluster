@@ -2,6 +2,7 @@ package com.thelastpickle.tlpcluster.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
+import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
@@ -9,8 +10,6 @@ import java.io.File
 import org.apache.commons.io.FileUtils
 import com.thelastpickle.tlpcluster.terraform.Configuration
 import com.thelastpickle.tlpcluster.containers.Terraform
-import com.thelastpickle.tlpcluster.instances.Regions
-import com.thelastpickle.tlpcluster.instances.importers.InstancesImporter
 
 
 sealed class CopyResourceResult {
@@ -97,8 +96,14 @@ class Init(val context: Context) : ICommand {
         terraform.init()
 
 
+        println("Your workspace has been initialized with $cassandraInstances Cassandra instances and $stressInstances stress instances in $region")
+
         if(start) {
             Up(context).execute()
+        } else {
+            with(TermColors()) {
+                println("Next you'll want to run ${green("tlp-cluster up")} to start your instances.")
+            }
         }
 
     }

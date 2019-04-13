@@ -84,6 +84,8 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.assertj/assertj-core
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
+
+    compile 'com.github.ajalt:mordant:1.2.1'
 }
 
 task docs(type:Exec) {
