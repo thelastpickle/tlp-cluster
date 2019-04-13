@@ -88,12 +88,16 @@ class Init(val context: Context) : ICommand {
         config.numStressInstances = stressInstances
         config.monitoring = monitoringEnabled
 
+
+        val c4xlarge = regionInfo.getAmi(region, "c4xlarge")
+        val c42xlarge = regionInfo.getAmi(region, "c42xlarge")
+
         config.region = region
         config.stressAMI = "ami-51537029"
-        config.stressInstanceType = instanceType
+        config.stressInstanceType = c42xlarge
 
         config.cassandraInstanceType = instanceType
-        config.monitoringInstanceType = instanceType
+        config.monitoringInstanceType = c4xlarge
         config.cassandraAMI = ami
 
         config.setVariable("client", client)
