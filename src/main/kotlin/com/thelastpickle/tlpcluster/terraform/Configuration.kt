@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.configuration.ServerType
+import com.thelastpickle.tlpcluster.instances.Regions
 import java.io.File
 import java.net.URL
 
@@ -14,6 +15,8 @@ class Configuration(val ticket: String,
                     val purpose: String,
                     var region: String = "us-west-2",
                     var context: Context) {
+
+    val regionLookup = Regions.load()
 
     var numCassandraInstances = 3
     var email = context.userConfig.email
@@ -24,17 +27,19 @@ class Configuration(val ticket: String,
         "email" to email)
 
     var cassandraInstanceType = "m5d.xlarge"
+    val ami = regionLookup.getAmi(region, cassandraInstanceType)
     var cassandraAMI = "ami-51537029"
 
     // stress
     var numStressInstances = 0
-    var stressAMI = "ami-51537029"
+
     var stressInstanceType = "c5d.2xlarge"
+    val stressAMI = regionLookup.getAmi(region, stressInstanceType)
 
     //monitoring
-    var monitoring = false
-    var monitoringAMI = "ami-51537029"
+    var monitoring = true
     var monitoringInstanceType = "c5d.2xlarge"
+    var monitoringAMI = regionLookup.getAmi(region, monitoringInstanceType)
 
     private val config  = TerraformConfig(region, context.userConfig.awsAccessKey, context.userConfig.awsSecret)
 
@@ -119,7 +124,7 @@ class Configuration(val ticket: String,
             "monitoring",
             monitoringAMI,
             monitoringInstanceType,
-            if (monitoring) 1 else 0,
+            1, // we always enable monitoring now
             listOf(instanceSg.name),
             setTagName(tags, ServerType.Monitoring))
 

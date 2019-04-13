@@ -30,9 +30,6 @@ class Init(val context: Context) : ICommand {
     @Parameter(description = "Number of stress instances", names = ["--stress", "-s"])
     var stressInstances = 0
 
-    @Parameter(description = "Enable monitoring (beta)", names = ["--monitoring", "-m"])
-    var monitoringEnabled = false
-
     @Parameter(description = "Start instances automatically", names = ["--up"])
     var start = false
 
@@ -82,23 +79,14 @@ class Init(val context: Context) : ICommand {
 
         val config = Configuration(ticket, client, purpose, region = context.userConfig.region, context = context)
 
-        val ami = regionInfo.getAmi(region, instanceType)
 
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
-        config.monitoring = monitoringEnabled
-
-
-        val c4xlarge = regionInfo.getAmi(region, "c4xlarge")
-        val c42xlarge = regionInfo.getAmi(region, "c42xlarge")
 
         config.region = region
-        config.stressAMI = "ami-51537029"
-        config.stressInstanceType = c42xlarge
 
         config.cassandraInstanceType = instanceType
-        config.monitoringInstanceType = c4xlarge
-        config.cassandraAMI = ami
+//        config.cassandraAMI = ami
 
         config.setVariable("client", client)
         config.setVariable("ticket", ticket)
