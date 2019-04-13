@@ -27,14 +27,13 @@ class Configuration(val ticket: String,
         "email" to email)
 
     var cassandraInstanceType = "m5d.xlarge"
-    val ami = regionLookup.getAmi(region, cassandraInstanceType)
-    var cassandraAMI = "ami-51537029"
+
 
     // stress
     var numStressInstances = 0
 
     var stressInstanceType = "c5d.2xlarge"
-    val stressAMI = regionLookup.getAmi(region, stressInstanceType)
+
 
     //monitoring
     var monitoring = true
@@ -88,6 +87,9 @@ class Configuration(val ticket: String,
 
 
     private fun build() : Configuration {
+        var cassandraAMI = regionLookup.getAmi(region, cassandraInstanceType)
+        val stressAMI = regionLookup.getAmi(region, stressInstanceType)
+        
         setVariable("email", email)
         setVariable("key_name", context.userConfig.keyName)
         setVariable("key_path", context.userConfig.sshKeyPath)
