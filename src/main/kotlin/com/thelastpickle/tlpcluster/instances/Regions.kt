@@ -86,6 +86,11 @@ data class Regions(val regions: Map<String, Region>) {
         val fp = File("src/main/resources/com/thelastpickle/tlpcluster/instances/regions.yaml")
         yaml.writeValue(fp, this)
     }
+
+    fun getAmi(region: String, instance: String) : String {
+        val r = regions.getValue(region)
+        return r.amis.getValue(instance)
+    }
 }
 
 /**

@@ -9,6 +9,8 @@ import java.io.File
 import org.apache.commons.io.FileUtils
 import com.thelastpickle.tlpcluster.terraform.Configuration
 import com.thelastpickle.tlpcluster.containers.Terraform
+import com.thelastpickle.tlpcluster.instances.Regions
+import com.thelastpickle.tlpcluster.instances.importers.InstancesImporter
 
 
 sealed class CopyResourceResult {
@@ -35,7 +37,7 @@ class Init(val context: Context) : ICommand {
     var start = false
 
     @Parameter(description = "AMI", names = ["--ami"])
-    var ami = "ami-51537029"
+    var ami = ""
 
     @Parameter(description = "Region", names = ["--region"])
     var region = "us-west-2"
@@ -49,6 +51,9 @@ class Init(val context: Context) : ICommand {
         val client = tags[0]
         val ticket = tags[1]
         val purpose = tags[2]
+
+
+        val regionInfo = Regions.load()
 
         check(client.isNotBlank())
         check(ticket.isNotBlank())
@@ -77,6 +82,8 @@ class Init(val context: Context) : ICommand {
 
         val config = Configuration(ticket, client, purpose, region = context.userConfig.region, context = context)
 
+        val ami = regionInfo.getAmi(region, instanceType)
+
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
         config.monitoring = monitoringEnabled
@@ -84,8 +91,10 @@ class Init(val context: Context) : ICommand {
         config.region = region
         config.stressAMI = "ami-51537029"
         config.stressInstanceType = instanceType
+
         config.cassandraInstanceType = instanceType
         config.monitoringInstanceType = instanceType
+        config.cassandraAMI = ami
 
         config.setVariable("client", client)
         config.setVariable("ticket", ticket)

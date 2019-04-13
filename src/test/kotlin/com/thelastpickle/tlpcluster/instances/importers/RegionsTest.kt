@@ -26,6 +26,14 @@ internal class RegionsTest {
         println("hello")
     }
 
+    @Test
+    fun testGetAmi() {
+
+        val expected = "ami-090820dead4048ccd"
+        val ami = regions.getAmi("us-east-1", "c5d.xlarge")
+        assertThat(ami).isEqualTo(expected)
+    }
+
 
 
 }
