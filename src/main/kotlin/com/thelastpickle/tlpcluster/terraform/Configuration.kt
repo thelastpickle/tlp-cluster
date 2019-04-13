@@ -32,12 +32,11 @@ class Configuration(val ticket: String,
     // stress
     var numStressInstances = 0
 
-    var stressInstanceType = "c5d.2xlarge"
-
+    var stressInstanceType = "c3.2xlarge"
 
     //monitoring
     var monitoring = true
-    var monitoringInstanceType = "c5d.2xlarge"
+    var monitoringInstanceType = "c3.2xlarge"
     var monitoringAMI = regionLookup.getAmi(region, monitoringInstanceType)
 
     private val config  = TerraformConfig(region, context.userConfig.awsAccessKey, context.userConfig.awsSecret)
@@ -89,7 +88,7 @@ class Configuration(val ticket: String,
     private fun build() : Configuration {
         var cassandraAMI = regionLookup.getAmi(region, cassandraInstanceType)
         val stressAMI = regionLookup.getAmi(region, stressInstanceType)
-        
+
         setVariable("email", email)
         setVariable("key_name", context.userConfig.keyName)
         setVariable("key_path", context.userConfig.sshKeyPath)
