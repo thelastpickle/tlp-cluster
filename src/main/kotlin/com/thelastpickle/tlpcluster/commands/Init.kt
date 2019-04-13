@@ -35,8 +35,8 @@ class Init(val context: Context) : ICommand {
     @Parameter(description = "AMI", names = ["--ami"])
     var ami = ""
 
-    @Parameter(description = "Region", names = ["--region"])
-    var region = "us-west-2"
+    @Parameter(description = "Override your default region", names = ["--region"])
+    var region = ""
 
     @Parameter(description = "Instance Type", names = ["--instance"])
     var instanceType =  "c5d.2xlarge"
@@ -73,7 +73,13 @@ class Init(val context: Context) : ICommand {
             FileUtils.copyInputStreamToFile(input, output)
         }
 
-        val config = Configuration(ticket, client, purpose, region = context.userConfig.region, context = context)
+        val regionToUse = if(region != "") {
+            region
+        } else {
+            context.userConfig.region
+        }
+
+        val config = Configuration(ticket, client, purpose, region = regionToUse , context = context)
 
 
         config.numCassandraInstances = cassandraInstances
@@ -90,7 +96,6 @@ class Init(val context: Context) : ICommand {
 
         val configOutput = File("terraform.tf.json")
         config.write(configOutput)
-
 
         val terraform = Terraform(context)
         terraform.init()
