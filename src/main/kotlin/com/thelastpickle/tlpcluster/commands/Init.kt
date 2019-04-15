@@ -32,11 +32,8 @@ class Init(val context: Context) : ICommand {
     @Parameter(description = "Start instances automatically", names = ["--up"])
     var start = false
 
-    @Parameter(description = "AMI", names = ["--ami"])
-    var ami = ""
-
     @Parameter(description = "Instance Type", names = ["--instance"])
-    var instanceType =  "c5d.2xlarge"
+    var instanceType =  "m5d.xlarge"
 
     override fun execute() {
         println("Initializing directory")
@@ -88,7 +85,7 @@ class Init(val context: Context) : ICommand {
         terraform.init()
 
 
-        println("Your workspace has been initialized with $cassandraInstances Cassandra instances and $stressInstances stress instances in ${context.userConfig.region}")
+        println("Your workspace has been initialized with $cassandraInstances Cassandra instances (${config.cassandraInstanceType}) and $stressInstances stress instances in ${context.userConfig.region}")
 
         if(start) {
             Up(context).execute()
