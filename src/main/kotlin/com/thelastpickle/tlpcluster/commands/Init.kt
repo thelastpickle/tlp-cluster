@@ -46,6 +46,17 @@ class Init(val context: Context) : ICommand {
         check(ticket.isNotBlank())
         check(purpose.isNotBlank())
 
+        val allowedTypes = listOf("m1", "m3", "t1", "c1", "c3", "cc2", "cr1", "m2", "r3", "d2", "hs1", "i2")
+
+        var found = false
+        for(x in allowedTypes) {
+            if(instanceType.startsWith(x))
+                found = true
+        }
+        if(!found) {
+            throw Exception("You requested the instance type $instanceType, but unfortunately it isn't supported in EC2 Classic.  We currently only support the following classes: $allowedTypes")
+        }
+
         // Added because if we're reusing a directory, we don't want any of the previous state
         Clean().execute()
 
