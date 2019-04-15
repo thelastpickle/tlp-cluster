@@ -130,6 +130,8 @@ task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     outputs.upToDateWhen { false }
+    description = "Runs the full end to end tests.  Will create a cluster in AWS.  Errors might require manual cluster tear down."
+    group = "Verification"
 }
 
 
