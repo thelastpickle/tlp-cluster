@@ -70,17 +70,12 @@ class Init(val context: Context) : ICommand {
             FileUtils.copyInputStreamToFile(input, output)
         }
 
-        val region = context.userConfig.region
-        val config = Configuration(ticket, client, purpose, region =  context.userConfig.region , context = context)
+        val config = Configuration(ticket, client, purpose, context.userConfig.region , context = context)
 
 
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
-
-        config.region = region
-
         config.cassandraInstanceType = instanceType
-//        config.cassandraAMI = ami
 
         config.setVariable("client", client)
         config.setVariable("ticket", ticket)
@@ -93,7 +88,7 @@ class Init(val context: Context) : ICommand {
         terraform.init()
 
 
-        println("Your workspace has been initialized with $cassandraInstances Cassandra instances and $stressInstances stress instances in $region")
+        println("Your workspace has been initialized with $cassandraInstances Cassandra instances and $stressInstances stress instances in ${context.userConfig.region}")
 
         if(start) {
             Up(context).execute()

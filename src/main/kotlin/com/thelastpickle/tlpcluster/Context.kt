@@ -94,7 +94,6 @@ data class Context(val tlpclusterUserDirectory: File) {
          * Used only for testing
          */
         fun testContext() : Context {
-            File("build/testContext")
             val tmpContentParent = File("test/contexts")
             tmpContentParent.mkdirs()
 

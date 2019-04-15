@@ -13,7 +13,7 @@ import java.net.URL
 class Configuration(val ticket: String,
                     val client: String,
                     val purpose: String,
-                    var region: String = "us-west-2",
+                    var region: String,
                     var context: Context) {
 
     val regionLookup = Regions.load()
@@ -28,14 +28,12 @@ class Configuration(val ticket: String,
 
     var cassandraInstanceType = "m5d.xlarge"
 
-
     // stress
     var numStressInstances = 0
 
     var stressInstanceType = "c3.2xlarge"
 
     //monitoring
-    var monitoring = true
     var monitoringInstanceType = "c3.2xlarge"
     var monitoringAMI = regionLookup.getAmi(region, monitoringInstanceType)
 
