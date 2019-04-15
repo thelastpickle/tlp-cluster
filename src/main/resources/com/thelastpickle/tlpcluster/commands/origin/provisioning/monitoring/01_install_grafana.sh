@@ -2,7 +2,7 @@
 
 echo "Installing Grafana"
 
-curl https://packagecloud.io/gpg.key | sudo apt-key add -
+curl -s https://packagecloud.io/install/repositories/grafana/stable/script.deb.sh | sudo bash
 
 sudo add-apt-repository "deb https://packagecloud.io/grafana/stable/debian/ stretch main"
 sudo apt-get update
