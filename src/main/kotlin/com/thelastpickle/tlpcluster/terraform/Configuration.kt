@@ -6,14 +6,17 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.configuration.ServerType
+import com.thelastpickle.tlpcluster.instances.Regions
 import java.io.File
 import java.net.URL
 
 class Configuration(val ticket: String,
                     val client: String,
                     val purpose: String,
-                    var region: String = "us-west-2",
+                    var region: String,
                     var context: Context) {
+
+    val regionLookup = Regions.load()
 
     var numCassandraInstances = 3
     var email = context.userConfig.email
@@ -24,17 +27,15 @@ class Configuration(val ticket: String,
         "email" to email)
 
     var cassandraInstanceType = "m5d.xlarge"
-    val cassandraAMI = "ami-51537029"
 
     // stress
     var numStressInstances = 0
-    var stressAMI = "ami-51537029"
-    var stressInstanceType = "c5d.2xlarge"
+
+    var stressInstanceType = "c3.2xlarge"
 
     //monitoring
-    var monitoring = false
-    var monitoringAMI = "ami-51537029"
-    var monitoringInstanceType = "c5d.2xlarge"
+    var monitoringInstanceType = "c3.2xlarge"
+    var monitoringAMI = regionLookup.getAmi(region, monitoringInstanceType)
 
     private val config  = TerraformConfig(region, context.userConfig.awsAccessKey, context.userConfig.awsSecret)
 
@@ -64,7 +65,7 @@ class Configuration(val ticket: String,
                                     instanceType: String,
                                     count: Int,
                                     securityGroups: List<String>,
-                                    tags: MutableMap<String, String>) : Configuration {
+                                    tags: Map<String, String>) : Configuration {
         val conf = InstanceResource(ami, instanceType, tags, security_groups = securityGroups, count = count)
         config.resource.aws_instance[key] = conf
         return this
@@ -75,7 +76,7 @@ class Configuration(val ticket: String,
         return this
     }
 
-    private fun setTagName(tags: MutableMap<String, String>, nodeType: ServerType) : MutableMap<String, String> {
+    private fun setTagName(tags: Map<String, String>, nodeType: ServerType) : MutableMap<String, String> {
         val newTags = HashMap<String, String>(tags).toMutableMap()
         newTags["Name"] = "${ticket}_${nodeType.serverType}"
         return newTags
@@ -83,11 +84,17 @@ class Configuration(val ticket: String,
 
 
     private fun build() : Configuration {
+        var cassandraAMI = regionLookup.getAmi(region, cassandraInstanceType)
+        val stressAMI = regionLookup.getAmi(region, stressInstanceType)
+
         setVariable("email", email)
         setVariable("key_name", context.userConfig.keyName)
         setVariable("key_path", context.userConfig.sshKeyPath)
         setVariable("region", region)
-        setVariable("zones", Variable(listOf("us-west-2a", "us-west-2b", "us-west-2c"), "list"))
+
+        val azs = regionLookup.getAzs(region)
+
+        setVariable("zones", Variable(azs))
 
         val externalCidr = listOf("${getExternalIpAddress()}/32")
         val instanceSg = SecurityGroupResource.Builder()
@@ -119,7 +126,7 @@ class Configuration(val ticket: String,
             "monitoring",
             monitoringAMI,
             monitoringInstanceType,
-            if (monitoring) 1 else 0,
+            1, // we always enable monitoring now
             listOf(instanceSg.name),
             setTagName(tags, ServerType.Monitoring))
 

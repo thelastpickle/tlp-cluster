@@ -4,7 +4,6 @@ import com.thelastpickle.tlpcluster.Context
 import org.apache.commons.io.FileUtils
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.AfterEach
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -12,7 +11,20 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.*
 
-internal class CassandraUnpackTest {
+class CassandraUnpackTest {
+    @Test
+    fun testCache() {
+        val cache = Files.createTempDirectory("cache")
+        unpacker = CassandraUnpack(context, "2.1.14", downloadDir, Optional.of(cache))
+        unpacker.download()
+        Assertions.assertThat(unpacker.cacheHits).isEqualTo(0)
+        Assertions.assertThat(unpacker.cacheChecks).isEqualTo(1)
+
+        unpacker.download()
+        Assertions.assertThat(unpacker.cacheChecks).isEqualTo(2)
+        Assertions.assertThat(unpacker.cacheHits).isEqualTo(1)
+
+    }
 
     lateinit var downloadDir : Path
     lateinit var unpacker : CassandraUnpack
@@ -42,33 +54,15 @@ internal class CassandraUnpackTest {
         FileUtils.deleteDirectory(downloadDir.toFile())
     }
 
-
-
-
     @Test
-    fun getURL() {
-        val expected = "http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/cassandra_2.1.14_all.deb"
-        assertThat(unpacker.getURL()).isEqualTo(expected)
+    fun ensureDownloadCreatesDebPackageAndConfFiles() {
+        unpacker.download()
+
+        Assertions.assertThat(File(downloadDir.toFile(), "cassandra_2.1.14_all.deb")).isFile()
+        Assertions.assertThat(File(downloadDir.toFile(), "conf")).exists()
+
+        unpacker.extractConf()
+
+        Assertions.assertThat(File(downloadDir.toFile(), "conf/cassandra.yaml")).isFile()
     }
-
-    @Test
-    fun getFileName() {
-    }
-
-    @Test
-    fun getVersion() {
-    }
-
-    @Test
-    fun getDest() {
-    }
-
-    @Test
-    fun ensureDebExistsBeforeExtracting() {
-        Assertions.assertThatIllegalStateException().isThrownBy { unpacker.extractConf() }
-                .withMessageContaining("Check failed")
-
-    }
-
-
 }

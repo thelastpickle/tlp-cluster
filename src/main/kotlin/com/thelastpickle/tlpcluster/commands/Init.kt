@@ -2,6 +2,7 @@ package com.thelastpickle.tlpcluster.commands
 
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
+import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
@@ -28,20 +29,11 @@ class Init(val context: Context) : ICommand {
     @Parameter(description = "Number of stress instances", names = ["--stress", "-s"])
     var stressInstances = 0
 
-    @Parameter(description = "Enable monitoring (beta)", names = ["--monitoring", "-m"])
-    var monitoringEnabled = false
-
     @Parameter(description = "Start instances automatically", names = ["--up"])
     var start = false
 
-    @Parameter(description = "AMI", names = ["--ami"])
-    var ami = "ami-51537029"
-
-    @Parameter(description = "Region", names = ["--region"])
-    var region = "us-west-2"
-
     @Parameter(description = "Instance Type", names = ["--instance"])
-    var instanceType =  "c5d.2xlarge"
+    var instanceType =  "r3.2xlarge"
 
     override fun execute() {
         println("Initializing directory")
@@ -53,6 +45,17 @@ class Init(val context: Context) : ICommand {
         check(client.isNotBlank())
         check(ticket.isNotBlank())
         check(purpose.isNotBlank())
+
+        val allowedTypes = listOf("m1", "m3", "t1", "c1", "c3", "cc2", "cr1", "m2", "r3", "d2", "hs1", "i2")
+
+        var found = false
+        for(x in allowedTypes) {
+            if(instanceType.startsWith(x))
+                found = true
+        }
+        if(!found) {
+            throw Exception("You requested the instance type $instanceType, but unfortunately it isn't supported in EC2 Classic.  We currently only support the following classes: $allowedTypes")
+        }
 
         // Added because if we're reusing a directory, we don't want any of the previous state
         Clean().execute()
@@ -75,17 +78,12 @@ class Init(val context: Context) : ICommand {
             FileUtils.copyInputStreamToFile(input, output)
         }
 
-        val config = Configuration(ticket, client, purpose, region = context.userConfig.region, context = context)
+        val config = Configuration(ticket, client, purpose, context.userConfig.region , context = context)
+
 
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
-        config.monitoring = monitoringEnabled
-
-        config.region = region
-        config.stressAMI = "ami-51537029"
-        config.stressInstanceType = instanceType
         config.cassandraInstanceType = instanceType
-        config.monitoringInstanceType = instanceType
 
         config.setVariable("client", client)
         config.setVariable("ticket", ticket)
@@ -94,13 +92,18 @@ class Init(val context: Context) : ICommand {
         val configOutput = File("terraform.tf.json")
         config.write(configOutput)
 
-
         val terraform = Terraform(context)
         terraform.init()
 
 
+        println("Your workspace has been initialized with $cassandraInstances Cassandra instances (${config.cassandraInstanceType}) and $stressInstances stress instances in ${context.userConfig.region}")
+
         if(start) {
             Up(context).execute()
+        } else {
+            with(TermColors()) {
+                println("Next you'll want to run ${green("tlp-cluster up")} to start your instances.")
+            }
         }
 
     }

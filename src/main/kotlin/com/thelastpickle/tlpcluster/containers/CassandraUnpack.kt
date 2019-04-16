@@ -59,7 +59,7 @@ class CassandraUnpack(val context: Context,
         // required that the download have already run
         check(File(dest.toFile(), getFileName()).exists())
 
-        val shellScript = ResourceFile(javaClass.getResource("unpack_cassandra.sh"))
+        val shellScript = ResourceFile(javaClass.getResourceAsStream("unpack_cassandra.sh"))
 
         docker.pullImage("ubuntu:bionic", "bionic")
         return docker

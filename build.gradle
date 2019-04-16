@@ -85,6 +85,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.assertj/assertj-core
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
 
+    compile 'com.github.ajalt:mordant:1.2.1'
 }
 
 task docs(type:Exec) {
@@ -129,6 +130,8 @@ task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
     outputs.upToDateWhen { false }
+    description = "Runs the full end to end tests.  Will create a cluster in AWS.  Errors might require manual cluster tear down."
+    group = "Verification"
 }
 
 

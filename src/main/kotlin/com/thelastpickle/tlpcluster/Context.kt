@@ -10,8 +10,10 @@ import com.github.dockerjava.netty.NettyDockerCmdExecFactory
 import com.thelastpickle.tlpcluster.configuration.TFState
 import com.thelastpickle.tlpcluster.configuration.User
 import org.apache.logging.log4j.kotlin.logger
+import com.thelastpickle.tlpcluster.configuration.Yaml
 import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 
 data class Context(val tlpclusterUserDirectory: File) {
 
@@ -48,8 +50,8 @@ data class Context(val tlpclusterUserDirectory: File) {
      *
      * val state = mapper.readValue<MyStateObject>(json)
      */
-    val yaml = ObjectMapper(YAMLFactory()).registerKotlinModule()
     val json = ObjectMapper()
+    val yaml : ObjectMapper by YamlDelegate()
 
     private val userConfigFile = File(profileDir, "settings.yaml")
 
@@ -92,7 +94,10 @@ data class Context(val tlpclusterUserDirectory: File) {
          * Used only for testing
          */
         fun testContext() : Context {
-            val testTempDirectory = Files.createTempDirectory("tlpcluster")
+            val tmpContentParent = File("test/contexts")
+            tmpContentParent.mkdirs()
+
+            val testTempDirectory = Files.createTempDirectory(tmpContentParent.toPath(), "tlpcluster")
             // create a default profile
             // generate a fake key
             val user = User("test@thelastpickle.com", "us-west-2", "test", "test", "test", "test", "test")
