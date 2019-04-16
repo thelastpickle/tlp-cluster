@@ -28,9 +28,15 @@ class Utils {
             return Utils.inputstreamToTempFile(resourceStream, "${resourceName}_", directory)
         }
 
-        fun prompt(question: String, default: String) : String {
+        fun prompt(question: String, default: String, secret : Boolean = false) : String {
             print("$question [$default]: ")
-            var line = (readLine() ?: default).trim()
+
+            var line : String = if(secret) {
+                String(System.console()?.readPassword()!!)
+            }
+            else {
+                (readLine() ?: default).trim()
+            }
 
             if(line.equals(""))
                 line = default
