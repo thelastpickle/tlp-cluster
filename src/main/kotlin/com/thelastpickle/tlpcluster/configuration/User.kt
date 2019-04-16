@@ -44,18 +44,15 @@ data class User(
             val email = Utils.prompt("What's your email?", "")
 
             // we're not honoring it, so we'll take this out
-            //val region = Utils.prompt("What AWS region do you prefer?", "us-west-2")
-//            val region = "us-west-2"
+            val regionAnswer = Utils.prompt("What AWS region do you use?", "us-west-2")
+            val region = Region.of(regionAnswer)
 
-            val awsAccessKey = Utils.prompt("AWS Access Key?", "")
-            val awsSecret = Utils.prompt("Aws Secret?", "")
+            val awsAccessKey = Utils.prompt("Please enter your AWS Access Key:", "")
+            val awsSecret = Utils.prompt("Please enter your AWS Secret Access Key:", "", secret = true)
+
             // create the key pair
 
-//            Ec2Client.builder().
-            // TODO: rename
             println("Attempting to validate credentials and generate tlp-cluster login keys")
-
-            val region = Region.US_WEST_2
 
             val creds = AwsBasicCredentials.create(awsAccessKey, awsSecret)
 
