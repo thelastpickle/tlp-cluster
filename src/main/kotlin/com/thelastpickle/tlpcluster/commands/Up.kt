@@ -22,14 +22,14 @@ class Up(val context: Context) : ICommand {
         // priority over user
         val terraform = Terraform(context)
 
+        with(TermColors()) {
+
         terraform.up(autoApprove).onFailure {
             println(it.message)
-            println("Some resources may have been unsuccessfully provisioned.")
-            return
-        }
+            println("${red("Some resources may have been unsuccessfully provisioned.")}  Rerun ${green("tlp-cluster up")} to provision the remaining resources.")
+        }.onSuccess {
 
-        with(TermColors()) {
-            println("""InstancesImporter have been provisioned.
+            println("""Instances have been provisioned.
 
 You can edit the provisioning scripts before running them, they've been copied to ./provisioning.
 
@@ -39,10 +39,14 @@ Next you'll probably want to run tlp-cluster build to create a new build, or ${g
 
             println("""The following alias will allow you to easily ssh to the cluster:
             |
-            |alias ssh="ssh -F sshConfig"
+            |${green("alias ssh=\"ssh -F sshConfig\"")}
             |
             |""".trimMargin())
+            }
         }
+
+
+
 
         val config = File("sshConfig").bufferedWriter()
         context.tfstate.writeSshConfig(config)
