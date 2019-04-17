@@ -44,10 +44,7 @@ class Up(val context: Context) : ICommand {
                 |""".trimMargin())
             }
         }
-
-
-
-
+        
         val config = File("sshConfig").bufferedWriter()
         context.tfstate.writeSshConfig(config)
 
