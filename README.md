@@ -2,6 +2,8 @@
 
 This is a tool to aid in Cassandra development.  
 
+Please see our [Google Group](https://groups.google.com/d/forum/tlp-dev-tools) for discussion.
+
 This tool is a work in progress and is intended for developers to use to quickly launch clusters based on arbitrary builds.
 
 If you aren't comfortable digging into code, this tool probably isn't for you, as you're very likely going to need to do some customizations.
