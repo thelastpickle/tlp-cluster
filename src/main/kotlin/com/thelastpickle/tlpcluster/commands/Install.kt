@@ -1,6 +1,7 @@
 package com.thelastpickle.tlpcluster.commands
 
 import com.beust.jcommander.Parameters
+import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.configuration.ServerType
 import com.thelastpickle.tlpcluster.containers.Pssh
@@ -50,7 +51,10 @@ class Install(val context: Context) : ICommand {
             }
 
         if (installSuccessful) {
-            println("Now run tlp-cluster start to fire up the cluster.")
+            with(TermColors()) {
+                println("Now run ${green("tlp-cluster start")} to fire up the cluster.")
+
+            }
         }
     }
 
