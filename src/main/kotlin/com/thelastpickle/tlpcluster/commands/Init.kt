@@ -1,15 +1,18 @@
 package com.thelastpickle.tlpcluster.commands
 
+import com.beust.jcommander.IStringConverter
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
+import com.thelastpickle.tlpcluster.commands.converters.AZConverter
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import java.io.File
 import org.apache.commons.io.FileUtils
 import com.thelastpickle.tlpcluster.terraform.Configuration
 import com.thelastpickle.tlpcluster.containers.Terraform
+import org.apache.logging.log4j.kotlin.logger
 
 
 sealed class CopyResourceResult {
@@ -19,6 +22,7 @@ sealed class CopyResourceResult {
 
 @Parameters(commandDescription = "Initialize this directory for tlp-cluster")
 class Init(val context: Context) : ICommand {
+
 
     @Parameter(description = "Client, Ticket, Purpose", required = true, arity = 3)
     var tags = mutableListOf<String>()
@@ -34,6 +38,9 @@ class Init(val context: Context) : ICommand {
 
     @Parameter(description = "Instance Type", names = ["--instance"])
     var instanceType =  "r3.2xlarge"
+
+    @Parameter(description = "Limit to specified availability zones", names = ["--azs", "--az", "-z"], listConverter = AZConverter::class)
+    var azs: List<String> = listOf()
 
     override fun execute() {
         println("Initializing directory")
@@ -61,11 +68,44 @@ class Init(val context: Context) : ICommand {
         Clean().execute()
 
         // copy provisioning over
-        val reflections = Reflections("com.thelastpickle.tlpcluster.commands.origin", ResourcesScanner())
-
-        val provisioning = reflections.getResources(".*".toPattern())
 
         println("Copying provisioning files")
+
+
+        var config = initializeDirectory(client, ticket, purpose)
+
+
+        config.numCassandraInstances = cassandraInstances
+        config.numStressInstances = stressInstances
+        config.cassandraInstanceType = instanceType
+
+        config.setVariable("client", client)
+        config.setVariable("ticket", ticket)
+        config.setVariable("purpose", purpose)
+
+        if(azs.isNotEmpty()) {
+            println("Overriding default az list with $azs")
+            config.azs = expand(context.userConfig.region, azs)
+        }
+
+        writeTerraformConfig(config)
+
+        println("Your workspace has been initialized with $cassandraInstances Cassandra instances (${config.cassandraInstanceType}) and $stressInstances stress instances in ${context.userConfig.region}")
+
+        if(start) {
+            Up(context).execute()
+        } else {
+            with(TermColors()) {
+                println("Next you'll want to run ${green("tlp-cluster up")} to start your instances.")
+            }
+        }
+
+    }
+
+
+    fun initializeDirectory(client: String, ticket: String, purpose: String) : Configuration {
+        val reflections = Reflections("com.thelastpickle.tlpcluster.commands.origin", ResourcesScanner())
+        val provisioning = reflections.getResources(".*".toPattern())
 
         for (f in provisioning) {
             val input = this.javaClass.getResourceAsStream("/" + f)
@@ -78,33 +118,24 @@ class Init(val context: Context) : ICommand {
             FileUtils.copyInputStreamToFile(input, output)
         }
 
-        val config = Configuration(ticket, client, purpose, context.userConfig.region , context = context)
+        return Configuration(ticket, client, purpose, context.userConfig.region , context = context)
+    }
 
-
-        config.numCassandraInstances = cassandraInstances
-        config.numStressInstances = stressInstances
-        config.cassandraInstanceType = instanceType
-
-        config.setVariable("client", client)
-        config.setVariable("ticket", ticket)
-        config.setVariable("purpose", purpose)
-
+    fun writeTerraformConfig(config: Configuration): Result<String> {
         val configOutput = File("terraform.tf.json")
         config.write(configOutput)
 
         val terraform = Terraform(context)
-        terraform.init()
+        return terraform.init()
+    }
 
 
-        println("Your workspace has been initialized with $cassandraInstances Cassandra instances (${config.cassandraInstanceType}) and $stressInstances stress instances in ${context.userConfig.region}")
 
-        if(start) {
-            Up(context).execute()
-        } else {
-            with(TermColors()) {
-                println("Next you'll want to run ${green("tlp-cluster up")} to start your instances.")
-            }
-        }
+    companion object {
+        fun expand(region: String, azs: List<String>) : List<String> = azs.map { region + it }
+
+        val log = logger()
+
 
     }
 

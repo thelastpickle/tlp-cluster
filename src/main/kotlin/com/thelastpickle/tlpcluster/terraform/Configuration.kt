@@ -46,6 +46,8 @@ class Configuration(val ticket: String,
         mapper.enable(SerializationFeature.INDENT_OUTPUT)
     }
 
+    var azs = regionLookup.getAzs(region)
+
     fun setVariable(key: String, default: String?) : Configuration {
         config.variable[key] = Variable(default)
         return this
@@ -92,7 +94,7 @@ class Configuration(val ticket: String,
         setVariable("key_path", context.userConfig.sshKeyPath)
         setVariable("region", region)
 
-        val azs = regionLookup.getAzs(region)
+
 
         setVariable("zones", Variable(azs))
 
