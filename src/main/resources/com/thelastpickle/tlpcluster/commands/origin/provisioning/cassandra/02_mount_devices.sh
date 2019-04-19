@@ -1,21 +1,24 @@
 #!/usr/bin/env bash
 
 # Mount the volume that is going to be used to store the data
-echo "Mounting NVMe volume that will store the data"
+echo "Mounting data volume "
 
-# You might need to edit this device
-TARGET_DEVICE=/dev/nvme1n1
-
-# leave this so we don't have to change the config
 MOUNT_POINT=/var/lib/cassandra/
 
-sudo mkfs.ext4 -F ${TARGET_DEVICE}
+DEVICES=( "/dev/nvme1n1" "/dev/xvdb" )
 
-sudo mkdir -p ${MOUNT_POINT}
-echo "${TARGET_DEVICE} ${MOUNT_POINT} ext4 defaults,nodev,nosuid 0 2" | sudo tee -a /etc/fstab
-sudo mount -a
+for TARGET_DEVICE in "${DEVICES[@]}"; do
+    echo "Checking $TARGET_DEVICE"
 
-# Moved the chown mount point to the install script, needs to run after the deb package is installed
-# sudo chown -R cassandra:cassandra ${MOUNT_POINT}
-sudo chmod 755 ${MOUNT_POINT}
-sudo rm -fr ${MOUNT_POINT}/lost+found/
+    if [[ -b "$TARGET_DEVICE" ]]
+    then
+	echo "Creating volume from $TARGET_DEVICE"
+        sudo mkfs.xfs -s size=4096 -f /dev/xvdb
+        sudo mkdir -p ${MOUNT_POINT}
+	    sudo mount $TARGET_DEVICE $MOUNT_POINT
+        sudo chmod 755 ${MOUNT_POINT}
+        break 2
+    fi
+    echo "Next"
+
+done

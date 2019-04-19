@@ -17,7 +17,7 @@ echo "Running all shell scripts"
 cd $1
 for f in $(ls [0-9]*.sh)
 do
-    sh ${f}
+    bash ${f}
 done
 
 echo "Done with shell scripts"
