@@ -52,9 +52,6 @@ fun main(arguments: Array<String>) {
     else
         jc.usage()
 
-
-    println("Done")
-
     // currently this is a work around to break out of a docker thread (netty?) that is never shut down.
     context.shutdown()
 }
