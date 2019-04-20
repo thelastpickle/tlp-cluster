@@ -13,6 +13,15 @@ internal class PrometheusTest {
             global {
                 scape_interval = "15s"
             }
+            scrape_config {
+                job_name = "prometheus"
+
+                static_configs {
+                    
+                }
+
+            }
+
         }
     }
 
