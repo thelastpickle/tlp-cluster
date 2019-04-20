@@ -35,19 +35,6 @@ class CassandraYaml(val parser: JsonNode) {
         tmp.put("seeds", seedList)
     }
 
-    fun setHosts(nodeType: ServerType, hosts: List<String>, port: String) {
-        val jobTargets = parser
-                .get("scrape_configs")
-                .filter { node: JsonNode -> node.get("job_name").textValue() == nodeType.serverType}
-                .first()
-                .get("static_configs")
-                .filter { node: JsonNode -> node.fieldNames().next() == "targets" }
-                .first()
-
-        val tmp = (jobTargets as ObjectNode).putArray("targets")
-        hosts.forEach { tmp.add("$it:$port") }
-    }
-
     /**
      * Convenience method
      */

@@ -1,11 +1,14 @@
 package com.thelastpickle.tlpcluster.configuration
 
-import org.junit.jupiter.api.Assertions.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.thelastpickle.tlpcluster.YamlDelegate
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 internal class PrometheusTest {
+
+    val yaml by YamlDelegate()
 
     val config = prometheus {
         global {
@@ -42,6 +45,11 @@ internal class PrometheusTest {
     fun testStaticConfigs() {
         val targets = config.scrape_configs.first().staticConfigs.targets
         assertThat(targets).containsExactly("127.0.0.1:8000", "192.168.1:8000")
+    }
+
+    @Test
+    fun testConvertToYaml() {
+        var data = yaml.writeValueAsString(config)
     }
 
 }
