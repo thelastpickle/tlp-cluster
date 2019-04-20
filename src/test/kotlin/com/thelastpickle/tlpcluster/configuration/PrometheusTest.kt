@@ -17,9 +17,9 @@ internal class PrometheusTest {
                 job_name = "prometheus"
                 scape_interval = "5s"
 
-                static_configs {
+                static_config {
                     targets {
-
+                        +"127.0.0.1:8000"
                     }
 
                 }
