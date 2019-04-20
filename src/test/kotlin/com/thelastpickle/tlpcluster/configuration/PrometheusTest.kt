@@ -8,8 +8,12 @@ import org.junit.jupiter.api.Test
 internal class PrometheusTest {
 
     @Test
-    fun blah() {
-        
+    fun testDSLBuilder() {
+        val prometheus = prometheus {
+            global {
+                scape_interval = "15s"
+            }
+        }
     }
 
 
