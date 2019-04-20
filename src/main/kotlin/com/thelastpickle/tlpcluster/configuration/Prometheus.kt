@@ -11,8 +11,11 @@ class Prometheus(var global: Global = Global("15s"),
                        var static_configs: StaticConfig = StaticConfig())
 
     // belongs to scrape config
-    class StaticConfig(var targets: MutableList<String> = mutableListOf())
+    class StaticConfig(var targetsList: MutableList<String> = mutableListOf())
 
+    fun global(block: Global.() -> Unit) {
+        global = Global().apply(block)
+    }
 
 }
 
@@ -20,9 +23,7 @@ fun prometheus(block: Prometheus.() -> Unit) : Prometheus {
     return Prometheus().apply(block)
 }
 
-fun Prometheus.global(block: Prometheus.Global.() -> Unit) {
-    global = Prometheus.Global().apply(block)
-}
+
 
 fun Prometheus.scrape_config(block: Prometheus.ScrapeConfig.() -> Unit) {
     val config = Prometheus.ScrapeConfig().apply(block)

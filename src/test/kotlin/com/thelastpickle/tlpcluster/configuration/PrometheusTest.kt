@@ -15,9 +15,13 @@ internal class PrometheusTest {
             }
             scrape_config {
                 job_name = "prometheus"
+                scape_interval = "5s"
 
                 static_configs {
-                    
+                    targets {
+
+                    }
+
                 }
 
             }
