@@ -119,11 +119,8 @@ class UseCassandra(val context: Context) : ICommand {
         // if using a monitoring instance, set the hosts to pull metrics from
         if (context.tfstate.getHosts(ServerType.Monitoring).count() > 0) {
             val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
-
-            // TODO: Finish with Prometheus DSL
-            cassandraHosts.map { "${it.private}:9500" }.joinToString(",")
-            stressHosts.map { "${it.private}:9501" }.joinToString(",")
-
+            
+            // TODO: Move out of here and make it more testable
             val prometheus = prometheus {
                 scrape_config {
                     job_name = "prometheus"
@@ -134,9 +131,12 @@ class UseCassandra(val context: Context) : ICommand {
                     }
                     static_config {
                         job_name = "cassandra"
+                        targets = cassandraHosts.map { "${it.private}:9500" }
+
                     }
                     static_config {
                         job_name = "stress"
+                        targets = stressHosts.map { "${it.private}:9501" }
                     }
                 }
             }
