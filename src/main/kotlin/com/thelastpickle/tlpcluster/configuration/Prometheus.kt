@@ -1,6 +1,7 @@
 package com.thelastpickle.tlpcluster.configuration
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.io.File
 import java.io.OutputStream
 
 // TODO: This needs some additional options
@@ -37,7 +38,32 @@ class Prometheus(var global: Global = Global("15s"),
 
     companion object {
         fun writeConfiguration(cassandra: List<String>, stress: List<String>, out: OutputStream) {
+
             // TODO: Move out of here and make it more testable
+            val config = prometheus {
+                scrape_config {
+                    job_name = "prometheus"
+
+                    static_config {
+                        job_name = "prometheus"
+                        targets = listOf("localhost:9090")
+                    }
+                    static_config {
+                        job_name = "cassandra"
+                        targets = cassandra.map { "$it:9500" }
+
+                    }
+                    static_config {
+                        job_name = "stress"
+                        targets = stress.map { "$it}:9501" }
+                    }
+                }
+
+
+            }
+
+
+            yaml.writeValue(file, prometheus)
             val prometheus = prometheus {
                 scrape_config {
                     job_name = "prometheus"

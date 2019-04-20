@@ -7,6 +7,7 @@ import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.YamlDelegate
 import com.thelastpickle.tlpcluster.configuration.ServerType
 import com.thelastpickle.tlpcluster.configuration.CassandraYaml
+import com.thelastpickle.tlpcluster.configuration.Prometheus
 import com.thelastpickle.tlpcluster.configuration.prometheus
 import com.thelastpickle.tlpcluster.containers.CassandraUnpack
 import org.apache.commons.io.FileUtils
@@ -118,37 +119,13 @@ class UseCassandra(val context: Context) : ICommand {
 
         // if using a monitoring instance, set the hosts to pull metrics from
         val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
+        val prometheusOutput = File(prometheusYamlLocation).outputStream()
 
-        // TODO: Move out of here and make it more testable
-        val prometheus = prometheus {
-            scrape_config {
-                job_name = "prometheus"
-
-                static_config {
-                    job_name = "prometheus"
-                    targets = listOf("localhost:9090")
-                }
-                static_config {
-                    job_name = "cassandra"
-                    targets = cassandraHosts.map { "${it.private}:9500" }
-
-                }
-                static_config {
-                    job_name = "stress"
-                    targets = stressHosts.map { "${it.private}:9501" }
-                }
-            }
-
-
-        }
-
-        val file = File(prometheusYamlLocation)
+        Prometheus.writeConfiguration(cassandraHosts.map { it.private }, stressHosts.map { it.private }, prometheusOutput)
         log.debug { "Writing Prometheus YAML to $prometheusYamlLocation" }
-        yaml.writeValue(file, prometheus)
 
         val env = File(cassandraEnvLocation)
         env.appendText("\nJVM_OPTS=\"\$JVM_OPTS -Dcassandra.consistent.rangemovement=false\"\n")
-
 
         with(TermColors()) {
             println("Cassandra deb and config copied to provisioning/.  Config files are located in provisioning/cassandra. \n Use ${green("tlp-cluster install")} to push the artifacts to the nodes.")
