@@ -10,8 +10,11 @@ echo "Pass a provisioning argument please"
 exit 1
 fi
 
-echo "Running all shell scripts"
+echo "installing common utilities"
+sudo apt install -y sysstat dstat iftop ifsta
 
+
+echo "Running all shell scripts"
 # subshell
 (
 cd $1
@@ -22,3 +25,4 @@ done
 
 echo "Done with shell scripts"
 )
+
