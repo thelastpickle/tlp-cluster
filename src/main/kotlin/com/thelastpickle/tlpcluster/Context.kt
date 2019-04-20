@@ -1,19 +1,15 @@
 package com.thelastpickle.tlpcluster
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientBuilder
 import com.github.dockerjava.netty.NettyDockerCmdExecFactory
 import com.thelastpickle.tlpcluster.configuration.TFState
 import com.thelastpickle.tlpcluster.configuration.User
 import org.apache.logging.log4j.kotlin.logger
-import com.thelastpickle.tlpcluster.configuration.Yaml
 import java.io.File
 import java.nio.file.Files
-import java.nio.file.Path
 
 data class Context(val tlpclusterUserDirectory: File) {
 

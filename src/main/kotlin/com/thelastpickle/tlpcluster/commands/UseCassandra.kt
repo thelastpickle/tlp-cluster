@@ -5,7 +5,7 @@ import com.beust.jcommander.Parameters
 import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.configuration.ServerType
-import com.thelastpickle.tlpcluster.configuration.Yaml
+import com.thelastpickle.tlpcluster.configuration.CassandraYaml
 import com.thelastpickle.tlpcluster.containers.CassandraUnpack
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.kotlin.logger
@@ -91,7 +91,7 @@ class UseCassandra(val context: Context) : ICommand {
         // update the seeds list
         val cassandraYamlLocation = "provisioning/cassandra/conf/cassandra.yaml"
         val cassandraEnvLocation = "provisioning/cassandra/conf/cassandra-env.sh"
-        val cassandraYaml = Yaml.create(File(cassandraYamlLocation))
+        val cassandraYaml = CassandraYaml.create(File(cassandraYamlLocation))
 
         cassandraYaml.setProperty("endpoint_snitch", "Ec2Snitch")
 
@@ -113,7 +113,7 @@ class UseCassandra(val context: Context) : ICommand {
         // if using a monitoring instance, set the hosts to pull metrics from
         if (context.tfstate.getHosts(ServerType.Monitoring).count() > 0) {
             val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
-            val prometheusYaml = Yaml.create(File(prometheusYamlLocation))
+            val prometheusYaml = CassandraYaml.create(File(prometheusYamlLocation))
 
             // port values are hard coded. We should probably make this configurable at some point.
             prometheusYaml.setHosts(ServerType.Cassandra, cassandraHosts.map { it.private }, "9500")

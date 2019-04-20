@@ -7,19 +7,19 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import java.io.File
 import java.io.InputStream
 
-class Yaml(val parser: JsonNode) {
+class CassandraYaml(val parser: JsonNode) {
 
     companion object {
         val mapper = ObjectMapper(YAMLFactory())
 
-        fun create(fp: File) : Yaml {
+        fun create(fp: File) : CassandraYaml {
             val tmp = mapper.readTree(fp)
-            return Yaml(tmp)
+            return CassandraYaml(tmp)
         }
 
-        fun create(inputStream: InputStream) : Yaml {
+        fun create(inputStream: InputStream) : CassandraYaml {
             val tmp = mapper.readTree(inputStream)
-            return Yaml(tmp)
+            return CassandraYaml(tmp)
         }
     }
     fun setProperty(name: String, value: String) {
