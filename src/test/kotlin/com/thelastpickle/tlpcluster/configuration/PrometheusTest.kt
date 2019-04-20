@@ -16,12 +16,8 @@ internal class PrometheusTest {
             scape_interval = "5s"
 
             static_config {
-                targets {
-                    +"127.0.0.1:8000"
-                }
-
+                targets = listOf("127.0.0.1:8000", "192.168.1:8000")
             }
-
         }
 
     }
@@ -36,7 +32,16 @@ internal class PrometheusTest {
     fun testScrapeConfigs() {
         val scrape = config.scrape_configs
         assertThat(scrape).isNotEmpty()
+
+        val prom = config.scrape_configs.first()
+        assertThat(prom.job_name).isEqualTo("prometheus")
+
     }
 
+    @Test
+    fun testStaticConfigs() {
+        val targets = config.scrape_configs.first().staticConfigs.targets
+        assertThat(targets).containsExactly("127.0.0.1:8000", "192.168.1:8000")
+    }
 
 }
