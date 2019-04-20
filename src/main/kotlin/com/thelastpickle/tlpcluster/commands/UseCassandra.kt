@@ -117,34 +117,34 @@ class UseCassandra(val context: Context) : ICommand {
         val stressHosts = context.tfstate.getHosts(ServerType.Stress)
 
         // if using a monitoring instance, set the hosts to pull metrics from
-        if (context.tfstate.getHosts(ServerType.Monitoring).count() > 0) {
-            val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
+        val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
 
-            // TODO: Move out of here and make it more testable
-            val prometheus = prometheus {
-                scrape_config {
+        // TODO: Move out of here and make it more testable
+        val prometheus = prometheus {
+            scrape_config {
+                job_name = "prometheus"
+
+                static_config {
                     job_name = "prometheus"
+                    targets = listOf("localhost:9090")
+                }
+                static_config {
+                    job_name = "cassandra"
+                    targets = cassandraHosts.map { "${it.private}:9500" }
 
-                    static_config {
-                        job_name = "prometheus"
-                        targets = listOf("localhost:9090")
-                    }
-                    static_config {
-                        job_name = "cassandra"
-                        targets = cassandraHosts.map { "${it.private}:9500" }
-
-                    }
-                    static_config {
-                        job_name = "stress"
-                        targets = stressHosts.map { "${it.private}:9501" }
-                    }
+                }
+                static_config {
+                    job_name = "stress"
+                    targets = stressHosts.map { "${it.private}:9501" }
                 }
             }
 
-            val file = File(prometheusYamlLocation)
-            log.debug { "Writing Prometheus YAML to $prometheusYamlLocation" }
-            yaml.writeValue(file, prometheus)
+
         }
+
+        val file = File(prometheusYamlLocation)
+        log.debug { "Writing Prometheus YAML to $prometheusYamlLocation" }
+        yaml.writeValue(file, prometheus)
 
         val env = File(cassandraEnvLocation)
         env.appendText("\nJVM_OPTS=\"\$JVM_OPTS -Dcassandra.consistent.rangemovement=false\"\n")
