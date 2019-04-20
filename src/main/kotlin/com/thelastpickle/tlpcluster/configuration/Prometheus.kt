@@ -2,7 +2,8 @@ package com.thelastpickle.tlpcluster.configuration
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-
+// TODO: This needs some additional options
+// Also need to validate the config generated here is valid prometheus config
 class Prometheus(var global: Global = Global("15s"),
                  var scrape_configs: MutableList<ScrapeConfig> = mutableListOf()) {
 
@@ -39,5 +40,15 @@ fun prometheus(block: Prometheus.() -> Unit) : Prometheus {
     return Prometheus().apply(block)
 }
 
+
+/**
+ * Convenience for generating sample configs
+ * This is for local testing and debugging
+ *
+ * TODO: Fill this out
+ */
+fun main() {
+
+}
 
 

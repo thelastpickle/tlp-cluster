@@ -119,7 +119,7 @@ class UseCassandra(val context: Context) : ICommand {
         // if using a monitoring instance, set the hosts to pull metrics from
         if (context.tfstate.getHosts(ServerType.Monitoring).count() > 0) {
             val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
-            
+
             // TODO: Move out of here and make it more testable
             val prometheus = prometheus {
                 scrape_config {
