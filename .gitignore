@@ -106,3 +106,4 @@ local.properties
 
 # End of https://www.gitignore.io/api/eclipse
 src/main/resources/com/thelastpickle/tlpcluster/instances/importers/instances.json
+/prometheus.yml
