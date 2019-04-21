@@ -1,5 +1,6 @@
 package com.thelastpickle.tlpcluster.configuration
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.thelastpickle.tlpcluster.YamlDelegate
 import org.yaml.snakeyaml.Yaml
@@ -11,10 +12,11 @@ import java.io.OutputStream
 class Prometheus(var global: Global = Global("15s"),
                  var scrape_configs: MutableList<ScrapeConfig> = mutableListOf()) {
 
-    class Global(@JsonProperty("scrape_intervals") var scape_interval: String = "")
+    class Global(var scrape_interval: String = "")
 
     class ScrapeConfig(var job_name: String = "",
-                       var scape_interval: String = "",
+                       @JsonInclude(JsonInclude.Include.NON_NULL)
+                       var scape_interval: String? = null,
 
                        @JsonProperty("static_configs")
                        var staticConfigs: StaticConfig = StaticConfig()) {
@@ -60,7 +62,7 @@ class Prometheus(var global: Global = Global("15s"),
                     }
                     static_config {
                         job_name = "stress"
-                        targets = stress.map { "$it}:9501" }
+                        targets = stress.map { "$it:9501" }
                     }
                 }
 
@@ -80,7 +82,6 @@ fun prometheus(block: Prometheus.() -> Unit) : Prometheus {
  * Convenience for generating sample configs
  * This is for local testing and debugging
  *
- * TODO: Fill this out
  */
 fun main() {
 
