@@ -45,7 +45,6 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
 
         fun writeConfiguration(cassandra: List<String>, stress: List<String>, out: OutputStream) {
 
-            // TODO: Move out of here and make it more testable
             val config = prometheus {
                 scrape_config {
                     job_name = "prometheus"
