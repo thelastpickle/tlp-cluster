@@ -1,6 +1,5 @@
 package com.thelastpickle.tlpcluster.configuration
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.thelastpickle.tlpcluster.YamlDelegate
 
 import org.assertj.core.api.Assertions.assertThat
@@ -12,23 +11,22 @@ internal class PrometheusTest {
 
     val config = prometheus {
         global {
-            scape_interval = "15s"
+            scrape_interval = "15s"
         }
         scrape_config {
             job_name = "prometheus"
-            scape_interval = "5s"
+            scrape_interval = "5s"
 
             static_config {
                 targets = listOf("127.0.0.1:8000", "192.168.1:8000")
             }
         }
-
     }
 
 
     @Test
     fun testGlobalConfig() {
-        assertThat(config.global.scape_interval).isEqualTo("15s")
+        assertThat(config.global.scrape_interval).isEqualTo("15s")
     }
 
     @Test
@@ -43,7 +41,7 @@ internal class PrometheusTest {
 
     @Test
     fun testStaticConfigs() {
-        val targets = config.scrape_configs.first().staticConfigs.targets
+        val targets = config.scrape_configs.first().staticConfigList.first().targets
         assertThat(targets).containsExactly("127.0.0.1:8000", "192.168.1:8000")
     }
 

@@ -3,36 +3,35 @@ package com.thelastpickle.tlpcluster.configuration
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.thelastpickle.tlpcluster.YamlDelegate
-import org.yaml.snakeyaml.Yaml
 import java.io.File
 import java.io.OutputStream
 
 // TODO: This needs some additional options
 // Also need to validate the config generated here is valid prometheus config
-class Prometheus(var global: Global = Global("15s"),
+class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"),
                  var scrape_configs: MutableList<ScrapeConfig> = mutableListOf()) {
 
-    class Global(var scrape_interval: String = "")
 
-    class ScrapeConfig(var job_name: String = "",
+    class ScrapeConfig(@JsonInclude(JsonInclude.Include.NON_EMPTY) var job_name: String = "",
                        @JsonInclude(JsonInclude.Include.NON_NULL)
-                       var scape_interval: String? = null,
+                       var scrape_interval: String? = null,
 
                        @JsonProperty("static_configs")
-                       var staticConfigs: StaticConfig = StaticConfig()) {
+                       @JsonInclude(JsonInclude.Include.NON_EMPTY)
+                       var staticConfigList: MutableList<StaticConfig> = mutableListOf()) {
 
         fun static_config(block: StaticConfig.() -> Unit) {
-            staticConfigs = StaticConfig().apply(block)
+            staticConfigList.add(StaticConfig().apply(block))
+
         }
     }
-
 
     // belongs to scrape config
     class StaticConfig(var targets: List<String> = listOf())
 
 
-    fun global(block: Global.() -> Unit) {
-        global = Global().apply(block)
+    fun global(block: ScrapeConfig.() -> Unit) {
+        global = ScrapeConfig().apply(block)
     }
 
     fun scrape_config(block: ScrapeConfig.() -> Unit) {
@@ -55,11 +54,13 @@ class Prometheus(var global: Global = Global("15s"),
                         job_name = "prometheus"
                         targets = listOf("localhost:9090")
                     }
+
                     static_config {
                         job_name = "cassandra"
                         targets = cassandra.map { "$it:9500" }
-
                     }
+
+
                     static_config {
                         job_name = "stress"
                         targets = stress.map { "$it:9501" }
