@@ -7,19 +7,19 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import java.io.File
 import java.io.InputStream
 
-class Yaml(val parser: JsonNode) {
+class CassandraYaml(val parser: JsonNode) {
 
     companion object {
         val mapper = ObjectMapper(YAMLFactory())
 
-        fun create(fp: File) : Yaml {
+        fun create(fp: File) : CassandraYaml {
             val tmp = mapper.readTree(fp)
-            return Yaml(tmp)
+            return CassandraYaml(tmp)
         }
 
-        fun create(inputStream: InputStream) : Yaml {
+        fun create(inputStream: InputStream) : CassandraYaml {
             val tmp = mapper.readTree(inputStream)
-            return Yaml(tmp)
+            return CassandraYaml(tmp)
         }
     }
     fun setProperty(name: String, value: String) {
@@ -33,19 +33,6 @@ class Yaml(val parser: JsonNode) {
         val tmp = seedNode as ObjectNode
         val seedList = seeds.joinToString(",")
         tmp.put("seeds", seedList)
-    }
-
-    fun setHosts(nodeType: ServerType, hosts: List<String>, port: String) {
-        val jobTargets = parser
-                .get("scrape_configs")
-                .filter { node: JsonNode -> node.get("job_name").textValue() == nodeType.serverType}
-                .first()
-                .get("static_configs")
-                .filter { node: JsonNode -> node.fieldNames().next() == "targets" }
-                .first()
-
-        val tmp = (jobTargets as ObjectNode).putArray("targets")
-        hosts.forEach { tmp.add("$it:$port") }
     }
 
     /**

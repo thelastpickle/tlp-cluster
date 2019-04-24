@@ -1,15 +1,12 @@
 package com.thelastpickle.tlpcluster.configuration
 
-import org.junit.jupiter.api.Assertions.*
-
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-internal class YamlTest {
-    val yaml : Yaml
+internal class CassandraYamlTest {
+    val yaml : CassandraYaml
     init {
         val tmp = this.javaClass.getResourceAsStream("cassandra.yaml")
-        yaml = Yaml.create(tmp)
+        yaml = CassandraYaml.create(tmp)
     }
 
     @Test

@@ -4,8 +4,11 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
+import com.thelastpickle.tlpcluster.YamlDelegate
 import com.thelastpickle.tlpcluster.configuration.ServerType
-import com.thelastpickle.tlpcluster.configuration.Yaml
+import com.thelastpickle.tlpcluster.configuration.CassandraYaml
+import com.thelastpickle.tlpcluster.configuration.Prometheus
+import com.thelastpickle.tlpcluster.configuration.prometheus
 import com.thelastpickle.tlpcluster.containers.CassandraUnpack
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.kotlin.logger
@@ -23,6 +26,8 @@ class UseCassandra(val context: Context) : ICommand {
 
     @Parameter(description = "Configuration settings to change in the cassandra.yaml file specified in the format key:value,...", names = ["--config", "-c"])
     var configSettings = listOf<String>()
+
+    val yaml by YamlDelegate()
 
     override fun execute() {
         check(name.isNotBlank())
@@ -91,7 +96,7 @@ class UseCassandra(val context: Context) : ICommand {
         // update the seeds list
         val cassandraYamlLocation = "provisioning/cassandra/conf/cassandra.yaml"
         val cassandraEnvLocation = "provisioning/cassandra/conf/cassandra-env.sh"
-        val cassandraYaml = Yaml.create(File(cassandraYamlLocation))
+        val cassandraYaml = CassandraYaml.create(File(cassandraYamlLocation))
 
         cassandraYaml.setProperty("endpoint_snitch", "Ec2Snitch")
 
@@ -110,26 +115,17 @@ class UseCassandra(val context: Context) : ICommand {
         log.debug { "Writing Cassandra YAML to $cassandraYamlLocation" }
         cassandraYaml.write(cassandraYamlLocation)
 
+        val stressHosts = context.tfstate.getHosts(ServerType.Stress)
+
         // if using a monitoring instance, set the hosts to pull metrics from
-        if (context.tfstate.getHosts(ServerType.Monitoring).count() > 0) {
-            val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
-            val prometheusYaml = Yaml.create(File(prometheusYamlLocation))
+        val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
+        val prometheusOutput = File(prometheusYamlLocation).outputStream()
 
-            // port values are hard coded. We should probably make this configurable at some point.
-            prometheusYaml.setHosts(ServerType.Cassandra, cassandraHosts.map { it.private }, "9500")
-
-            if (context.tfstate.getHosts(ServerType.Stress).count() > 0) {
-                val stressHosts = context.tfstate.getHosts(ServerType.Stress)
-                prometheusYaml.setHosts(ServerType.Stress, stressHosts.map { it.private }, "9501")
-            }
-
-            log.debug { "Writing Prometheus YAML to $prometheusYamlLocation" }
-            prometheusYaml.write(prometheusYamlLocation)
-        }
+        Prometheus.writeConfiguration(cassandraHosts.map { it.private }, stressHosts.map { it.private }, prometheusOutput)
+        log.debug { "Writing Prometheus YAML to $prometheusYamlLocation" }
 
         val env = File(cassandraEnvLocation)
         env.appendText("\nJVM_OPTS=\"\$JVM_OPTS -Dcassandra.consistent.rangemovement=false\"\n")
-
 
         with(TermColors()) {
             println("Cassandra deb and config copied to provisioning/.  Config files are located in provisioning/cassandra. \n Use ${green("tlp-cluster install")} to push the artifacts to the nodes.")
