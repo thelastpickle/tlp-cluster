@@ -42,11 +42,15 @@ class TFState(val context: Context,
 
             val serverName = name as String
 
-            
-            if(serverName.contains(serverType.serverType)) {
-                val host = Host.fromTerraformString(serverName, public!!, private!!)
-                log.info { "Adding host: $host" }
-                result.add(host)
+            if(public != null && private != null) {
+
+                if(serverName.contains(serverType.serverType)) {
+                    val host = Host.fromTerraformString(serverName, public, private)
+                    log.info { "Adding host: $host" }
+                    result.add(host)
+                }
+            } else {
+                log.error("Invalid terraform state: null IP for $serverName, check terraform.tfstate to debug.")
             }
 
         }
