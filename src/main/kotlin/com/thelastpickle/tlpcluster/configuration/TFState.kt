@@ -42,7 +42,7 @@ class TFState(val context: Context,
 
             val serverName = name as String
 
-
+            
             if(serverName.contains(serverType.serverType)) {
                 val host = Host.fromTerraformString(serverName, public!!, private!!)
                 log.info { "Adding host: $host" }

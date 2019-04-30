@@ -99,8 +99,11 @@ class Configuration(val ticket: String,
         setVariable("zones", Variable(azs))
 
         val externalCidr = listOf("${getExternalIpAddress()}/32")
+
+        val unixTime = System.currentTimeMillis() / 1000L
+
         val instanceSg = SecurityGroupResource.Builder()
-            .newSecurityGroupResource("${ticket}_TlpClusterSG","tlp-cluster ${ticket} security group", tags)
+            .newSecurityGroupResource("${ticket}_TlpClusterSG_$unixTime","tlp-cluster ${ticket} security group", tags)
             .withOutboundRule(0, 65535, "tcp", listOf("0.0.0.0/0"), "All traffic")
             .withInboundRule(22, 22, "tcp", externalCidr, "SSH")
             .withInboundSelfRule(0, 65535, "tcp", "Intra node")
