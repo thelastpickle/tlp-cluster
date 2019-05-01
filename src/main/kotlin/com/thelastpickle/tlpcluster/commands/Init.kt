@@ -6,6 +6,7 @@ import com.beust.jcommander.Parameters
 import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.commands.converters.AZConverter
+import com.thelastpickle.tlpcluster.configuration.ansible.Playbook
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import java.io.File
@@ -88,6 +89,8 @@ class Init(val context: Context) : ICommand {
             config.azs = expand(context.userConfig.region, azs)
         }
 
+        File("ansible").mkdir()
+
         writeTerraformConfig(config)
 
         println("Your workspace has been initialized with $cassandraInstances Cassandra instances (${config.cassandraInstanceType}) and $stressInstances stress instances in ${context.userConfig.region}")
@@ -102,21 +105,14 @@ class Init(val context: Context) : ICommand {
 
     }
 
-
+    /**
+     * Initialize the current directory for tlp-cluster to use as a workspace.
+     * There isn't much here, but the logic is kept separate to let mocking prevent the actual resources from being copied in unit tests
+     * See the InitTest
+     */
     fun initializeDirectory(client: String, ticket: String, purpose: String) : Configuration {
-        val reflections = Reflections("com.thelastpickle.tlpcluster.commands.origin", ResourcesScanner())
-        val provisioning = reflections.getResources(".*".toPattern())
 
-        for (f in provisioning) {
-            val input = this.javaClass.getResourceAsStream("/" + f)
-            val outputFile = f.replace("com/thelastpickle/tlpcluster/commands/origin/", "")
-
-            val output = File(outputFile)
-            println("Writing ${output.absolutePath}")
-
-            output.absoluteFile.parentFile.mkdirs()
-            FileUtils.copyInputStreamToFile(input, output)
-        }
+        Playbook().copyResourcesToLocation(File(context.cwdPath))
 
         return Configuration(ticket, client, purpose, context.userConfig.region , context = context)
     }
