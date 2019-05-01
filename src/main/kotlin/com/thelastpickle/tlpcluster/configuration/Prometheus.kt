@@ -87,12 +87,20 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
                     }
                 }
                 scrape_config {
+                    job_name = "cassandra-os"
+
+                    static_config {
+                        targets = cassandra.map { "$it:9100" }
+                    }
+                }
+                scrape_config {
                     job_name = "stress"
 
                     static_config {
                         targets = stress.map { "$it:9501" }
                     }
                 }
+
 
 
             }
