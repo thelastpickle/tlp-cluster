@@ -79,6 +79,7 @@ dependencies {
     compile 'com.github.ajalt:mordant:1.2.1'
 
     testCompile "io.mockk:mockk:1.9.3"
+    testCompile "org.testcontainers:junit-jupiter:1.11.2"
 }
 
 task docs(type:Exec) {

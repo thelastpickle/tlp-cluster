@@ -21,7 +21,7 @@ class Start(val context: Context) : ICommand {
         }
 
         println("Starting all nodes.")
-        val parallelSsh = Pssh(context, sshKeyPath)
+        val parallelSsh = Pssh(context)
         val successMessage = "service successfully started"
         val failureMessage = "service failed to started"
 

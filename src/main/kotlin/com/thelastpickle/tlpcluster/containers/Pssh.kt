@@ -7,10 +7,7 @@ import com.thelastpickle.tlpcluster.configuration.ServerType
 import org.apache.logging.log4j.kotlin.logger
 
 
-/**
- * This is currently flawed in that it only allows for SSH'ing to Cassandra
- */
-class Pssh(val context: Context, val sshKey: String) {
+class Pssh(val context: Context) {
     private val dockerImageTag = "thelastpickle/tlp-cluster_pssh"
 
     private val provisionCommand = "cd provisioning; chmod +x install.sh; sudo ./install.sh"
@@ -64,8 +61,9 @@ class Pssh(val context: Context, val sshKey: String) {
         val hosts = "PSSH_HOSTNAMES=${context.tfstate.getHosts(nodeType).map { it.public }.joinToString(" ")}"
         log.info("Starting container with $hosts")
 
+
         return docker
-                .addVolume(VolumeMapping(sshKey, "/root/.ssh/aws-private-key", AccessMode.ro))
+                .addVolume(VolumeMapping(context.userConfig.sshKeyPath, "/root/.ssh/aws-private-key", AccessMode.ro))
                 .addVolume(VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
                 .addVolume(VolumeMapping(scriptFile.path, scriptPathInContainer, AccessMode.rw))
                 .addEnv(hosts)

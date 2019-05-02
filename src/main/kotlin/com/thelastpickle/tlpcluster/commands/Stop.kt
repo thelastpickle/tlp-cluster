@@ -21,7 +21,7 @@ class Stop(val context: Context) : ICommand {
         }
 
         println("Stopping cassandra service on all nodes.")
-        val parallelSsh = Pssh(context, sshKeyPath)
+        val parallelSsh = Pssh(context)
 
         parallelSsh.stopService(ServerType.Cassandra, "cassandra")
 

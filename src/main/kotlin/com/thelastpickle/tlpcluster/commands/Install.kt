@@ -29,7 +29,7 @@ class Install(val context: Context) : ICommand {
             System.exit(1)
         }
 
-        val parallelSsh = Pssh(context, sshKeyPath)
+        val parallelSsh = Pssh(context)
 
         var installSuccessful = true
 
