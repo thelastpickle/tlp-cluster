@@ -162,7 +162,10 @@ class Docker(val context: Context) {
 
             dockerCommandBuilder
                     .withVolumes(volumesList)
-                    .withBinds(bindesList)
+                    // This api changed a little when docker-java was upgraded, they stopped proxying this call
+                    // now we have to explicitly set a host config and add the binds there
+                    .withHostConfig(HostConfig().withBinds(bindesList)
+                    )
         }
 
         if (workingDirectory.isNotEmpty()) {
