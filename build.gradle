@@ -1,13 +1,15 @@
 
 buildscript {
-    ext.kotlin_version = "1.3.21"
+    ext.kotlin_version = "1.3.31"
     ext.jcommander_version = "1.72"
     
     repositories {
         mavenCentral()
+        jcenter()
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:5.0.0'
     }
 }
 
@@ -15,6 +17,8 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
 
 group 'com.thelastpickle'
 version '1.0-SNAPSHOT'
@@ -28,20 +32,7 @@ repositories {
     // You can declare any Maven/Ivy/file repository here.
 //    jcenter()
     mavenCentral()
-
-}
-
-
-jar {
-    manifest {
-        attributes 'Main-Class': 'com.thelastpickle.tlpcluster.MainKt'
-    }
-    // This line of code recursively collects and copies all of a project's files
-    // and adds them to the JAR itself. One can extend this task, to skip certain
-    // files or particular types at will
-    baseName = "tlp-cluster"
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+    jcenter()
 }
 
 

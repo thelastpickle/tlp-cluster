@@ -7,5 +7,5 @@ TLP_CLUSTER_USER_DATA=~/.tlp-cluster/
 
 mkdir -p $TLP_CLUSTER_USER_DATA/{builds,maven}
 
-java -jar $BASE_DIR/build/libs/tlp-cluster-1.0-SNAPSHOT.jar "$@"
+java -jar $BASE_DIR/build/libs/tlp-cluster-1.0-SNAPSHOT-all.jar "$@"
 
