@@ -258,4 +258,8 @@ class Docker(val context: Context) {
 
         return if ( returnCode == 0) Result.success(capturedStdOut.toString()) else Result.failure(Exception("Non zero response returned."))
     }
+
+    fun killContainer(id: String) {
+        context.docker.killContainerCmd(id)
+    }
 }
