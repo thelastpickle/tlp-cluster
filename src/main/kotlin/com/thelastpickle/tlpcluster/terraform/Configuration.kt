@@ -180,7 +180,10 @@ data class SecurityGroupRule(
     val to_port: Int,
     val protocol: String = "tcp",
     val self: Boolean = false,
-    val cidr_blocks: List<String> = listOf()
+    val cidr_blocks: List<String> = listOf(),
+    val ipv6_cidr_blocks: List<String> = listOf(),
+    val prefix_list_ids: List<String> = listOf(),
+    val security_groups: List<String> = listOf()
 )
 
 data class SecurityGroupResource(
