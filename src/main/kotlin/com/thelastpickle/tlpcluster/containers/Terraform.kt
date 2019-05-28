@@ -8,11 +8,11 @@ import com.thelastpickle.tlpcluster.VolumeMapping
 
 class Terraform(val context: Context) {
     private val docker = Docker(context)
-    private val dockerImageTag = "hashicorp/terraform:light"
+    private val dockerImageTag = "hashicorp/terraform:0.11.14"
     private var localDirectory = "/local"
 
     init {
-        docker.pullImage(dockerImageTag, "light")
+        docker.pullImage(dockerImageTag, "0.11.14")
     }
 
     fun init() : Result<String> {
