@@ -14,6 +14,7 @@ echo "installing common utilities"
 sudo apt install -y sysstat dstat iftop ifstat htop
 
 
+
 echo "Running all shell scripts"
 # subshell
 (

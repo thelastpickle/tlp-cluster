@@ -85,6 +85,29 @@ tlp-cluster up
 
 Terraform will eventually ask you to type `yes` and fire up your instances.  Optionally you can pass `--yes` to the `-up` command and you won't be prompted.
 
+tlp-cluster will create a file, `env.sh`, which has helpful aliases and bash functions that will help you run your cluster.  Run the following:
+
+[source,bash]
+----
+source env.sh
+----
+
+This will set up SSH, SCP, SFTP, and rsync to use a local sshConfig file, as well as some other helpful aliases.
+
+
+SSH alises for all Cassandra nodes are automatically created as `c0`-`cN`.  `ssh` is not required.  For example:
+
+`c0 nodetool status`
+
+In addition, the following are defined:
+
+* *c-all* executes a command on every node in the cluster sequentially.
+* *c-collect-artifacts* will collect metrics, nodetool output and system information into the artifacts directory.  It takes a name as a parameter.  This is useful when doing performance testing to capture the state of the system at a given moment.
+* *c-start* Starts cassandra on all nodes.
+* *c-restart* Restarts cassandra on all nodes.  Not a graceful operation.  To test true rolling restarts we recommend using https://github.com/spotify/cstar[cstar].
+* *c-status*: Executes `nodetool status` on cassandra0.
+* *c-tpstats*: Executes `nodetool tpstats` on all nodes.
+
 
 == Installing Cassandra
 

@@ -13,6 +13,7 @@ import org.apache.commons.io.FileUtils
 import com.thelastpickle.tlpcluster.terraform.Configuration
 import com.thelastpickle.tlpcluster.containers.Terraform
 import org.apache.logging.log4j.kotlin.logger
+import java.util.zip.GZIPInputStream
 
 
 sealed class CopyResourceResult {
@@ -117,6 +118,18 @@ class Init(val context: Context) : ICommand {
             output.absoluteFile.parentFile.mkdirs()
             FileUtils.copyInputStreamToFile(input, output)
         }
+
+        // gunzip the collector
+        val collector = "collector-0.11.1-SNAPSHOT.jar.gz"
+
+        val dir = "provisioning/cassandra/"
+
+        val fp = GZIPInputStream(File(dir, collector).inputStream())
+
+        val out = File(dir, collector.removeSuffix(".gz"))
+
+        out.writeBytes(fp.readBytes())
+
 
         return Configuration(ticket, client, purpose, context.userConfig.region , context = context)
     }

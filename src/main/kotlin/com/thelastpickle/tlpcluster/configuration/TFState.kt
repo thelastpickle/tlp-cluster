@@ -74,5 +74,37 @@ class TFState(val context: Context,
         config.flush()
     }
 
+    fun writeEnvironmentFile(fp: BufferedWriter) {
+
+        // write the initial SSH aliases
+
+        fp.appendln("#!/bin/bash")
+        fp.appendln()
+
+        var i = 0
+        fp.append("SERVERS=(")
+        getHosts(ServerType.Cassandra).forEach {
+            fp.append("cassandra$i ")
+            i++
+        }
+        fp.appendln(")")
+
+        i=0
+        getHosts(ServerType.Cassandra).forEach {
+            fp.appendln("alias c${i}=\"ssh cassandra${i}\"")
+            i++
+        }
+
+        fp.appendln()
+
+        val content = this.javaClass.getResourceAsStream("env.sh").bufferedReader()
+        val lines = content.readLines().toMutableList()
+
+        for(line in lines) {
+            fp.appendln(line)
+        }
+        fp.flush()
+    }
+
 
 }
