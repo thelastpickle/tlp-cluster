@@ -42,4 +42,14 @@ internal class TFStateTest {
         log.info { result }
         assertThat(result).contains("Host cassandra0")
     }
+
+    @Test
+    fun testWriteEnvironmentFile() {
+        val tmp = StringWriter()
+        val writer = tmp.buffered()
+        state.writeEnvironmentFile(writer)
+        val result = writer.toString()
+        assertThat(result.length).isGreaterThan(0)
+
+    }
 }

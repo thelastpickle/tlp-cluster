@@ -37,9 +37,9 @@ class Up(val context: Context) : ICommand {
 
                 println("Writing ssh config file to sshConfig.")
 
-                println("""The following alias will allow you to easily ssh to the cluster:
+                println("""The following alias will allow you to easily work with the cluster:
                 |
-                |${green("alias ssh=\"ssh -F sshConfig\"")}
+                |${green("source env.sh")}
                 |
                 |""".trimMargin())
             }
@@ -47,6 +47,13 @@ class Up(val context: Context) : ICommand {
         
         val config = File("sshConfig").bufferedWriter()
         context.tfstate.writeSshConfig(config)
+
+        val envFile = File("env.sh").bufferedWriter()
+        context.tfstate.writeEnvironmentFile(envFile)
+
+
+
+
 
     }
 
