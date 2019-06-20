@@ -65,8 +65,14 @@ data class Context(val tlpclusterUserDirectory: File) {
     val docker by lazy {
         nettyInitialised = true
 
+        val socketLocation = "/var/run/docker.sock"
+        val socket = "unix://$socketLocation"
+
+        if(!File(socketLocation).exists())
+            throw Exception("Could not find the docker socket, is docker running?  Using $socket")
+
         val dockerConfig = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerHost("unix:///var/run/docker.sock")
+                .withDockerHost(socket)
                 .build()
 
 
