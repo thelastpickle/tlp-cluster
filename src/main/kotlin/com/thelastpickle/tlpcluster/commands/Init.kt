@@ -124,6 +124,8 @@ class Init(val context: Context) : ICommand {
 
         val dir = "provisioning/cassandra/"
 
+        println("Copying JMX collector")
+
         val fp = GZIPInputStream(File(dir, collector).inputStream())
 
         val out = File(dir, collector.removeSuffix(".gz"))
