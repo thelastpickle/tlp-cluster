@@ -97,7 +97,7 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
                     job_name = "stress"
 
                     static_config {
-                        targets = stress.map { "$it:9501" }
+                        targets = stress.map { "$it:9500" }
                     }
                 }
 
