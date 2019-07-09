@@ -21,3 +21,6 @@ services:
       - "8080:8080"
     volumes:
       - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/jmx_prometheus_javaagent-0.12.0.jar.txt:/usr/share/jmx_prometheus_javaagent-0.12.0.jar:ro"
+      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/config.yaml:/usr/share/config.yaml:ro"
+    environment:
+      JVM_EXTRA_OPTS: '-javaagent:/usr/share/jmx_prometheus_javaagent-0.12.0.jar=9500:/usr/share/config.yaml'
