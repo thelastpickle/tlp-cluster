@@ -13,4 +13,4 @@ scrape_configs:
   - job_name: 'stress'
     scrape_interval: 5s
     static_configs:
-      - targets: ['stress:9501']
+      - targets: ['stress:9500']
