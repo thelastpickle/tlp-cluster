@@ -9,6 +9,8 @@ services:
     image: prom/prometheus
     ports:
       - "9090:9090"
+    volumes:
+      - "./src/test/resources/prometheus.yml:/etc/prometheus/prometheus.yml"
 
   grafana:
     image: grafana/grafana
