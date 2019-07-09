@@ -19,3 +19,5 @@ services:
     image: cassandra:3.11.4
     ports:
       - "8080:8080"
+    volumes:
+      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/jmx_prometheus_javaagent-0.12.0.jar.txt:/usr/share/jmx_prometheus_javaagent-0.12.0.jar:ro"
