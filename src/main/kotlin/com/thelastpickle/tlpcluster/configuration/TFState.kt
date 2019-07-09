@@ -39,13 +39,14 @@ class TFState(val context: Context,
 
             val private = attrs.get("private_ip")
             val public = attrs.get("public_ip")
+            val az = attrs.get("availability_zone")
 
-            val serverName = name as String
+            val serverName = name as String?
 
-            if(public != null && private != null) {
+            if(public != null && private != null && serverName != null) {
 
                 if(serverName.contains(serverType.serverType)) {
-                    val host = Host.fromTerraformString(serverName, public, private)
+                    val host = Host.fromTerraformString(serverName as String, public, private, az as String)
                     log.info { "Adding host: $host" }
                     result.add(host)
                 }

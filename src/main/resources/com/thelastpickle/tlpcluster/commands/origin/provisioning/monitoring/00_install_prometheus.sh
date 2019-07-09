@@ -24,7 +24,9 @@ sudo cp ${PACKAGE_NAME}/promtool ${BIN_DIR}
 sudo cp -r ${PACKAGE_NAME}/consoles ${ETC_DIR}
 sudo cp -r ${PACKAGE_NAME}/console_libraries ${ETC_DIR}
 
-sudo cp config/prometheus/prometheus.yml ${ETC_DIR}/
+# all configs
+sudo cp config/prometheus/*.yml ${ETC_DIR}/
+
 sudo cp config/prometheus/prometheus.service /etc/systemd/system/
 
 sudo chown -R prometheus:prometheus ${ETC_DIR}

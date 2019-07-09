@@ -1,0 +1,2079 @@
+{
+   "__inputs": [ ],
+   "__requires": [ ],
+   "annotations": {
+      "list": [ ]
+   },
+   "editable": true,
+   "gnetId": null,
+   "graphTooltip": 0,
+   "hideControls": false,
+   "id": null,
+   "links": [ ],
+   "refresh": "1m",
+   "rows": [
+      {
+         "collapse": false,
+         "collapsed": false,
+         "panels": [
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Coordinator level read and write count - Max of each 1m rate for each operation type",
+               "fill": 0,
+               "gridPos": { },
+               "id": 2,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum by (scope) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~\"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite\", name=~\"Latency|ViewWriteLatency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "{{scope}} Request Rate",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Request Throughputs",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "rps",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "rps",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Timeouts, Failures, Unavailable Rates for each operation type",
+               "fill": 0,
+               "gridPos": { },
+               "id": 3,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum by (name) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~\"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite\", name!~\"Latency|ViewWriteLatency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "{{name}} Requests ",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Error throughputs",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "rps",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "rps",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "cacheTimeout": null,
+               "colorBackground": false,
+               "colorValue": false,
+               "colors": [
+                  "#DEB6F2",
+                  "#CA95E5",
+                  "#8F3BB8"
+               ],
+               "datasource": "Prometheus",
+               "decimals": 2,
+               "description": "Part of reads in the total of standard requests (Reads+Writes). CAS, Views, ... operations are ignored.",
+               "format": "percentunit",
+               "gauge": {
+                  "maxValue": 1,
+                  "minValue": 0,
+                  "show": true,
+                  "thresholdLabels": true,
+                  "thresholdMarkers": false
+               },
+               "gridPos": { },
+               "id": 4,
+               "interval": null,
+               "links": [ ],
+               "mappingType": 1,
+               "mappingTypes": [
+                  {
+                     "name": "value to text",
+                     "value": 1
+                  },
+                  {
+                     "name": "range to text",
+                     "value": 2
+                  }
+               ],
+               "maxDataPoints": 100,
+               "nullPointMode": "connected",
+               "nullText": null,
+               "postfix": " Reads",
+               "postfixFontSize": "30%",
+               "prefix": "",
+               "prefixFontSize": "50%",
+               "rangeMaps": [
+                  {
+                     "from": "null",
+                     "text": "N/A",
+                     "to": "null"
+                  }
+               ],
+               "sparkline": {
+                  "fillColor": "rgba(31, 118, 189, 0.18)",
+                  "full": false,
+                  "lineColor": "#FFB357",
+                  "show": false
+               },
+               "tableColumn": "",
+               "targets": [
+                  {
+                     "expr": "sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=\"Read\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}) / ignoring (scope) (sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=\"Read\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}) + ignoring (scope) sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=\"Write\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}))",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": "0.25,0.5,0.75",
+               "timeFrom": "1m",
+               "title": "Read / Write Distribution",
+               "transparent": true,
+               "type": "singlestat",
+               "valueFontSize": "30%",
+               "valueMaps": [
+                  {
+                     "op": "=",
+                     "text": "N/A",
+                     "value": "null"
+                  }
+               ],
+               "valueName": "current"
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Read latency maximum for coordinated reads",
+               "fill": 0,
+               "gridPos": { },
+               "id": 5,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope=\"Read\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Max {{scope}} 99th percentile for {{cluster}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Read Latency",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "µs",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "µs",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Write latency maximum for coordinated reads",
+               "fill": 0,
+               "gridPos": { },
+               "id": 6,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope=\"Write\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Max {{scope}} 99th percentile for {{cluster}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Write Latency",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "µs",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "µs",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Other latencies on p99 for coordinated requests",
+               "fill": 0,
+               "gridPos": { },
+               "id": 7,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope!~\"Write|Read|.*-.*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Max {{scope}} 99th percentile for {{cluster}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Other Latencies",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "µs",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "µs",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            }
+         ],
+         "repeat": null,
+         "repeatIteration": null,
+         "repeatRowId": null,
+         "showTitle": true,
+         "title": "Cluster Requests (Coordinator Perspective)",
+         "titleSize": "h6",
+         "type": "row"
+      },
+      {
+         "collapse": false,
+         "collapsed": false,
+         "panels": [
+            {
+               "columns": [
+                  {
+                     "text": "Current",
+                     "value": "current"
+                  }
+               ],
+               "datasource": "Prometheus",
+               "description": "Disks space used ordered (fullest disks first)",
+               "gridPos": { },
+               "id": 8,
+               "sort": {
+                  "col": 1,
+                  "desc": true
+               },
+               "styles": [
+                  {
+                     "alias": "Node --> Mounting Point",
+                     "colorMode": null,
+                     "colors": [
+                        "rgba(245, 54, 54, 0.9)",
+                        "rgba(237, 129, 40, 0.89)",
+                        "rgba(50, 172, 45, 0.97)"
+                     ],
+                     "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                     "decimals": 2,
+                     "mappingType": 1,
+                     "pattern": "Metric",
+                     "preserveFormat": true,
+                     "sanitize": true,
+                     "thresholds": [ ],
+                     "type": "string",
+                     "unit": "short"
+                  },
+                  {
+                     "alias": "% Disk Space Used",
+                     "colorMode": "row",
+                     "colors": [
+                        "rgba(50, 172, 45, 0.97)",
+                        "rgba(237, 129, 40, 0.89)",
+                        "rgba(245, 54, 54, 0.9)"
+                     ],
+                     "dateFormat": "YYYY-MM-DD HH:mm:ss",
+                     "decimals": 2,
+                     "link": false,
+                     "mappingType": 1,
+                     "pattern": "Current",
+                     "thresholds": [
+                        "0.5",
+                        "0.75"
+                     ],
+                     "type": "number",
+                     "unit": "percentunit"
+                  }
+               ],
+               "targets": [
+                  {
+                     "expr": "max by (environment, cluster, datacenter, rack, node, mountpoint)(1-(node_filesystem_avail_bytes/node_filesystem_size_bytes))",
+                     "format": "time_series",
+                     "instant": true,
+                     "intervalFactor": 2,
+                     "legendFormat": "{{node}} --> {{mountpoint}}",
+                     "refId": "A"
+                  }
+               ],
+               "title": "Disk Space Usage",
+               "transform": "timeseries_aggregations",
+               "transparent": true,
+               "type": "table"
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Sum of the sizes of the data on distinct nodes",
+               "fill": 0,
+               "gridPos": { },
+               "id": 9,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum by (environment, cluster, datacenter, rack, node)\n        (org_apache_cassandra_metrics_table_value{name=\"LiveDiskSpaceUsed\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}        )",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Sum live data size - nodes in cluster: {{cluster}}",
+                     "refId": "A"
+                  },
+                  {
+                     "expr": "sum by (environment, cluster, datacenter, rack, node)\n        (org_apache_cassandra_metrics_table_value{name=\"TotalDiskSpaceUsed\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Sum total data size - nodes in cluster: {{cluster}}",
+                     "refId": "B"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Total Data Size",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "bytes",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "format": "bytes",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "SSTable Count Max and Average per node and table",
+               "fill": 0,
+               "gridPos": { },
+               "id": 10,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (keyspace, scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_table_value{name=\"LiveSSTableCount\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Maximum number of SSTables for table: {{keyspace}}.{{scope}}",
+                     "refId": "A"
+                  },
+                  {
+                     "expr": "max by (environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_table_value{name=\"LiveSSTableCount\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Maximum number of SSTables for cluster: {{cluster}}",
+                     "refId": "B"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "SSTable Count",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": true,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Maximum pending compactions on a node and per table",
+               "fill": 0,
+               "gridPos": { },
+               "id": 11,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": false,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": true,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (keyspace, scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_table_value{name=\"PendingCompactions\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Max pending compactions for cluster/table: {{cluster}}/{{scope}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Pending Compactions",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            }
+         ],
+         "repeat": null,
+         "repeatIteration": null,
+         "repeatRowId": null,
+         "showTitle": true,
+         "title": "Data Status",
+         "titleSize": "h6",
+         "type": "row"
+      },
+      {
+         "collapse": false,
+         "collapsed": false,
+         "panels": [
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Pending threads rate summed by pool",
+               "fill": 0,
+               "gridPos": { },
+               "id": 12,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_threadpools_value{name=\"PendingTasks\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Sum of Dropped Messages for Cluster/Scope: {{cluster}}/{{scope}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Pending Messages",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Dropped messages rate summed by message type",
+               "fill": 0,
+               "gridPos": { },
+               "id": 13,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_droppedmessage_oneminuterate{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Sum of Dropped Messages for Cluster/Scope: {{cluster}}/{{scope}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Dropped Messages",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Read repair rate summed per cluster",
+               "fill": 0,
+               "gridPos": { },
+               "id": 14,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum by (environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_threadpools_value{name=\"ActiveTasks\", scope=\"ReadRepairStage\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Sum of Read Repairs for Cluster: {{cluster}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Read Repairs",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Hints being sent over to the node the data belongs.",
+               "fill": 0,
+               "gridPos": { },
+               "id": 15,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum by (environment, cluster, datacenter, rack, node) (org_apache_cassandra_db_storageproxy_hintsinprogress{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Sum of hinted handoff for Cluster: {{cluster}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Hinted Handoff",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            }
+         ],
+         "repeat": null,
+         "repeatIteration": null,
+         "repeatRowId": null,
+         "showTitle": true,
+         "title": "Cassandra Internals",
+         "titleSize": "h6",
+         "type": "row"
+      },
+      {
+         "collapse": false,
+         "collapsed": false,
+         "panels": [
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Maximum CPU utilisation (max 100%)",
+               "fill": 1,
+               "gridPos": { },
+               "id": 16,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": true,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "(1 - min by (mode) (rate(node_cpu_seconds_total{mode=\"idle\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m])))",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Maximum CPU utilisation",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "CPU Utilization",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "percent",
+                     "label": null,
+                     "logBase": 1,
+                     "max": 105,
+                     "min": 0,
+                     "show": true
+                  },
+                  {
+                     "format": "percent",
+                     "label": null,
+                     "logBase": 1,
+                     "max": 105,
+                     "min": 0,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Unix load per node",
+               "fill": 0,
+               "gridPos": { },
+               "id": 17,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (environment, cluster, datacenter, rack, node) (node_load1{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Maximum Load (1m rate)",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Unix Load",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Maximum Memory allocated per usage (worst node) - excludes caches, buffers, etc",
+               "fill": 1,
+               "gridPos": { },
+               "id": 18,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 2,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (node_memory_MemTotal_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_MemFree_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_Buffers_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_Cached_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_SwapCached_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_Slab_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_PageTables_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_VmallocUsed_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        )",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Maximum memory used for nodes in cluster: {{cluster}}",
+                     "refId": "A"
+                  },
+                  {
+                     "expr": "min by (environment, cluster, datacenter, rack, node)\n        (node_memory_MemTotal_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Minimum amount of memory available for nodes in cluster: {{cluster}}",
+                     "refId": "B"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Memory Utilisation",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "bytes",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "format": "bytes",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Equivalent to r_await and w_await from `iostat -x` - Building help, see: https://www.robustperception.io/mapping-iostat-to-the-node-exporters-node_disk_-metrics",
+               "fill": 0,
+               "gridPos": { },
+               "id": 19,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (100 * rate(node_disk_read_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n        / rate(node_disk_reads_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Max r_await in: {{cluster}}",
+                     "refId": "A"
+                  },
+                  {
+                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (100 * rate(node_disk_write_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n        / rate(node_disk_writes_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Max w_await in: {{cluster}}",
+                     "refId": "B"
+                  },
+                  {
+                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (100 *\n          (rate(node_disk_read_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n          + rate(node_disk_write_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))\n        ) / (\n          (rate(node_disk_reads_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n          + rate(node_disk_writes_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))\n        )",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Max await in: {{cluster}}",
+                     "refId": "C"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Disk IO Wait",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "percent",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "format": "percent",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": true,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Network In and Out per node",
+               "fill": 0,
+               "gridPos": { },
+               "id": 20,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "sum by (environment, cluster) (rate(node_network_transmit_bytes_total{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Sum of Network Outgoing, cluster: {{cluster}}",
+                     "refId": "A"
+                  },
+                  {
+                     "expr": "sum by (environment, cluster) (-1 * (rate(node_network_receive_bytes_total{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m])))",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Sum of Network Incoming, cluster: {{cluster}}",
+                     "refId": "B"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Network I/O",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "bytes",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "format": "bytes",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            }
+         ],
+         "repeat": null,
+         "repeatIteration": null,
+         "repeatRowId": null,
+         "showTitle": true,
+         "title": "Hardware / Operating System",
+         "titleSize": "h6",
+         "type": "row"
+      },
+      {
+         "collapse": false,
+         "collapsed": false,
+         "panels": [
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Garbage Collection duration",
+               "fill": 0,
+               "gridPos": { },
+               "id": 21,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (gc, node) (rate(jvm_gc_collection_seconds_sum{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Maximum GC duration per minute for {{gc}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Garbage Collection Time",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "s",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "format": "s",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Garbage Collection Count",
+               "fill": 0,
+               "gridPos": { },
+               "id": 22,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (gc, node) (rate(jvm_gc_collection_seconds_count{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Maximum GC count per minute for {{gc}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Garbage Collection Count",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "format": "short",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "Prometheus",
+               "description": "Maximum JVM Heap Memory size (worst node)",
+               "fill": 1,
+               "gridPos": { },
+               "id": 23,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 2,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
+                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (jvm_memory_bytes_used{area=\"heap\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}        )",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Maximum heap size used for nodes in cluster: {{cluster}}",
+                     "refId": "A"
+                  },
+                  {
+                     "expr": "min by (environment, cluster, datacenter, rack, node)\n        (jvm_memory_bytes_max{area=\"heap\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Minimum amount of heap memory available for nodes in cluster: {{cluster}}",
+                     "refId": "B"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "JVM Heap Memory Utilisation",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "format": "bytes",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "format": "bytes",
+                     "label": null,
+                     "logBase": 1,
+                     "max": null,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            }
+         ],
+         "repeat": null,
+         "repeatIteration": null,
+         "repeatRowId": null,
+         "showTitle": true,
+         "title": "JVM / Garbage Collection",
+         "titleSize": "h6",
+         "type": "row"
+      }
+   ],
+   "schemaVersion": 14,
+   "style": "dark",
+   "tags": [
+      "Cassandra",
+      "Overview"
+   ],
+   "templating": {
+      "list": [
+         {
+            "current": {
+               "text": "Prometheus",
+               "value": "Prometheus"
+            },
+            "hide": 1,
+            "label": null,
+            "name": "PROMETHEUS_DS",
+            "options": [ ],
+            "query": "prometheus",
+            "refresh": 1,
+            "regex": "",
+            "type": "datasource"
+         },
+         {
+            "allValue": null,
+            "current": { },
+            "datasource": "$PROMETHEUS_DS",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Environment",
+            "multi": false,
+            "name": "environment",
+            "options": [ ],
+            "query": "label_values(org_apache_cassandra_metrics_clientrequest_oneminuterate, environment)",
+            "refresh": 2,
+            "regex": "",
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [ ],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+         },
+         {
+            "allValue": null,
+            "current": { },
+            "datasource": "$PROMETHEUS_DS",
+            "hide": 0,
+            "includeAll": false,
+            "label": "Cluster",
+            "multi": false,
+            "name": "cluster",
+            "options": [ ],
+            "query": "label_values(org_apache_cassandra_metrics_clientrequest_oneminuterate{environment=\"$environment\"}, cluster)",
+            "refresh": 2,
+            "regex": "",
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [ ],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+         },
+         {
+            "allValue": null,
+            "current": { },
+            "datasource": "$PROMETHEUS_DS",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Datacenter",
+            "multi": true,
+            "name": "datacenter",
+            "options": [ ],
+            "query": "label_values(org_apache_cassandra_metrics_clientrequest_oneminuterate{environment=\"$environment\", cluster=\"$cluster\"}, datacenter)",
+            "refresh": 2,
+            "regex": "",
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [ ],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+         },
+         {
+            "allValue": null,
+            "current": { },
+            "datasource": "$PROMETHEUS_DS",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Rack",
+            "multi": true,
+            "name": "rack",
+            "options": [ ],
+            "query": "label_values(org_apache_cassandra_metrics_clientrequest_oneminuterate{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\"}, rack)",
+            "refresh": 2,
+            "regex": "",
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [ ],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+         },
+         {
+            "allValue": null,
+            "current": {
+               "text": "all",
+               "value": "$__all"
+            },
+            "datasource": "$PROMETHEUS_DS",
+            "hide": 0,
+            "includeAll": true,
+            "label": "Node",
+            "multi": true,
+            "name": "node",
+            "options": [ ],
+            "query": "label_values(org_apache_cassandra_metrics_clientrequest_oneminuterate{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\"}, node)",
+            "refresh": 2,
+            "regex": "",
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [ ],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+         }
+      ]
+   },
+   "time": {
+      "from": "now-3h",
+      "to": "now"
+   },
+   "timepicker": {
+      "refresh_intervals": [
+         "5s",
+         "10s",
+         "30s",
+         "1m",
+         "5m",
+         "15m",
+         "30m",
+         "1h",
+         "2h",
+         "1d"
+      ],
+      "time_options": [
+         "5m",
+         "15m",
+         "1h",
+         "6h",
+         "12h",
+         "24h",
+         "2d",
+         "7d",
+         "30d"
+      ]
+   },
+   "timezone": "browser",
+   "title": "Cassandra Overview",
+   "version": 0
+}

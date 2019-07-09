@@ -137,9 +137,64 @@ task integrationTest(type: Test) {
     group = "Verification"
 }
 
+task buildJsonnet(type: Exec) {
+    workingDir 'src/dashboards'
+    commandLine "docker-compose", "build"
+    standardOutput = new ByteArrayOutputStream()
+    group = "dashboard"
+    description = "Rebuild the jsonnet container"
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
+
+}
+
+task generateDashboards(type: Exec) {
+    workingDir 'src/dashboards'
+    commandLine "docker-compose", "up", "--exit-code-from", "grafonnet"
+
+
+    standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
+
+    group = "dashboard"
+    description = "Regenerate the Grafana Dashboards using Docker."
+    inputs.files(project.fileTree(dir: "src/dashboards"))
+
+    ignoreExitValue true
+    doLast {
+        logger.info(standardOutput.toString())
+        logger.error(errorOutput.toString())
+        if (execResult.getExitValue() != 0) {
+            print(standardOutput)
+            throw new GradleScriptException("non zero exit code")
+        }
+    }
+}
+
+compileKotlin.dependsOn(generateDashboards)
+
+task startPreviewDependencies(type:Exec) {
+    group = "dashboard"
+    description = "Start Cassandra and wait for it to be up"
+    commandLine "docker-compose", "-f", "docker-compose-monitoring-dev.yml", "run", "start_dependencies"
+}
+
+task previewDashboards(type:Exec) {
+    group = "dashboard"
+    description = "Start the dashboard dev environment"
+    commandLine "docker-compose", "-f", "docker-compose-monitoring-dev.yml", "up"
+    dependsOn startPreviewDependencies
+}
+
 
 test {
     useJUnitPlatform()
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+    }
 }
 
 ospackage {

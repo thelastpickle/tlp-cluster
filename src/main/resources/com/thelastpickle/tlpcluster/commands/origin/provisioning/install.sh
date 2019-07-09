@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # pass either cassandra, stress or monitor to execute all files
+export DEBIAN_FRONTEND=noninteractive
 
 echo "Updating local apt database"
 sudo apt-get update

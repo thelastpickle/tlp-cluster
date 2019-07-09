@@ -1,0 +1,71 @@
+# Docker compose for testing the monitoring dashboards and prometheus configs
+# start with docker-compose -f docker-compose-monitoring-dev.yml up
+# that's it.
+
+version: "3.0"
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.11.1
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./src/test/resources/monitoring-environment/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+
+  node_exporter:
+    image: prom/node-exporter:v0.18.1
+    ports:
+      - "9100:9100"
+    volumes:
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/:/rootfs:ro"
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--collector.ntp"
+      - "--collector.meminfo"
+      #- "--collector.ntp.server=ntp"
+      #- "--collector.ntp.server-is-local"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - "./src/test/resources/monitoring-environment/grafana.ini:/etc/grafana/grafana.ini:ro"
+      - "./src/test/resources/monitoring-environment/provisioning/:/etc/grafana/provisioning/"
+      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/monitoring/config/grafana/dashboards:/var/lib/grafana/dashboards:ro"
+    environment:
+      # Attempts to get a nice nodes up/total panel...
+      # - "GF_INSTALL_PLUGINS=vonage-status-panel"
+      - "GF_PANELS_DISABLE_SANITIZE_HTML=true"
+
+  cassandra:
+    image: cassandra:3.11.4
+    ports:
+      - "9501:9501"
+      - "9042:9042"
+    volumes:
+      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/jmx_prometheus_javaagent-0.12.0.jar.txt:/usr/share/jmx_prometheus_javaagent-0.12.0.jar:ro"
+      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/config.yaml:/usr/share/config.yaml:ro"
+    environment:
+      JVM_EXTRA_OPTS: '-javaagent:/usr/share/jmx_prometheus_javaagent-0.12.0.jar=9501:/usr/share/config.yaml'
+
+  stress:
+    image: thelastpickle/tlp-stress:latest
+    ports:
+      - "9500:9500"
+    environment:
+      - "TLP_STRESS_CASSANDRA_HOST=cassandra"
+    command: "run KeyValue --rate 100 -d 1d -r .8"
+    depends_on:
+      - cassandra
+
+  start_dependencies:
+    image: dadarek/wait-for-dependencies
+    depends_on:
+      - cassandra
+    command: cassandra:9042

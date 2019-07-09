@@ -5,10 +5,7 @@ import com.beust.jcommander.Parameters
 import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.YamlDelegate
-import com.thelastpickle.tlpcluster.configuration.ServerType
-import com.thelastpickle.tlpcluster.configuration.CassandraYaml
-import com.thelastpickle.tlpcluster.configuration.Prometheus
-import com.thelastpickle.tlpcluster.configuration.prometheus
+import com.thelastpickle.tlpcluster.configuration.*
 import com.thelastpickle.tlpcluster.containers.CassandraUnpack
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.kotlin.logger
@@ -117,12 +114,26 @@ class UseCassandra(val context: Context) : ICommand {
 
         val stressHosts = context.tfstate.getHosts(ServerType.Stress)
 
+        // TODO: possibly move the prometheus file generation to Up command, i'm not sure if we need to wait before generating it
         // if using a monitoring instance, set the hosts to pull metrics from
         val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
         val prometheusOutput = File(prometheusYamlLocation).outputStream()
 
-        Prometheus.writeConfiguration(cassandraHosts.map { it.private }, stressHosts.map { it.private }, prometheusOutput)
+        val labelBaseLocation = "provisioning/monitoring/config/prometheus/"
+
+        val cassandraLabelOutput = File(labelBaseLocation, "cassandra.yml").outputStream()
+        val cassandraOSLabelOutput = File(labelBaseLocation, "cassandra-os.yml").outputStream()
+        val stressLabelOutput = File(labelBaseLocation, "stress.yml").outputStream()
+
+        Prometheus.writeConfiguration(cassandraHosts.map {
+            HostInfo(it.private, it.alias, rack = it.availabilityZone)
+        }, stressHosts.map {
+            HostInfo(it.private, it.alias, rack = it.availabilityZone)
+        },
+                "/etc/prometheus/", prometheusOutput, cassandraLabelOutput, cassandraOSLabelOutput, stressLabelOutput)
         log.debug { "Writing Prometheus YAML to $prometheusYamlLocation" }
+
+        // write out the sd file
 
         val env = File(cassandraEnvLocation)
         env.appendText("\nJVM_OPTS=\"\$JVM_OPTS -Dcassandra.consistent.rangemovement=false\"\n")

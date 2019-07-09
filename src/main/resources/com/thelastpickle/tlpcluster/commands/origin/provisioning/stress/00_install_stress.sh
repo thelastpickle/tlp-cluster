@@ -4,7 +4,8 @@ echo "Installing tlp-stress"
 
 
 echo "deb https://dl.bintray.com/thelastpickle/tlp-tools-deb weezy main" | sudo tee -a /etc/apt/sources.list
+
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 2895100917357435
-sudo apt update
-sudo apt install -y tlp-stress
+sudo apt-get update
+sudo apt-get install -y tlp-stress
 

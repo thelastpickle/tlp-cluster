@@ -23,9 +23,6 @@ class Pssh(val context: Context, val sshKey: String) {
         docker.buildContainer("DockerfileSSH", dockerImageTag)
     }
 
-    fun createGrafanaDashboard() : Result<String> {
-        return execute("create_dashboard.sh", "", ServerType.Monitoring)
-    }
 
     fun copyProvisioningResources(nodeType: ServerType) : Result<String> {
         return execute("copy_provisioning_resources.sh", "", nodeType)
