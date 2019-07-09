@@ -1,0 +1,21 @@
+# Docker compose for testing the monitoring dashboards and prometheus configs
+# start with docker-compose -f docker-compose-monitoring-dev.yml up
+# that's it.
+
+version: "3.0"
+
+services:
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+
+  cassandra:
+    image: cassandra:3.11.4
+    ports:
+      - "8080:8080"
