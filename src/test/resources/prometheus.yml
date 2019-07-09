@@ -1,3 +1,4 @@
+# used for docker testing only
 global:
   scrape_interval: 15s
 
@@ -8,8 +9,8 @@ scrape_configs:
   - job_name: 'cassandra'
     scrape_interval: 5s
     static_configs:
-      - targets: ['localhost:9500']
+      - targets: ['cassandra:9500']
   - job_name: 'stress'
     scrape_interval: 5s
     static_configs:
-      - targets: ['localhost:9501']
+      - targets: ['stress:9501']
