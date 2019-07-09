@@ -10,12 +10,15 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - "./src/test/resources/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./src/test/resources/monitoring-environment/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
 
   grafana:
     image: grafana/grafana
     ports:
       - "3000:3000"
+    volumes:
+#      - "./src/test/resources/monitoring-environment/grafana.ini:/etc/grafana/grafana.ini:ro"
+      - "./src/test/resources/monitoring-environment/datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro"
 
   cassandra:
     image: cassandra:3.11.4
