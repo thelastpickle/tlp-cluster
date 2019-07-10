@@ -112,3 +112,5 @@ src/main/resources/com/thelastpickle/tlpcluster/instances/importers/instances.js
 tlp-cluster.ipr
 tlp-cluster.iws
 
+# generated dashboards, we don't want to commit these
+/src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/monitoring/config/grafana/dashboards/
