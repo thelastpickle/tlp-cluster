@@ -127,6 +127,19 @@ task integrationTest(type: Test) {
     group = "Verification"
 }
 
+task buildJsonnet(type: Exec) {
+    workingDir 'src/dashboards'
+    commandLine "docker-compose", "build"
+    standardOutput = new ByteArrayOutputStream()
+    group = "build"
+    description = "Rebuild the jsonnet container"
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
+
+}
+
 task generateDashboards(type: Exec) {
     workingDir 'src/dashboards'
     commandLine "docker-compose", "up"
