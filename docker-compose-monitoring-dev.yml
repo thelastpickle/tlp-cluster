@@ -18,7 +18,8 @@ services:
       - "3000:3000"
     volumes:
       - "./src/test/resources/monitoring-environment/grafana.ini:/etc/grafana/grafana.ini:ro"
-      - "./src/test/resources/monitoring-environment/provisioning/:/etc/grafana/provisioning/:ro"
+      - "./src/test/resources/monitoring-environment/provisioning/:/etc/grafana/provisioning/"
+      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/monitoring/config/grafana/dashboards:/var/lib/grafana/dashboards:ro"
 
   cassandra:
     image: cassandra:3.11.4

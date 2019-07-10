@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: "cassandra"
+    orgId: 1
+    folder: "cassandra"
+    type: file
+    editable: true
+    updateIntervalInSeconds: 5
+    options:
+      path: "/var/lib/grafana/dashboards"
