@@ -7,7 +7,7 @@ local template = grafana.template;
 
 dashboard.new(
     "Threadpools",
-    schemaVersion=17
+    schemaVersion=17,
     tags=["cassandra"]
 ).addPanel(
     singlestat.new(
@@ -20,4 +20,9 @@ dashboard.new(
         prometheus.target(
             "now-10m"
     )
-    ))
+    ), gridPos={
+                  x: 0,
+                  y: 0,
+                  w: 24,
+                  h: 3,
+                })
