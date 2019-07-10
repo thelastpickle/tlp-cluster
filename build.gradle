@@ -127,6 +127,18 @@ task integrationTest(type: Test) {
     group = "Verification"
 }
 
+task generateDashboards(type: Exec) {
+    workingDir 'src/dashboards'
+    commandLine "docker-compose", "up"
+    standardOutput = new ByteArrayOutputStream()
+    group = "build"
+    description = "Regenerate the Grafana Dashboards using Docker."
+    //extension method stopTomcat.output() can be used to obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }
+}
+
 
 test {
     useJUnitPlatform()
