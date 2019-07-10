@@ -146,10 +146,14 @@ task generateDashboards(type: Exec) {
     standardOutput = new ByteArrayOutputStream()
     group = "build"
     description = "Regenerate the Grafana Dashboards using Docker."
+    inputs.files(project.fileTree(dir: "src/dashboards"))
+    
     //extension method stopTomcat.output() can be used to obtain the output:
     ext.output = {
         return standardOutput.toString()
     }
+
+
 }
 
 
