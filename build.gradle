@@ -144,17 +144,22 @@ task buildJsonnet(type: Exec) {
 task generateDashboards(type: Exec) {
     workingDir 'src/dashboards'
     commandLine "docker-compose", "up"
+
     standardOutput = new ByteArrayOutputStream()
+    errorOutput = new ByteArrayOutputStream()
+
     group = "build"
     description = "Regenerate the Grafana Dashboards using Docker."
     inputs.files(project.fileTree(dir: "src/dashboards"))
-    
-    //extension method stopTomcat.output() can be used to obtain the output:
-    ext.output = {
-        return standardOutput.toString()
+
+    doLast {
+        logger.info(standardOutput.toString())
+        logger.error(errorOutput.toString())
     }
+}
 
-
+task previewDashboards(type:Exec) {
+    commandLine "docker-compose", "-f", "docker-compose-monitoring-dev.yml", "up"
 }
 
 

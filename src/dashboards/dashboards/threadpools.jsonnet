@@ -5,24 +5,31 @@ local singlestat = grafana.singlestat;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 
+local blockedTasks =
+    singlestat.new(
+     "Blocked",
+     format="s",
+     datasource="Prometheus",
+     span=2,
+     valueName="current"
+    ).addTarget(
+       prometheus.target(
+        "cassandra_threadpool_request"
+       )
+      );
+
+
 dashboard.new(
     "Threadpools",
-    schemaVersion=17,
+    schemaVersion=18,
     tags=["cassandra"]
-).addPanel(
-    singlestat.new(
-        "Blocked",
-        format="s",
-        datasource="Prometheus",
-        span=2,
-        valueName="current"
-    ).addTarget(
-        prometheus.target(
-            "now-10m"
-    )
-    ), gridPos={
-                  x: 0,
-                  y: 0,
-                  w: 24,
-                  h: 3,
-                })
+).addTemplate(
+    template.datasource(
+      'PROMETHEUS_DS',
+      'prometheus',
+      'Prometheus')
+      ).addPanels(
+      [
+        blockedTasks {gridPos: {h:4, w:4, y:0}  }
+
+      ])
