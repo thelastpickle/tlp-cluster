@@ -3,8 +3,8 @@ lowercaseOutputLabelNames: true
 lowercaseOutputName: true
 startDelaySeconds: 0
 #hostPort: 127.0.0.1:7199
-username: 
-password: 
+username:
+password:
 #jmxUrl: service:jmx:rmi:///jndi/rmi://127.0.0.1:7199/jmxrmi
 ssl: false
 whitelistObjectNames:
@@ -15,48 +15,6 @@ whitelistObjectNames:
   - "org.apache.cassandra.metrics:type=ThreadPools"
 blacklistObjectNames:
   - "org.apache.cassandra.metrics:type=ColumnFamily,*"
-rules:
-  - pattern: 'org.apache.cassandra.metrics<type=Table, keyspace=(\w+), scope=(\w+), name=(\w+)><>Value: (\d+)'
-    name: cassandra_table_metrics
-    value: $4
-    help: "Cassandra $1.$2"
-    type: GAUGE
-    attrNameSnakeCase: false
-    valueFactor: 0.001
-    labels: {"name":"$3", "keyspace":"$1", "table":"$2"}
-  - pattern: 'org.apache.cassandra.db<type=(\w+)><>(\w+): (\d+)'
-    name: cassandra_db
-    value: $3
-    type: GAUGE
-    help: "internal database counter"
-    attrNameSnakeCase: false
-    labels: {"type":"$1", "attribute": "$2"}
-  - pattern: 'org.apache.cassandra.net<type=(\w+)><>(\w+): (\d+)'
-    name: cassandra_net
-    value: $3
-    type: GAUGE
-    help: "internal database counter"
-    attrNameSnakeCase: false
-    labels: {"type":"$1", "attribute": "$2"}
-  - pattern: 'org.apache.cassandra.internal<type=(\w+)><>(\w+): (\d+)'
-    name: cassandra_internal
-    value: $3
-    type: GAUGE
-    help: "internal database counter"
-    attrNameSnakeCase: false
-    labels: {"type":"$1", "attribute": "$2"}
-  - pattern: 'org.apache.cassandra.metrics<type=ThreadPools, path=(\w+), scope=(\w+), name=(ActiveTasks|CompletedTasks|PendingTasks|TotalBlockedTasks)><>(Value|Count): (\d+)'
-    name: cassandra_threadpool_$1
-    labels: {"stage": "$2", "pool":"$3"}
-    help: "Threadpool stats $1"
-    type: UNTYPED
-    value: $5
-  # "org.apache.cassandra.metrics:type=Table,keyspace=system_traces,scope=events,name=ReadLatency"
-  - pattern: 'org.apache.cassandra.metrics<type=Table, keyspace=(\w+), scope=(\w+), name=(\w+)><>(99thPercentile|Count|OneMinuteRate): (\w+)'
-    name: cassandra_table_histo_$3_$4
-    labels: {"keyspace": $1, "table": $2}
-    type: UNTYPED
-    value: $5
 
 
 
