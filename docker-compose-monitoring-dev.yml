@@ -6,11 +6,25 @@ version: "3.0"
 
 services:
   prometheus:
-    image: prom/prometheus
+    image: prom/prometheus:v2.11.1
     ports:
       - "9090:9090"
     volumes:
       - "./src/test/resources/monitoring-environment/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+
+  node_exporter:
+    image: prom/node-exporter:v0.18.1
+    ports:
+      - "9100:9100"
+    volumes:
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/:/rootfs:ro"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
 
   grafana:
     image: grafana/grafana

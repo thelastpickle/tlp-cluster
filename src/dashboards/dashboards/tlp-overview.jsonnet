@@ -82,6 +82,7 @@ dashboard.new(
     transparent=true,
     fill=0,
     legend_show=false,
+    shared_tooltip=false,
   )
   .addTarget(
     prometheus.target(
@@ -103,6 +104,8 @@ dashboard.new(
     transparent=true,
     fill=0,
     legend_show=false,
+    shared_tooltip=false,
+    min=0,
   )
   .addTarget(
     prometheus.target(
@@ -124,6 +127,8 @@ dashboard.new(
     transparent=true,
     fill=0,
     legend_show=false,
+    shared_tooltip=false,
+    min=0,
   )
   .addTarget(
     prometheus.target(
@@ -146,6 +151,7 @@ dashboard.new(
     transparent=true,
     fill=0,
     legend_show=false,
+    shared_tooltip=false,
   )
   .addTarget(
     prometheus.target(
@@ -167,6 +173,7 @@ dashboard.new(
     transparent=true,
     fill=0,
     legend_show=false,
+    shared_tooltip=false,
   )
   .addTarget(
     prometheus.target(
@@ -188,6 +195,7 @@ dashboard.new(
     transparent=true,
     fill=0,
     legend_show=false,
+    shared_tooltip=false,
   )
   .addTarget(
     prometheus.target(
@@ -210,6 +218,8 @@ dashboard.new(
     transparent=true,
     fill=0,
     legend_show=false,
+    shared_tooltip=false,
+    min=0,
   )
   .addTarget(
     prometheus.target(
@@ -236,6 +246,8 @@ dashboard.new(
     transparent=true,
     fill=0,
     legend_show=false,
+    shared_tooltip=false,
+    min=0,
   )
   .addTarget(
     prometheus.target(
@@ -244,6 +256,124 @@ dashboard.new(
   ), gridPos={
     x: 8,
     y: 12,
+    w: 8,
+    h: 6,
+  }
+)
+.addPanel(
+  graphPanel.new(
+    'Place Holder',
+    description='keep that spot occupied',
+    format='short',
+    datasource='Prometheus',
+    transparent=true,
+    fill=0,
+    legend_show=false,
+    shared_tooltip=false,
+    min=0,
+  )
+  .addTarget(
+    prometheus.target(
+      'sum by (table) (org_apache_cassandra_metrics_table_value{name="PendingCompactions", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+    )
+  ), gridPos={
+    x: 16,
+    y: 12,
+    w: 8,
+    h: 6,
+  }
+)
+.addPanel(
+  graphPanel.new(
+    'CPU',
+    description='CPU Average per CPU mode and node',
+    format='percent',
+    datasource='Prometheus',
+    transparent=true,
+    fill=1,
+    legend_show=false,
+    shared_tooltip=false,
+    stack=true,
+    percentage=true,
+  )
+  .addTarget(
+    prometheus.target(
+      'avg by (mode) (rate(node_cpu_seconds_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+    )
+  ), gridPos={
+    x: 0,
+    y: 18,
+    w: 8,
+    h: 6,
+  }
+)
+.addPanel(
+  graphPanel.new(
+    'Unix Load',
+    description='Unix load per node',
+    format='short',
+    datasource='Prometheus',
+    transparent=true,
+    fill=0,
+    legend_show=false,
+    shared_tooltip=false,
+  )
+  .addTarget(
+    prometheus.target(
+      'node_load1{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}',
+    )
+  ), gridPos={
+    x: 8,
+    y: 18,
+    w: 8,
+    h: 6,
+  }
+)
+.addPanel(
+  graphPanel.new(
+    'Network I/O',
+    description='Network In and Out per node',
+    format='bytes',
+    datasource='Prometheus',
+    transparent=true,
+    fill=0,
+    legend_show=false,
+    shared_tooltip=false,
+  )
+  .addTarget(
+    prometheus.target(
+      'sum by (node) (rate(node_network_transmit_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+    )
+  )
+  .addTarget(
+    prometheus.target(
+      'sum by (node) (rate(node_network_receive_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+    )
+  ), gridPos={
+    x: 16,
+    y: 18,
+    w: 8,
+    h: 6,
+  }
+)
+.addPanel(
+  graphPanel.new(
+    'Garbage Collection',
+    description='Garbage Collection duration',
+    format='s',
+    datasource='Prometheus',
+    transparent=true,
+    fill=0,
+    legend_show=false,
+    shared_tooltip=false,
+  )
+  .addTarget(
+    prometheus.target(
+      'max by (gc) (rate(jvm_gc_collection_seconds_sum{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+    )
+  ), gridPos={
+    x: 0,
+    y: 24,
     w: 8,
     h: 6,
   }

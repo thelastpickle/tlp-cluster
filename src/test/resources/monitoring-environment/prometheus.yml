@@ -6,19 +6,29 @@ scrape_configs:
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']
+
   - job_name: 'cassandra'
     scrape_interval: 5s
     static_configs:
-      - targets:
-        - 'cassandra:9500'
+      - targets: ['cassandra:9500']
         labels:
-          environment: PickleLabs™
+          environment: PickleLabs
           cluster: FunkyTesting
           datacenter: AwesomenDC
           rack: RadRack
-    relabel_configs:
-      - source_labels: [__address__]
-        target_label: node
+          node: Cassandra_01
+
+  - job_name: 'node_exporter'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['node_exporter:9100']
+        labels:
+          environment: PickleLabs
+          cluster: FunkyTesting
+          datacenter: AwesomenDC
+          rack: RadRack
+          node: Cassandra_01
+
   - job_name: 'stress'
     scrape_interval: 5s
     static_configs:
