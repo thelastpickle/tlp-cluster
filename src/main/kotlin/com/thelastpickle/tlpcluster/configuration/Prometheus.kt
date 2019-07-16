@@ -21,19 +21,34 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
      * You will never need to call this directly
      * @see <a href="https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config">Prometheus Scrape Config</a>
      */
-    class ScrapeConfig(@JsonInclude(JsonInclude.Include.NON_EMPTY) var job_name: String = "",
+    class ScrapeConfig(@JsonInclude(JsonInclude.Include.NON_EMPTY)
+                       var job_name: String = "",
+
                        @JsonInclude(JsonInclude.Include.NON_NULL)
                        var scrape_interval: String? = null,
 
                        @JsonProperty("static_configs")
                        @JsonInclude(JsonInclude.Include.NON_EMPTY)
-                       var staticConfigList: MutableList<StaticConfig> = mutableListOf()) {
+                       var staticConfigList: MutableList<StaticConfig> = mutableListOf() ,
+
+                       @JsonInclude(JsonInclude.Include.NON_EMPTY)
+                       @JsonProperty("relabel_configs")
+                       var relabelConfigList : MutableList<RelabelConfig> = mutableListOf()
+                       ) {
 
         fun static_config(block: StaticConfig.() -> Unit) {
             staticConfigList.add(StaticConfig().apply(block))
 
         }
+        fun relabel_config(block: RelabelConfig.() -> Unit) {
+            relabelConfigList.add(RelabelConfig().apply(block))
+        }
     }
+
+    class RelabelConfig(var source_labels: List<String> = listOf(),
+                        var regex : String = "",
+                        var action : String = "keep",
+                        var target_label: String = "")
 
     /**
      * belongs to scrape config.  We're only using the targets list for now, so I haven't included anything else here

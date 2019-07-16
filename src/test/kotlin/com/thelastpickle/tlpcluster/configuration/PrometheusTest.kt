@@ -21,6 +21,21 @@ internal class PrometheusTest {
                 targets = listOf("127.0.0.1:8000", "192.168.1:8000")
             }
         }
+
+        scrape_config {
+            job_name = "cassandra"
+            scrape_interval = "5s"
+
+            static_config {
+                targets = listOf("127.0.0.1:9500")
+                relabel_config {
+                    source_labels = listOf("__meta_ec2_availability_zone")
+                    regex = "(.+)"
+                    target_label = "rack"
+                    action = "replace"
+                }
+            }
+        }
     }
 
 
@@ -48,6 +63,13 @@ internal class PrometheusTest {
     @Test
     fun testConvertToYaml() {
         var data = yaml.writeValueAsString(config)
+    }
+
+    @Test
+    fun testRelabel() {
+        var data = yaml.writeValueAsString(config)
+        println(data)
+
     }
 
 }

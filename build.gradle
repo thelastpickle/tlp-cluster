@@ -159,6 +159,8 @@ task generateDashboards(type: Exec) {
 }
 
 task previewDashboards(type:Exec) {
+    group = "build"
+    description = "Start the dashboard dev environment"
     commandLine "docker-compose", "-f", "docker-compose-monitoring-dev.yml", "up"
 }
 
