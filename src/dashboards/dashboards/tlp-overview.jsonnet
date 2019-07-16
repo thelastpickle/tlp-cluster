@@ -2,6 +2,7 @@ local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local row = grafana.row;
 local graphPanel = grafana.graphPanel;
+local tablePanel = grafana.tablePanel;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 
@@ -72,6 +73,72 @@ dashboard.new(
     includeAll=true,
     multi=true,
   )
+)
+.addPanel(
+  tablePanel.new(
+    'Nodes Up/Down',
+    description='Nodes being up or down - For now uses "up" metric, that only says if we could scrape metrics or not. To be improved',
+    datasource='Prometheus',
+    transform='timeseries_aggregations',
+    styles=[
+      {
+        "alias": "Node",
+        "colorMode": null,
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "dateFormat": "YYYY-MM-DD HH:mm:ss",
+        "decimals": 2,
+        "mappingType": 1,
+        "pattern": "Metric",
+        "preserveFormat": true,
+        "sanitize": true,
+        "thresholds": [],
+        "type": "string",
+        "unit": "short"
+      },
+      {
+        "alias": "Up?",
+        "colorMode": "row",
+        "colors": [
+          "rgba(245, 54, 54, 0.9)",
+          "rgba(237, 129, 40, 0.89)",
+          "rgba(50, 172, 45, 0.97)"
+        ],
+        "dateFormat": "YYYY-MM-DD HH:mm:ss",
+        "decimals": 0,
+        "link": false,
+        "mappingType": 1,
+        "pattern": "Current",
+        "thresholds": [
+          "0",
+          "1"
+        ],
+        "type": "number",
+        "unit": "short"
+      }
+    ],
+    columns=[
+      {
+        "text": "Current",
+        "value": "current"
+      }
+    ]
+  )
+  .addTarget(
+    prometheus.target(
+      'min by (node) (up{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+      legendFormat='{{environment}}/{{cluster}}/{{datacenter}}/{{rack}}/{{node}}',
+      instant=true
+    )
+  ), gridPos={
+    x: 0,
+    y: 0,
+    w: 8,
+    h: 6,
+  }
 )
 .addPanel(
   graphPanel.new(
