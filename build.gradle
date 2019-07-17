@@ -158,6 +158,8 @@ task generateDashboards(type: Exec) {
     }
 }
 
+assemble.dependsOn(generateDashboards)
+
 task previewDashboards(type:Exec) {
     group = "build"
     description = "Start the dashboard dev environment"
