@@ -2,15 +2,18 @@
 
 echo "Configuring Cassandra monitoring"
 
-EXPORTER_AGENT_VERSION="0.9.6"
-EXPORTER_AGENT_JAR="cassandra-exporter-agent-${EXPORTER_AGENT_VERSION}.jar"
+EXPORTER_AGENT_VERSION="0.12.0"
+EXPORTER_AGENT_JAR="jmx_prometheus_javaagent-${EXPORTER_AGENT_VERSION}.jar"
+
 CASSANDRA_LIB="/usr/share/cassandra/lib"
 
-curl -LO https://github.com/instaclustr/cassandra-exporter/releases/download/v${EXPORTER_AGENT_VERSION}/${EXPORTER_AGENT_JAR}
+curl -LO https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.12.0/jmx_prometheus_javaagent-${EXPORTER_AGENT_VERSION}.jar
 
 sudo mv ${EXPORTER_AGENT_JAR} ${CASSANDRA_LIB}/
+sudo cp config.yaml /etc/cassandra/
 
-echo "JVM_OPTS=\"\$JVM_OPTS -javaagent:${CASSANDRA_LIB}/${EXPORTER_AGENT_JAR}\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
+
+echo "JVM_OPTS=\"\$JVM_OPTS -javaagent:${CASSANDRA_LIB}/${EXPORTER_AGENT_JAR}=9500:config.yaml\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
 echo "Finished configuring Cassandra monitoring for the Cassandra process"
 
 echo "Grabbing the node exporter for system metrics"
