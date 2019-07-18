@@ -109,3 +109,6 @@ src/main/resources/com/thelastpickle/tlpcluster/instances/importers/instances.js
 /prometheus.yml
 /env.sh
 /artifacts
+tlp-cluster.ipr
+tlp-cluster.iws
+
