@@ -158,7 +158,7 @@ task generateDashboards(type: Exec) {
     }
 }
 
-assemble.dependsOn(generateDashboards)
+compileKotlin.dependsOn(generateDashboards)
 
 task previewDashboards(type:Exec) {
     group = "build"
