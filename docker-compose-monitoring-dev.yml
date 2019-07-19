@@ -21,10 +21,13 @@ services:
       - "/sys:/host/sys:ro"
       - "/:/rootfs:ro"
     command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--collector.ntp"
+      #- "--collector.ntp.server=ntp"
+      #- "--collector.ntp.server-is-local"
 
   grafana:
     image: grafana/grafana
