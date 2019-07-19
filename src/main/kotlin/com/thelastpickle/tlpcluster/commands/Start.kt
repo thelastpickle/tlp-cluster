@@ -42,20 +42,8 @@ class Start(val context: Context) : ICommand {
 
                 serviceName = "grafana-server"
                 parallelSsh.startService(ServerType.Monitoring, serviceName).fold({
+                    println("Grafana started")
 
-                    println("$serviceName $successMessage")
-                    println("Creating Grafana dashboards")
-                    parallelSsh.createGrafanaDashboard().fold({
-                        println("Dashboards created!")
-                        println()
-                        println("""
-You can access the monitoring UI using the following URLs:
- - Prometheus: http://${monitoringHost.first().public}:9090
- - Grafana:    http://${monitoringHost.first().public}:3000
-                        """)
-                    }, {
-                        println("Failed to create dashboards. ${it.message}")
-                    })
                 }, {
                     // error starting grafana
                     println("$serviceName $failureMessage. ${it.message}")
