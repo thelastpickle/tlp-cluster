@@ -13,7 +13,7 @@ sudo mv ${EXPORTER_AGENT_JAR} ${CASSANDRA_LIB}/
 sudo cp config.yaml /etc/cassandra/
 
 
-echo "JVM_OPTS=\"\$JVM_OPTS -javaagent:${CASSANDRA_LIB}/${EXPORTER_AGENT_JAR}=9500:config.yaml\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
+echo "JVM_OPTS=\"\$JVM_OPTS -javaagent:${CASSANDRA_LIB}/${EXPORTER_AGENT_JAR}=9500:/etc/cassandra/config.yaml\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
 echo "Finished configuring Cassandra monitoring for the Cassandra process"
 
 echo "Grabbing the node exporter for system metrics"
