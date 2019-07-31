@@ -14,6 +14,7 @@ class Pssh(val context: Context, val sshKey: String) {
     private val dockerImageTag = "thelastpickle/tlp-cluster_pssh"
 
     private val provisionCommand = "cd provisioning; chmod +x install.sh; sudo ./install.sh"
+    private val postStartCommand = "cd provisioning; chmod +x post_start.sh; sudo ./post_start.sh"
 
     val log = logger()
     init {
@@ -25,7 +26,6 @@ class Pssh(val context: Context, val sshKey: String) {
     fun createGrafanaDashboard() : Result<String> {
         return execute("create_dashboard.sh", "", ServerType.Monitoring)
     }
-
 
     fun copyProvisioningResources(nodeType: ServerType) : Result<String> {
         return execute("copy_provisioning_resources.sh", "", nodeType)
@@ -45,7 +45,7 @@ class Pssh(val context: Context, val sshKey: String) {
 
     private fun serviceCommand(nodeType: ServerType, serviceName: String, command: String) : Result<String> {
         return execute("parallel_ssh.sh",
-                "sudo service $serviceName $command && sleep 5 && sudo service $serviceName status",
+                "sudo service $serviceName $command && sleep 5 && sudo service $serviceName status && $postStartCommand ${nodeType.serverType}",
                 nodeType)
     }
 
