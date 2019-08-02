@@ -26,6 +26,7 @@ services:
       - "--path.sysfs=/host/sys"
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
       - "--collector.ntp"
+      - "--collector.meminfo"
       #- "--collector.ntp.server=ntp"
       #- "--collector.ntp.server-is-local"
 
@@ -37,11 +38,16 @@ services:
       - "./src/test/resources/monitoring-environment/grafana.ini:/etc/grafana/grafana.ini:ro"
       - "./src/test/resources/monitoring-environment/provisioning/:/etc/grafana/provisioning/"
       - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/monitoring/config/grafana/dashboards:/var/lib/grafana/dashboards:ro"
+    environment:
+      # Attempts to get a nice nodes up/total panel...
+      # - "GF_INSTALL_PLUGINS=vonage-status-panel"
+      - "GF_PANELS_DISABLE_SANITIZE_HTML=true"
 
   cassandra:
     image: cassandra:3.11.4
     ports:
       - "9500:9500"
+      - "9042:9042"
     volumes:
       - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/jmx_prometheus_javaagent-0.12.0.jar.txt:/usr/share/jmx_prometheus_javaagent-0.12.0.jar:ro"
       - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/config.yaml:/usr/share/config.yaml:ro"

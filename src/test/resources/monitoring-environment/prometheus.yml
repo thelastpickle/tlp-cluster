@@ -14,7 +14,7 @@ scrape_configs:
         labels:
           environment: PickleLabs
           cluster: FunkyTesting
-          datacenter: AwesomenDC
+          datacenter: AwesomeDC
           rack: RadRack
           node: Cassandra_01
 
@@ -25,7 +25,7 @@ scrape_configs:
         labels:
           environment: PickleLabs
           cluster: FunkyTesting
-          datacenter: AwesomenDC
+          datacenter: AwesomeDC
           rack: RadRack
           node: Cassandra_01
 

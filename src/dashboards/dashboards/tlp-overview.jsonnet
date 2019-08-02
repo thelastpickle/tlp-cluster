@@ -4,6 +4,7 @@ local row = grafana.row;
 local graphPanel = grafana.graphPanel;
 local tablePanel = grafana.tablePanel;
 local singleStatPanel = grafana.singlestat;
+local textPanel = grafana.text;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 
@@ -78,69 +79,95 @@ dashboard.new(
 .addRow(
   row.new(title='Nodes Status')
   .addPanel(
-    tablePanel.new(
-      'Nodes Up/Down',
-      description='Nodes being up or down - For now uses "up" metric, that only says if we could scrape metrics or not. To be improved',
+    textPanel.new(
+      'Nodes Status per Protocol',
+      description='Nodes being up or down - considering the activity of distinct protocols',
       datasource='Prometheus',
-      transform='timeseries_aggregations',
       transparent=true,
-      styles=[
-        {
-          "alias": "Node",
-          "colorMode": null,
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 2,
-          "mappingType": 1,
-          "pattern": "Metric",
-          "preserveFormat": true,
-          "sanitize": true,
-          "thresholds": [],
-          "type": "string",
-          "unit": "short"
-        },
-        {
-          "alias": "Up?",
-          "colorMode": "row",
-          "colors": [
-            "rgba(245, 54, 54, 0.9)",
-            "rgba(237, 129, 40, 0.89)",
-            "rgba(50, 172, 45, 0.97)"
-          ],
-          "dateFormat": "YYYY-MM-DD HH:mm:ss",
-          "decimals": 0,
-          "link": false,
-          "mappingType": 1,
-          "pattern": "Current",
-          "thresholds": [
-            "0",
-            "1"
-          ],
-          "type": "number",
-          "unit": "short"
+      mode='html',
+      content='
+        <br/>
+        <br/>
+        <center><h2>Nodes Up (Gossip Activity): <span id="gossip_up">0</span>/<span id="gossip_total">0</span></h2><center>
+        <center><h2>Nodes Up (Native Client Activity): <span id="native_up">0</span>/<span id="native_total">0</span></h2><center>
+        <center><h2>Nodes Reporting Metics: <span id="reporting_up">0</span>/<span id="reporting_total">0</span></h2><center>
+
+        <script type="text/javascript">
+        var nodeStatusTimer = setTimeout(function(){console.log("init");}, 1);
+
+        function countNodesInUpState(nodeArray) {
+            var upCount = 0;
+            for (var i = 0; i < nodeArray.length; i+=1) {
+                /*
+                console.log("i --> ", i)
+                console.log("upCount --> ", upCount)
+                console.log("nodeArray --> ", nodeArray)
+                console.log("nodeArray.legnth --> ", nodeArray.length)
+                console.log("nodeArray[i].childNodes --> ", nodeArray[i].childNodes)
+                */
+                // Get the node state either 1 or 0 from the row data. Skip every node with an
+                // odd index in the array, because it only has the node IP.
+                // Increment the count for every node that is up. Sometimes that value may
+                // be just less than 1, so allow an "up" status to be 0.5 and above.
+                if (Number(nodeArray[i].childNodes[1].nodeValue) >= 0.5) {
+                   upCount = upCount + 1;
+                }
+            }
+            return upCount;
         }
-      ],
-      columns=[
-        {
-          "text": "Current",
-          "value": "current"
+
+        function updatePanel(){
+            var panelReporting = $("span:contains(\'Nodes Collecting Metrics Successfully\')").parents("div.react-grid-item")
+            var tableReporting = $("span:contains(\'Nodes Collecting Metrics Successfully\')").parents("grafana-panel").find("tbody tr td");
+            var nodesReportingTotal = $("span:contains(\'Nodes Collecting Metrics Successfully\')").parents("grafana-panel").find("tbody tr").length;
+            var reportingUp = countNodesInUpState(tableReporting);
+
+            var panelGossip = $("span:contains(\'Gossip Activity\')").parents("div.react-grid-item")
+            var tableGossip = $("span:contains(\'Gossip Activity\')").parents("grafana-panel").find("tbody tr td");
+            var nodesGossipTotal = $("span:contains(\'Gossip Activity\')").parents("grafana-panel").find("tbody tr").length;
+            var gossipUp = countNodesInUpState(tableGossip);
+
+            var panelNative = $("span:contains(\'Native Client Activity\')").parents("div.react-grid-item")
+            var tableNative = $("span:contains(\'Native Client Activity\')").parents("grafana-panel").find("tbody tr td");
+            var nodesNativeTotal = $("span:contains(\'Native Client Activity\')").parents("grafana-panel").find("tbody tr").length;
+            var nativeUp = countNodesInUpState(tableNative);
+
+            $("#reporting_up").html(reportingUp);
+            $("#reporting_total").html(nodesReportingTotal);
+            $("#gossip_up").html(gossipUp);
+            $("#gossip_total").html(nodesGossipTotal);
+            $("#native_up").html(nativeUp);
+            $("#native_total").html(nodesNativeTotal);
+            panelReporting.hide();
+            panelGossip.hide();
+            panelNative.hide();
+
+            if(reportingUp<nodesReportingTotal){
+                    $("#reporting_up").attr("style","color:red");
+            } else {
+                    $("#reporting_up").attr("style","color:lightgreen");
+            }
+            if(gossipUp<nodesGossipTotal){
+                    $("#gossip_up").attr("style","color:red");
+            } else {
+                    $("#gossip_up").attr("style","color:lightgreen");
+            }
+            if(nativeUp<nodesNativeTotal){
+                    $("#native_up").attr("style","color:red");
+            } else {
+                    $("#native_up").attr("style","color:lightgreen");
+            }
         }
-      ],
-      sort={
-        "col": 1,
-        "desc": false
-      }
-    )
-    .addTarget(
-      prometheus.target(
-        'min by (node) (up{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='{{node}}',
-        instant=true
-      )
+
+        $(document).ready(function() {
+                nodeStatusTimer = setInterval(updatePanel, 1);
+        });
+
+        $("span:contains(\'Nodes Collecting Metrics Successfully\')").parents("grafana-panel").find("tbody tr td").bind("DOMSubtreeModified",function(){
+                clearTimeout(nodeStatusTimer);
+                nodeStatusTimer = setTimeout(updatePanel,1000);
+        });
+        </script>',
     )
   )
   .addPanel(
@@ -209,49 +236,252 @@ dashboard.new(
       )
     )
   )
+  .addPanel(
+    tablePanel.new(
+      'Nodes Up (Gossip Activity)',
+      description='Nodes being up or down from an internal perspective, based on Gossip Activity',
+      datasource='Prometheus',
+      transform='timeseries_aggregations',
+      transparent=true,
+      span=1,
+      styles=[
+        {
+          "alias": "Node",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "Metric",
+          "preserveFormat": true,
+          "sanitize": true,
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "Gossip Up?",
+          "colorMode": "row",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 0,
+          "link": false,
+          "mappingType": 1,
+          "pattern": "Current",
+          "thresholds": [
+            "0.1",
+            "0.9"
+          ],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      columns=[
+        {
+          "text": "Current",
+          "value": "current"
+        }
+      ],
+      sort={
+        "col": 1,
+        "desc": false
+      }
+    )
+    .addTarget(
+      prometheus.target(
+        'max by (node) (changes(org_apache_cassandra_metrics_threadpools_value{scope="GossipStage", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        legendFormat='{{node}}',
+        instant=false
+      )
+    )
+  )
+  .addPanel(
+    tablePanel.new(
+      'Nodes Up (Native Client Activity)',
+      description='Nodes being up or down from an internal perspective, based on native client activities',
+      datasource='Prometheus',
+      transform='timeseries_aggregations',
+      transparent=true,
+      span=1,
+      styles=[
+        {
+          "alias": "Node",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "Metric",
+          "preserveFormat": true,
+          "sanitize": true,
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "Native Up?",
+          "colorMode": "row",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 0,
+          "link": false,
+          "mappingType": 1,
+          "pattern": "Current",
+          "thresholds": [
+            "0.1",
+            "0.9"
+          ],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      columns=[
+        {
+          "text": "Current",
+          "value": "current"
+        }
+      ],
+      sort={
+        "col": 1,
+        "desc": false
+      }
+    )
+    .addTarget(
+      prometheus.target(
+        'max by (node) (changes(org_apache_cassandra_metrics_threadpools_value{scope="Native-Transport-Requests", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        legendFormat='{{node}}',
+        instant=false
+      )
+    )
+  )
+  .addPanel(
+    tablePanel.new(
+      'Nodes Collecting Metrics Successfully',
+      description='Nodes being up or down - For now uses "up" metric, that only says if we could scrape metrics or not. To be improved',
+      datasource='Prometheus',
+      transform='timeseries_aggregations',
+      transparent=true,
+      span=1,
+      styles=[
+        {
+          "alias": "Node",
+          "colorMode": null,
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 2,
+          "mappingType": 1,
+          "pattern": "Metric",
+          "preserveFormat": true,
+          "sanitize": true,
+          "thresholds": [],
+          "type": "string",
+          "unit": "short"
+        },
+        {
+          "alias": "Up?",
+          "colorMode": "row",
+          "colors": [
+            "rgba(245, 54, 54, 0.9)",
+            "rgba(237, 129, 40, 0.89)",
+            "rgba(50, 172, 45, 0.97)"
+          ],
+          "dateFormat": "YYYY-MM-DD HH:mm:ss",
+          "decimals": 0,
+          "link": false,
+          "mappingType": 1,
+          "pattern": "Current",
+          "thresholds": [
+            "0.1",
+            "0.9"
+          ],
+          "type": "number",
+          "unit": "short"
+        }
+      ],
+      columns=[
+        {
+          "text": "Current",
+          "value": "current"
+        }
+      ],
+      sort={
+        "col": 1,
+        "desc": false
+      }
+    )
+    .addTarget(
+      prometheus.target(
+        'max by (node) (up{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='{{node}}',
+        instant=true
+      )
+    )
+  )
 )
 .addRow(
-  row.new(title='Client Requests',)
+  row.new(title='Cluster Requests (Coordinator Perspective)',)
   .addPanel(
     graphPanel.new(
-      'Request Rates',
+      'Request Throughputs',
       description='Coordinator level read and write count - Max of each 1m rate for each operation type',
       format='rps',
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
+      min=0,
     )
     .addTarget(
       prometheus.target(
-        'sum by (scope) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        'sum by (scope) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite", name=~"Latency|ViewWriteLatency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
         legendFormat='{{scope}} Request Rate',
       )
     )
   )
   .addPanel(
     graphPanel.new(
-      'Request Rates per Consistency Level',
-      description='Coordinator level read and write count - Max of each 1m rate for each operation type',
+      'Error throughputs',
+      description='Timeouts, Failures, Unavailable Rates for each operation type',
       format='rps',
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
+      min=0,
     )
     .addTarget(
       prometheus.target(
-        'sum by (scope) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope!~"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='{{scope}} Request Rate',
+        'sum by (name) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite", name!~"Latency|ViewWriteLatency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='{{name}} Requests ',
       )
     )
   )
   .addPanel(
     singleStatPanel.new(
       'Read / Write Distribution',
-      description='Part of writes in the total of standard requests (Reads+Writes). CAS, Views, ... operations are ignored.',
+      description='Part of reads in the total of standard requests (Reads+Writes). CAS, Views, ... operations are ignored.',
       format='percentunit',
       datasource='Prometheus',
       transparent=true,
@@ -275,11 +505,11 @@ dashboard.new(
       sparklineFillColor='rgba(31, 118, 189, 0.18)',
       sparklineFull=false,
       sparklineLineColor='#FFB357',
-      sparklineShow=true
+      sparklineShow=false
     )
     .addTarget(
       prometheus.target(
-        'sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}) / (sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}) + sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}))',
+        'sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}) / ignoring (scope) (sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}) + ignoring (scope) sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}))',
       )
     )
   )
@@ -291,22 +521,26 @@ dashboard.new(
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
+      min=0,
     )
     .addTarget(
       prometheus.target(
-        'max by (node) (org_apache_cassandra_metrics_clientrequest_75thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        'max by (datacenter) (org_apache_cassandra_metrics_clientrequest_75thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='Max 75th percentile for {{datacenter}}',
       )
     )
     .addTarget(
       prometheus.target(
-        'max by (node) (org_apache_cassandra_metrics_clientrequest_95thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        'max by (datacenter) (org_apache_cassandra_metrics_clientrequest_95thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='Max 95th percentile for {{datacenter}}',
       )
     )
     .addTarget(
       prometheus.target(
-        'max by (node) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        'max by (datacenter) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='Max 99th percentile for {{datacenter}}',
       )
     )
   )
@@ -318,22 +552,26 @@ dashboard.new(
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
+      min=0,
     )
     .addTarget(
       prometheus.target(
-        'max by (node) (org_apache_cassandra_metrics_clientrequest_75thpercentile{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        'max by (datacenter) (org_apache_cassandra_metrics_clientrequest_75thpercentile{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='Max 75th percentile for {{datacenter}}',
       )
     )
     .addTarget(
       prometheus.target(
-        'max by (node) (org_apache_cassandra_metrics_clientrequest_95thpercentile{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        'max by (datacenter) (org_apache_cassandra_metrics_clientrequest_95thpercentile{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='Max 95th percentile for {{datacenter}}',
       )
     )
     .addTarget(
       prometheus.target(
         'max by (node) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='Max 99th percentile for {{datacenter}}',
       )
     )
   )
@@ -345,8 +583,9 @@ dashboard.new(
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
+      min=0,
     )
     .addTarget(
       prometheus.target(
@@ -357,24 +596,6 @@ dashboard.new(
 )
 .addRow(
   row.new(title='Cassandra Internals',)
- .addPanel(
-    graphPanel.new(
-      'Dropped Messages',
-      description='Dropped messages rate summed by message type',
-      format='short',
-      datasource='Prometheus',
-      transparent=true,
-      fill=0,
-      legend_show=false,
-      shared_tooltip=false,
-      min=0,
-    )
-    .addTarget(
-      prometheus.target(
-        'sum by (message_type) (org_apache_cassandra_metrics_droppedmessage_oneminuterate{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-      )
-    ), gridPos={w: 6, h: 6, x: 0,}
-  )
   .addPanel(
     graphPanel.new(
       'Pending Messages',
@@ -383,16 +604,33 @@ dashboard.new(
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
       min=0,
     )
     .addTarget(
       prometheus.target(
-        'sum by (pool) (org_apache_cassandra_metrics_threadpools_value{name="PendingTasks", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        'sum by (scope) (org_apache_cassandra_metrics_threadpools_value{name="PendingTasks", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
       )
     )
-    , gridPos={w: 6, h: 6, x: 6,}
+  )
+ .addPanel(
+    graphPanel.new(
+      'Dropped Messages',
+      description='Dropped messages rate summed by message type',
+      format='short',
+      datasource='Prometheus',
+      transparent=true,
+      fill=0,
+      legend_show=true,
+      shared_tooltip=false,
+      min=0,
+    )
+    .addTarget(
+      prometheus.target(
+        'sum by (scope) (org_apache_cassandra_metrics_droppedmessage_oneminuterate{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+      )
+    )
   )
   .addPanel(
     graphPanel.new(
@@ -402,7 +640,7 @@ dashboard.new(
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
       min=0,
     )
@@ -415,7 +653,7 @@ dashboard.new(
       prometheus.target(
         'avg by (table) (org_apache_cassandra_metrics_table_count{name="SSTablesPerReadHistogram", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
       )
-    ), gridPos={w: 6, h: 6, x: 12,}
+    )
   )
   .addPanel(
     graphPanel.new(
@@ -425,7 +663,7 @@ dashboard.new(
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
       min=0,
     )
@@ -433,29 +671,31 @@ dashboard.new(
       prometheus.target(
         'sum by (table) (org_apache_cassandra_metrics_table_value{name="PendingCompactions", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
       )
-    ), gridPos={w: 6, h: 6, x: 18,}
+    )
   )
 )
 .addRow(
   row.new(title='Hardware / Operating System',)
  .addPanel(
     graphPanel.new(
-      'CPU',
-      description='CPU Average per CPU mode and node',
+      'CPU Utilization',
+      description='Maximum CPU utilisation (max 100%)',
       format='percent',
       datasource='Prometheus',
       transparent=true,
       fill=1,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
-      stack=true,
       percentage=true,
+      min=0,
+      max=105,
     )
     .addTarget(
       prometheus.target(
-        'avg by (mode) (rate(node_cpu_seconds_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        '(1 - min by (mode) (rate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])))',
+        legendFormat='Maximum CPU utilisation',
       )
-    ), gridPos={w: 8, h: 6, x: 0,}
+    )
   )
   .addPanel(
     graphPanel.new(
@@ -465,14 +705,15 @@ dashboard.new(
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
     )
     .addTarget(
       prometheus.target(
-        'node_load1{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}',
+        'max by (node) (node_load1{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='Maximum Load (1m rate)',
       )
-    ), gridPos={w: 8, h: 6, x: 8,}
+    )
   )
   .addPanel(
     graphPanel.new(
@@ -482,38 +723,60 @@ dashboard.new(
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
+      bars=true ,
     )
     .addTarget(
       prometheus.target(
-        'sum by (node) (rate(node_network_transmit_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        'sum by (cluster) (rate(node_network_transmit_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        legendFormat='Sum of Network Outgoing, cluster: {{cluster}}',
       )
     )
     .addTarget(
       prometheus.target(
-        'sum by (node) (rate(node_network_receive_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        'sum by (cluster) (-1 * (rate(node_network_receive_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])))',
+        legendFormat='Sum of Network Incoming, cluster: {{cluster}}',
       )
-    ), gridPos={w: 8, h: 6, x: 16,}
+    )
   )
 )
 .addRow(
   row.new(title='JVM / Garbage Collection',)
- .addPanel(
+  .addPanel(
     graphPanel.new(
-      'Garbage Collection',
+      'Garbage Collection Time',
       description='Garbage Collection duration',
       format='s',
       datasource='Prometheus',
       transparent=true,
       fill=0,
-      legend_show=false,
+      legend_show=true,
       shared_tooltip=false,
     )
     .addTarget(
       prometheus.target(
-        'max by (gc) (rate(jvm_gc_collection_seconds_sum{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        'max by (gc, node) (rate(jvm_gc_collection_seconds_sum{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        legendFormat='Maximum GC duration per minute for {{gc}}',
       )
-    ), gridPos={w: 8, h: 6, x: 0,}
+    )
+  )
+  .addPanel(
+    graphPanel.new(
+      'Garbage Collection Count',
+      description='Garbage Collection Count',
+      format='short',
+      datasource='Prometheus',
+      transparent=true,
+      fill=0,
+      legend_show=true,
+      shared_tooltip=false,
+    )
+    .addTarget(
+      prometheus.target(
+        'max by (gc, node) (rate(jvm_gc_collection_seconds_count{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        legendFormat='Maximum GC count per minute for {{gc}}',
+      )
+    )
   )
 )
