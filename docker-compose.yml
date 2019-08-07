@@ -8,4 +8,4 @@ services:
     - ./manual:/documents
     - ./docs:/html
 
-    command: asciidoctor -o /html/index.html  index.adoc
+    command: asciidoctor -o /html/index.html  index.adoc -a TLP_CLUSTER_VERSION=${TLP_CLUSTER_VERSION}

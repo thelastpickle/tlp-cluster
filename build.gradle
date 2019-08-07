@@ -1,6 +1,6 @@
 
 buildscript {
-    ext.kotlin_version = "1.3.40"
+    ext.kotlin_version = "1.3.41"
     ext.jcommander_version = "1.72"
     
     repositories {
@@ -89,7 +89,10 @@ dependencies {
 }
 
 task docs(type:Exec) {
+    environment "TLP_CLUSTER_VERSION", version
     commandLine 'docker-compose', 'up', 'docs'
+    group = "Documentation"
+    description = "Build website documentation"
 }
 
 compileKotlin {
