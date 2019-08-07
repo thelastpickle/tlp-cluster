@@ -25,7 +25,7 @@ apply plugin: 'nebula.ospackage-application'
 
 
 group 'com.thelastpickle'
-version '1.0-SNAPSHOT'
+version '0.1'
 sourceCompatibility = 1.8
 
 application {
@@ -159,7 +159,7 @@ task uploadDeb(type: Exec) {
     group = "Publish"
     workingDir 'build/distributions'
 
-    def debPackage = "tlp-cluster-${version}_all.deb"
+    def debPackage = "tlp-cluster_${version}_all.deb"
 
     // get the deb package
 
