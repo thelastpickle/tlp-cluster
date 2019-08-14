@@ -33,6 +33,7 @@ class Start(val context: Context) : ICommand {
         })
 
         val monitoringHost = context.tfstate.getHosts(ServerType.Monitoring)
+        val cassandraHosts = context.tfstate.getHosts(ServerType.Cassandra)
 
         if (monitoringHost.count() > 0) {
 
@@ -52,6 +53,10 @@ class Start(val context: Context) : ICommand {
 You can access the monitoring UI using the following URLs:
  - Prometheus: http://${monitoringHost.first().public}:9090
  - Grafana:    http://${monitoringHost.first().public}:3000
+ 
+ Reaper is available on all Cassandra nodes with the login 'admin', password 'admin'
+ 
+ - Reaper:     http://${cassandraHosts.first().public}:8080/webui/
                         """)
                     }, {
                         println("Failed to create dashboards. ${it.message}")
