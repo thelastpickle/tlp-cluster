@@ -3,7 +3,7 @@
 # pass either cassandra, stress or monitor to execute all files
 
 echo "Updating local apt database"
-apt-get update
+sudo apt-get update
 
 if [[ "$1" == "" ]]; then
 echo "Pass a provisioning argument please"

@@ -4,6 +4,7 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
+import com.thelastpickle.tlpcluster.configuration.ServerType
 import com.thelastpickle.tlpcluster.containers.Terraform
 import java.io.File
 
@@ -51,9 +52,16 @@ class Up(val context: Context) : ICommand {
         val envFile = File("env.sh").bufferedWriter()
         context.tfstate.writeEnvironmentFile(envFile)
 
+        val stressEnvironmentVars = File("provisioning/stress/environment.sh").bufferedWriter()
+        stressEnvironmentVars.write("#!/usr/bin/env bash")
+        stressEnvironmentVars.newLine()
 
+        val host = context.tfstate.getHosts(ServerType.Cassandra).first().private
 
-
+        stressEnvironmentVars.write("export TLP_STRESS_CASSANDRA_HOST=$host")
+        stressEnvironmentVars.newLine()
+        stressEnvironmentVars.flush()
+        stressEnvironmentVars.close()
 
     }
 
