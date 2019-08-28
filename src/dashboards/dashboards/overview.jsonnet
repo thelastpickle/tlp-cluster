@@ -366,8 +366,8 @@ dashboard.new(
   )
   .addPanel(
     graphPanel.new(
-      'Pending Compactions',
-      description='Maximum pending compactions on a node and per table',
+      'Pending Compactions per node',
+      description='Maximum pending compactions on each node',
       format='short',
       datasource='Prometheus',
       transparent=true,
@@ -380,14 +380,43 @@ dashboard.new(
       legend_sortDesc=true,
       shared_tooltip=false,
       min=0,
-      bars=true,
-      lines=false,
-      stack=true,
+      bars=false,
+      lines=true,
+      stack=false,
+      decimals=0,
     )
     .addTarget(
       prometheus.target(
-        'max by (keyspace, scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_table_value{name="PendingCompactions", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Max pending compactions for cluster/table: {{cluster}}/{{scope}}',
+        'max by (environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_table_value{name="PendingCompactions", keyspace=~".+", scope=~".+", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='Pending compactions for node: {{node}}',
+      )
+    )
+  )
+  .addPanel(
+    graphPanel.new(
+      'Pending Compactions per table',
+      description='Maximum pending compactions per table',
+      format='short',
+      datasource='Prometheus',
+      transparent=true,
+      fill=0,
+      legend_show=true,
+      legend_values=true,
+      legend_current=true,
+      legend_alignAsTable=true,
+      legend_sort='current',
+      legend_sortDesc=true,
+      shared_tooltip=false,
+      min=0,
+      bars=false,
+      lines=true,
+      stack=true,
+      decimals=0,
+    )
+    .addTarget(
+      prometheus.target(
+        'Max by (keyspace, scope, environment, cluster) (org_apache_cassandra_metrics_table_value{name="PendingCompactions", keyspace=~".+", scope=~".+", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='Pending compactions for table: {{keyspace}}.{{scope}}',
       )
     )
   )
