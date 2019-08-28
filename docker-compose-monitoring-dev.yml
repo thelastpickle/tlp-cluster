@@ -27,8 +27,6 @@ services:
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
       - "--collector.ntp"
       - "--collector.meminfo"
-      #- "--collector.ntp.server=ntp"
-      #- "--collector.ntp.server-is-local"
 
   grafana:
     image: grafana/grafana
@@ -40,7 +38,6 @@ services:
       - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/monitoring/config/grafana/dashboards:/var/lib/grafana/dashboards:ro"
     environment:
       # Attempts to get a nice nodes up/total panel...
-      # - "GF_INSTALL_PLUGINS=vonage-status-panel"
       - "GF_PANELS_DISABLE_SANITIZE_HTML=true"
 
   cassandra:

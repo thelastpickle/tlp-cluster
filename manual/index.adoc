@@ -218,13 +218,9 @@ This will push the contents of the `provisioning/cassandra` directory up to each
 
 WARNING: This documentation is _very_ rough, and needs improvment before the 1.0 release.
 
-<<<<<<< HEAD
 The dashboards are built using a tool called jsonnet, with a library called grafonnet.  The jsonnet files are here: `src/dashboards/dashboards`
-=======
-The dashboards are built using a tool called https://jsonnet.org/[jsonnet], with a library called grafonnet.  The jsonnet files are here: `src/dashboards/dashboards`
->>>>>>> 0380d57... Started work to have awesome dashboards
 
-NOTE: if you want to do anything in the dashboards, you’d need to do ./gradlew buildJsonnet to build the container
+NOTE: if you want to do anything in the dashboards, you’d need to run `./gradlew buildJsonnet` to build the container
 
 You can regenerate the dashboards using the following:
 

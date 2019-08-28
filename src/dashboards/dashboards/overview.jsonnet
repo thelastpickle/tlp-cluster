@@ -240,7 +240,7 @@ dashboard.new(
   .addPanel(
     tablePanel.new(
       'Disk Space Usage',
-      description='Disks space used ordered (fullest disks first)',
+      description='Disk space used ordered (fullest disks first)',
       datasource='Prometheus',
       transform='timeseries_aggregations',
       transparent=true,
