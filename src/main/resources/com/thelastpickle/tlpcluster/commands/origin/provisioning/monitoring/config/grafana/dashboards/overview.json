@@ -22,7 +22,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "Prometheus",
-               "description": "Coordinator level read and write count - Max of each 1m rate for each operation type",
+               "description": "Coordinator level read and write count - Sum of each 1m rate for each operation type and per cluster",
                "fill": 0,
                "gridPos": { },
                "id": 2,
@@ -54,10 +54,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum by (scope) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~\"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite\", name=~\"Latency|ViewWriteLatency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "sum by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~\"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite\", name=~\"Latency|ViewWriteLatency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "{{scope}} Request Rate",
+                     "legendFormat": "Sum of {{scope}} Request Rate for cluster {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -104,7 +104,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "Prometheus",
-               "description": "Timeouts, Failures, Unavailable Rates for each operation type",
+               "description": "Sum of Timeouts, Failures, Unavailable Rates for each cluster",
                "fill": 0,
                "gridPos": { },
                "id": 3,
@@ -136,10 +136,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum by (name) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~\"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite\", name!~\"Latency|ViewWriteLatency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "sum by (name, environment, cluster) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~\"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite\", name!~\"Latency|ViewWriteLatency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "{{name}} Requests ",
+                     "legendFormat": "Sum of {{name}} Requests for cluster {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -238,7 +238,7 @@
                "tableColumn": "",
                "targets": [
                   {
-                     "expr": "sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=\"Read\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}) / ignoring (scope) (sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=\"Read\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}) + ignoring (scope) sum by (scope)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=\"Write\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}))",
+                     "expr": "sum by (scope, environment, cluster)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=\"Read\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}) / ignoring (scope) (sum by (scope, environment, cluster)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=\"Read\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}) + ignoring (scope) sum by (scope, environment, cluster)(org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=\"Write\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}))",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "",
@@ -298,7 +298,7 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope=\"Read\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "max by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope=\"Read\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Max {{scope}} 99th percentile for {{cluster}}",
@@ -380,7 +380,7 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope=\"Write\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "max by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope=\"Write\", name=\"Latency\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Max {{scope}} 99th percentile for {{cluster}}",
@@ -462,7 +462,7 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope!~\"Write|Read|.*-.*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "max by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope!~\"Write|Read|.*-.*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Max {{scope}} 99th percentile for {{cluster}}",
@@ -527,7 +527,7 @@
                   }
                ],
                "datasource": "Prometheus",
-               "description": "Disks space used ordered (fullest disks first)",
+               "description": "Disk space used ordered (fullest disks first)",
                "gridPos": { },
                "id": 8,
                "sort": {
@@ -580,7 +580,7 @@
                      "format": "time_series",
                      "instant": true,
                      "intervalFactor": 2,
-                     "legendFormat": "{{node}} --> {{mountpoint}}",
+                     "legendFormat": "{{cluster}}-{{node}} --> {{mountpoint}}",
                      "refId": "A"
                   }
                ],
@@ -627,18 +627,11 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum by (environment, cluster, datacenter, rack, node)\n        (org_apache_cassandra_metrics_table_value{name=\"LiveDiskSpaceUsed\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}        )",
+                     "expr": "sum by (name, environment, cluster)\n        (org_apache_cassandra_metrics_table_value{name=~\"LiveDiskSpaceUsed|TotalDiskSpaceUsed\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}        )",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Sum live data size - nodes in cluster: {{cluster}}",
+                     "legendFormat": "Sum of {{name}} for nodes in cluster: {{cluster}}",
                      "refId": "A"
-                  },
-                  {
-                     "expr": "sum by (environment, cluster, datacenter, rack, node)\n        (org_apache_cassandra_metrics_table_value{name=\"TotalDiskSpaceUsed\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
-                     "format": "time_series",
-                     "intervalFactor": 2,
-                     "legendFormat": "Sum total data size - nodes in cluster: {{cluster}}",
-                     "refId": "B"
                   }
                ],
                "thresholds": [ ],
@@ -684,7 +677,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "Prometheus",
-               "description": "SSTable Count Max and Average per node and table",
+               "description": "SSTable Count Max and Average per table",
                "fill": 0,
                "gridPos": { },
                "id": 10,
@@ -716,17 +709,17 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (keyspace, scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_table_value{name=\"LiveSSTableCount\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "max by (keyspace, scope, environment, cluster) (org_apache_cassandra_metrics_table_value{name=\"LiveSSTableCount\", keyspace=~\".+\", scope=~\".+\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Maximum number of SSTables for table: {{keyspace}}.{{scope}}",
+                     "legendFormat": "Maximum on any node in {{cluster}} for table: {{keyspace}}.{{scope}}",
                      "refId": "A"
                   },
                   {
-                     "expr": "max by (environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_table_value{name=\"LiveSSTableCount\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "max by (environment, cluster) (org_apache_cassandra_metrics_table_value{name=\"LiveSSTableCount\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Maximum number of SSTables for cluster: {{cluster}}",
+                     "legendFormat": "Maximum on any node for cluster: {{cluster}}",
                      "refId": "B"
                   }
                ],
@@ -773,7 +766,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "Prometheus",
-               "description": "Maximum pending compactions on each node",
+               "description": "Maximum pending compactions on any node in the cluster",
                "fill": 0,
                "gridPos": { },
                "id": 11,
@@ -805,17 +798,17 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_table_value{name=\"PendingCompactions\", keyspace=~\".+\", scope=~\".+\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "max by (environment, cluster) (org_apache_cassandra_metrics_table_value{name=\"PendingCompactions\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Pending compactions for node: {{node}}",
+                     "legendFormat": "Maximum on any node for cluster: {{cluster}}",
                      "refId": "A"
                   }
                ],
                "thresholds": [ ],
                "timeFrom": null,
                "timeShift": null,
-               "title": "Pending Compactions per node",
+               "title": "Pending Compactions",
                "tooltip": {
                   "shared": false,
                   "sort": 0,
@@ -892,7 +885,7 @@
                      "expr": "Max by (keyspace, scope, environment, cluster) (org_apache_cassandra_metrics_table_value{name=\"PendingCompactions\", keyspace=~\".+\", scope=~\".+\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Pending compactions for table: {{keyspace}}.{{scope}}",
+                     "legendFormat": "Maximum for table: {{keyspace}}.{{scope}} in {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -986,10 +979,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_threadpools_value{name=\"PendingTasks\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "sum by (scope, environment) (org_apache_cassandra_metrics_threadpools_value{name=\"PendingTasks\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Sum of Dropped Messages for Cluster/Scope: {{cluster}}/{{scope}}",
+                     "legendFormat": "Sum for Cluster/Thread Pool: {{cluster}}/{{scope}}",
                      "refId": "A"
                   }
                ],
@@ -1036,7 +1029,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "Prometheus",
-               "description": "Dropped messages rate summed by message type",
+               "description": "Dropped messages rate summed by message type and cluster",
                "fill": 0,
                "gridPos": { },
                "id": 14,
@@ -1068,10 +1061,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum by (scope, environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_droppedmessage_oneminuterate{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "sum by (scope, environment, cluster) (org_apache_cassandra_metrics_droppedmessage_oneminuterate{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Sum of Dropped Messages for Cluster/Scope: {{cluster}}/{{scope}}",
+                     "legendFormat": "Sum for Cluster/Thread Pool: {{cluster}}/{{scope}}",
                      "refId": "A"
                   }
                ],
@@ -1150,10 +1143,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum by (environment, cluster, datacenter, rack, node) (org_apache_cassandra_metrics_threadpools_value{name=\"ActiveTasks\", scope=\"ReadRepairStage\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "sum by (environment, cluster) (org_apache_cassandra_metrics_threadpools_value{name=\"ActiveTasks\", scope=\"ReadRepairStage\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Sum of Read Repairs for Cluster: {{cluster}}",
+                     "legendFormat": "Sum for Cluster: {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -1200,7 +1193,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "Prometheus",
-               "description": "Hints being sent over to the node the data belongs.",
+               "description": "Sum of hints being handed off per cluster.",
                "fill": 0,
                "gridPos": { },
                "id": 16,
@@ -1232,10 +1225,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum by (environment, cluster, datacenter, rack, node) (org_apache_cassandra_db_storageproxy_hintsinprogress{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "sum by (environment, cluster) (org_apache_cassandra_db_storageproxy_hintsinprogress{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Sum of hinted handoff for Cluster: {{cluster}}",
+                     "legendFormat": "Sum for Cluster: {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -1327,10 +1320,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "(1 - min by (mode) (rate(node_cpu_seconds_total{mode=\"idle\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m])))",
+                     "expr": "(1 - min by (mode, environment, cluster) (rate(node_cpu_seconds_total{mode=\"idle\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m])))",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Maximum CPU utilisation",
+                     "legendFormat": "Maximum in Cluster: {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -1377,7 +1370,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "Prometheus",
-               "description": "Unix load per node",
+               "description": "Max Unix load on a node for a cluster",
                "fill": 0,
                "gridPos": { },
                "id": 18,
@@ -1409,10 +1402,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (environment, cluster, datacenter, rack, node) (node_load1{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "max by (environment, cluster) (node_load1{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Maximum Load (1m rate)",
+                     "legendFormat": "Maximum Load (1m rate) in {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -1491,17 +1484,17 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (node_memory_MemTotal_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_MemFree_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_Buffers_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_Cached_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_SwapCached_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_Slab_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_PageTables_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_VmallocUsed_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        )",
+                     "expr": "max by (environment, cluster)\n        (node_memory_MemTotal_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_MemFree_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_Buffers_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_Cached_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_SwapCached_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_Slab_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_PageTables_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        - node_memory_VmallocUsed_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}\n        )",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Maximum memory used for nodes in cluster: {{cluster}}",
+                     "legendFormat": "Max memory used on any node in cluster: {{cluster}}",
                      "refId": "A"
                   },
                   {
-                     "expr": "min by (environment, cluster, datacenter, rack, node)\n        (node_memory_MemTotal_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "min by (environment, cluster)\n        (node_memory_MemTotal_bytes{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Minimum amount of memory available for nodes in cluster: {{cluster}}",
+                     "legendFormat": "Min memory available on any node in cluster: {{cluster}}",
                      "refId": "B"
                   }
                ],
@@ -1580,25 +1573,18 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (100 * rate(node_disk_read_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n        / rate(node_disk_reads_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))",
+                     "expr": "max by (environment, cluster)\n        (100 * rate(node_disk_read_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n        / rate(node_disk_reads_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Max r_await in: {{cluster}}",
                      "refId": "A"
                   },
                   {
-                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (100 * rate(node_disk_write_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n        / rate(node_disk_writes_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))",
+                     "expr": "max by (environment, cluster)\n        (100 * rate(node_disk_write_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n        / rate(node_disk_writes_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Max w_await in: {{cluster}}",
                      "refId": "B"
-                  },
-                  {
-                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (100 *\n          (rate(node_disk_read_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n          + rate(node_disk_write_time_seconds_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))\n        ) / (\n          (rate(node_disk_reads_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m])\n          + rate(node_disk_writes_completed_total{device=~\".*\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[5m]))\n        )",
-                     "format": "time_series",
-                     "intervalFactor": 2,
-                     "legendFormat": "Max await in: {{cluster}}",
-                     "refId": "C"
                   }
                ],
                "thresholds": [ ],
@@ -1644,7 +1630,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "Prometheus",
-               "description": "Network In and Out per node",
+               "description": "Network In and Out per cluster",
                "fill": 0,
                "gridPos": { },
                "id": 21,
@@ -1676,14 +1662,14 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum by (environment, cluster) (rate(node_network_transmit_bytes_total{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
+                     "expr": "sum by (environment, cluster) (-1 * (rate(node_network_transmit_bytes_total{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m])))",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Sum of Network Outgoing, cluster: {{cluster}}",
                      "refId": "A"
                   },
                   {
-                     "expr": "sum by (environment, cluster) (-1 * (rate(node_network_receive_bytes_total{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m])))",
+                     "expr": "sum by (environment, cluster) (rate(node_network_receive_bytes_total{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Sum of Network Incoming, cluster: {{cluster}}",
@@ -1746,7 +1732,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "Prometheus",
-               "description": "Garbage Collection duration",
+               "description": "Max garbage collection duration per cluster",
                "fill": 0,
                "gridPos": { },
                "id": 22,
@@ -1778,10 +1764,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (gc, node) (rate(jvm_gc_collection_seconds_sum{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
+                     "expr": "max by (gc, environment, cluster) (rate(jvm_gc_collection_seconds_sum{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Maximum GC duration per minute for {{gc}}",
+                     "legendFormat": "Maximum {{gc}} duration per minute in cluster {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -1860,10 +1846,10 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (gc, node) (rate(jvm_gc_collection_seconds_count{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
+                     "expr": "max by (gc, environment, cluster) (rate(jvm_gc_collection_seconds_count{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Maximum GC count per minute for {{gc}}",
+                     "legendFormat": "Maximum {{gc}} count per minute in cluster {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -1942,17 +1928,17 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "max by (environment, cluster, datacenter, rack, node)\n        (jvm_memory_bytes_used{area=\"heap\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}        )",
+                     "expr": "max by (environment, cluster)\n        (jvm_memory_bytes_used{area=\"heap\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Maximum heap size used for nodes in cluster: {{cluster}}",
+                     "legendFormat": "Max heap size used for nodes in cluster: {{cluster}}",
                      "refId": "A"
                   },
                   {
-                     "expr": "min by (environment, cluster, datacenter, rack, node)\n        (jvm_memory_bytes_max{area=\"heap\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "min by (environment, cluster)\n        (jvm_memory_bytes_max{area=\"heap\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Minimum amount of heap memory available for nodes in cluster: {{cluster}}",
+                     "legendFormat": "Min heap memory available for nodes in cluster: {{cluster}}",
                      "refId": "B"
                   }
                ],
