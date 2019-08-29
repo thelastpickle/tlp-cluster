@@ -25,7 +25,7 @@ apply plugin: 'nebula.ospackage-application'
 
 
 group 'com.thelastpickle'
-version '0.1'
+version '0.2'
 sourceCompatibility = 1.8
 
 application {
@@ -249,11 +249,18 @@ task uploadTar(type:Exec) {
 }
 
 task buildAll {
+    group = "Publish"
     dependsOn "buildDeb"
     dependsOn "buildRpm"
     dependsOn "distTar"
 }
 
+task uploadAll  {
+    group = "Publish"
+    dependsOn "uploadDeb"
+    dependsOn "uploadRpm"
+    dependsOn "uploadTar"
+}
 
 
 assemble.mustRunAfter clean
