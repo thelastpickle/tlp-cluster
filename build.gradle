@@ -185,6 +185,12 @@ task previewDashboards(type:Exec) {
     dependsOn startPreviewDependencies
 }
 
+task stopPreview(type:Exec) {
+    group = "dashboard"
+    description = "Stops the docker compose environment"
+    commandLine  "docker-compose", "-f", "docker-compose-monitoring-dev.yml", "stop"
+}
+
 
 test {
     useJUnitPlatform()
