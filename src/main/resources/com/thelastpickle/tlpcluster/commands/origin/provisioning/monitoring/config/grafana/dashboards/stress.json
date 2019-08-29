@@ -25,7 +25,7 @@
                   "rgba(237, 129, 40, 0.89)",
                   "#d44a3a"
                ],
-               "datasource": "Prometheus",
+               "datasource": "$PROMETHEUS_DS",
                "description": "Aggregate Writes / Second",
                "format": "none",
                "gauge": {
@@ -103,7 +103,7 @@
                   "rgba(237, 129, 40, 0.89)",
                   "#d44a3a"
                ],
-               "datasource": "Prometheus",
+               "datasource": "$PROMETHEUS_DS",
                "description": "Aggregate Reads / Second",
                "format": "none",
                "gauge": {
@@ -181,7 +181,7 @@
                   "rgba(237, 129, 40, 0.89)",
                   "#d44a3a"
                ],
-               "datasource": "Prometheus",
+               "datasource": "$PROMETHEUS_DS",
                "description": "Aggregate Errors / Second",
                "format": "none",
                "gauge": {
@@ -268,7 +268,7 @@
                "bars": false,
                "dashLength": 10,
                "dashes": false,
-               "datasource": "Prometheus",
+               "datasource": "$PROMETHEUS_DS",
                "description": "p99 Write Latency (ms)",
                "fill": 0,
                "gridPos": { },
@@ -352,7 +352,7 @@
                "bars": false,
                "dashLength": 10,
                "dashes": false,
-               "datasource": "Prometheus",
+               "datasource": "$PROMETHEUS_DS",
                "description": "p99 Read Latency (ms)",
                "fill": 0,
                "gridPos": { },

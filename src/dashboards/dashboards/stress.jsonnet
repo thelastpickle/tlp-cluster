@@ -67,7 +67,7 @@ dashboard.new(
             postfix=" writes/s",
             sparklineShow=true,
             timeFrom='30s',
-            datasource='Prometheus',
+            datasource='$PROMETHEUS_DS',
             )
             .addTarget(
                 prometheus.target(
@@ -82,7 +82,7 @@ dashboard.new(
             postfix=" reads/s",
             sparklineShow=true,
             timeFrom='30s',
-            datasource='Prometheus',
+            datasource='$PROMETHEUS_DS',
             )
             .addTarget(
                 prometheus.target(
@@ -97,7 +97,7 @@ dashboard.new(
             postfix=" errors/s",
             sparklineShow=true,
             timeFrom='30s',
-            datasource='Prometheus',
+            datasource='$PROMETHEUS_DS',
             )
             .addTarget(
                 prometheus.target(
@@ -113,7 +113,7 @@ dashboard.new(
               'Write Latency (p99)',
               description='p99 Write Latency (ms)',
               format='short',
-              datasource='Prometheus',
+              datasource='$PROMETHEUS_DS',
               transparent=true,
               fill=0,
               legend_show=true,
@@ -137,7 +137,7 @@ dashboard.new(
               'Read Latency (p99)',
               description='p99 Read Latency (ms)',
               format='short',
-              datasource='Prometheus',
+              datasource='$PROMETHEUS_DS',
               transparent=true,
               fill=0,
               legend_show=true,
