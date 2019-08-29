@@ -200,6 +200,13 @@ test {
     }
 }
 
+buildRpm {
+    requires("java-1.8.0-openjdk")
+    user "root"
+    group = "build"
+}
+
+
 ospackage {
     os = LINUX
     link("/usr/local/bin/tlp-cluster", "/opt/tlp-cluster/bin/tlp-cluster" )
