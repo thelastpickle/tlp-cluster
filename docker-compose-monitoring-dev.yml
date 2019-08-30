@@ -61,6 +61,17 @@ services:
     depends_on:
       - cassandra
 
+  stress2:
+    image: thelastpickle/tlp-stress:latest
+    ports:
+      - "9500"
+    environment:
+      - "TLP_STRESS_CASSANDRA_HOST=cassandra"
+    command: "run BasicTimeSeries --rate 100 -d 1d -r .9"
+    depends_on:
+      - cassandra
+      - stress
+
   start_dependencies:
     image: dadarek/wait-for-dependencies
     depends_on:
