@@ -947,7 +947,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "$PROMETHEUS_DS",
-               "description": "Pending threads rate summed by pool",
+               "description": "Cluster Wide Pending threads rate, by Thread Pool",
                "fill": 0,
                "gridPos": { },
                "id": 13,
@@ -979,7 +979,7 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "sum by (scope, environment) (org_apache_cassandra_metrics_threadpools_value{name=\"PendingTasks\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
+                     "expr": "sum by (scope, environment) (org_apache_cassandra_metrics_threadpools_value{name=\"PendingTasks\", scope!~\"RPC-Thread\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"})",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Sum for Cluster/Thread Pool: {{cluster}}/{{scope}}",
@@ -989,7 +989,7 @@
                "thresholds": [ ],
                "timeFrom": null,
                "timeShift": null,
-               "title": "Pending Messages",
+               "title": "Cluster Wide Pending Messages",
                "tooltip": {
                   "shared": false,
                   "sort": 0,
@@ -1320,7 +1320,7 @@
                "steppedLine": false,
                "targets": [
                   {
-                     "expr": "(1 - min by (mode, environment, cluster) (rate(node_cpu_seconds_total{mode=\"idle\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m])))",
+                     "expr": "max by (environment, cluster) (100 * (1 - min by (mode, environment, cluster) (rate(node_cpu_seconds_total{mode=\"idle\", environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))))",
                      "format": "time_series",
                      "intervalFactor": 2,
                      "legendFormat": "Maximum in Cluster: {{cluster}}",
@@ -1347,6 +1347,7 @@
                },
                "yaxes": [
                   {
+                     "decimals": 1,
                      "format": "percent",
                      "label": null,
                      "logBase": 1,
@@ -1355,6 +1356,7 @@
                      "show": true
                   },
                   {
+                     "decimals": 1,
                      "format": "percent",
                      "label": null,
                      "logBase": 1,
@@ -1732,7 +1734,7 @@
                "dashLength": 10,
                "dashes": false,
                "datasource": "$PROMETHEUS_DS",
-               "description": "Max garbage collection duration per cluster",
+               "description": "Percentage of the time node is NOT doing GC per cluster",
                "fill": 0,
                "gridPos": { },
                "id": 22,
@@ -1764,10 +1766,94 @@
                "steppedLine": false,
                "targets": [
                   {
+                     "expr": "max by (gc, environment, cluster) (1-rate(jvm_gc_collection_seconds_sum{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
+                     "format": "time_series",
+                     "intervalFactor": 2,
+                     "legendFormat": "Max % of time doing {{gc}} in cluster {{cluster}}",
+                     "refId": "A"
+                  }
+               ],
+               "thresholds": [ ],
+               "timeFrom": null,
+               "timeShift": null,
+               "title": "Garbage Collection Throughput (Time not spent in GC)",
+               "tooltip": {
+                  "shared": false,
+                  "sort": 0,
+                  "value_type": "individual"
+               },
+               "transparent": true,
+               "type": "graph",
+               "xaxis": {
+                  "buckets": null,
+                  "mode": "time",
+                  "name": null,
+                  "show": true,
+                  "values": [ ]
+               },
+               "yaxes": [
+                  {
+                     "decimals": 2,
+                     "format": "percentunit",
+                     "label": null,
+                     "logBase": 1,
+                     "max": 1,
+                     "min": null,
+                     "show": true
+                  },
+                  {
+                     "decimals": 2,
+                     "format": "percentunit",
+                     "label": null,
+                     "logBase": 1,
+                     "max": 1,
+                     "min": null,
+                     "show": true
+                  }
+               ]
+            },
+            {
+               "aliasColors": { },
+               "bars": false,
+               "dashLength": 10,
+               "dashes": false,
+               "datasource": "$PROMETHEUS_DS",
+               "description": "Max garbage collection duration per cluster",
+               "fill": 0,
+               "gridPos": { },
+               "id": 23,
+               "legend": {
+                  "alignAsTable": true,
+                  "avg": false,
+                  "current": true,
+                  "max": false,
+                  "min": false,
+                  "rightSide": false,
+                  "show": true,
+                  "sort": "current",
+                  "sortDesc": true,
+                  "total": false,
+                  "values": true
+               },
+               "lines": true,
+               "linewidth": 1,
+               "links": [ ],
+               "nullPointMode": "null",
+               "percentage": false,
+               "pointradius": 5,
+               "points": false,
+               "renderer": "flot",
+               "repeat": null,
+               "seriesOverrides": [ ],
+               "spaceLength": 10,
+               "stack": false,
+               "steppedLine": false,
+               "targets": [
+                  {
                      "expr": "max by (gc, environment, cluster) (rate(jvm_gc_collection_seconds_sum{environment=\"$environment\", cluster=\"$cluster\", datacenter=~\"$datacenter\", rack=~\"$rack\", node=~\"$node\"}[1m]))",
                      "format": "time_series",
                      "intervalFactor": 2,
-                     "legendFormat": "Maximum {{gc}} duration per minute in cluster {{cluster}}",
+                     "legendFormat": "Maximum {{gc}} duration (ms/s) in cluster {{cluster}}",
                      "refId": "A"
                   }
                ],
@@ -1817,7 +1903,7 @@
                "description": "Garbage Collection Count",
                "fill": 0,
                "gridPos": { },
-               "id": 23,
+               "id": 24,
                "legend": {
                   "alignAsTable": true,
                   "avg": false,
@@ -1899,7 +1985,7 @@
                "description": "Maximum JVM Heap Memory size (worst node)",
                "fill": 1,
                "gridPos": { },
-               "id": 24,
+               "id": 25,
                "legend": {
                   "alignAsTable": true,
                   "avg": false,
