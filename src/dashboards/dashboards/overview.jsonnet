@@ -435,7 +435,7 @@ dashboard.new(
     )
     .addTarget(
       prometheus.target(
-        'sum by (scope, environment) (org_apache_cassandra_metrics_threadpools_value{name="PendingTasks", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        'sum by (scope, environment) (org_apache_cassandra_metrics_threadpools_value{name="PendingTasks", scope!~"RPC-Thread", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
         legendFormat='Sum for Cluster/Thread Pool: {{cluster}}/{{scope}}',
       )
     )
@@ -531,12 +531,13 @@ dashboard.new(
       legend_sortDesc=true,
       shared_tooltip=false,
       percentage=true,
+      decimals=1,
       min=0,
       max=105,
     )
     .addTarget(
       prometheus.target(
-        '(1 - min by (mode, environment, cluster) (rate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])))',
+        'max by (environment, cluster) (100 * (1 - min by (mode, environment, cluster) (rate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
         legendFormat='Maximum in Cluster: {{cluster}}',
       )
     )
@@ -666,7 +667,7 @@ dashboard.new(
       legend_sort='current',
       legend_sortDesc=true,
       shared_tooltip=false,
-      bars=true ,
+      bars=true,
     )
     .addTarget(
       prometheus.target(
@@ -686,6 +687,31 @@ dashboard.new(
   row.new(title='JVM / Garbage Collection',)
   .addPanel(
     graphPanel.new(
+      'Garbage Collection Throughput',
+      description='Percentage of the time node is NOT doing GC per cluster',
+      format='percentunit',
+      datasource='$PROMETHEUS_DS',
+      transparent=true,
+      fill=0,
+      legend_show=true,
+      legend_values=true,
+      legend_current=true,
+      legend_alignAsTable=true,
+      legend_sort='current',
+      legend_sortDesc=true,
+      shared_tooltip=false,
+      decimals=2,
+      max=1,
+    )
+    .addTarget(
+      prometheus.target(
+        'max by (gc, environment, cluster) (1-rate(jvm_gc_collection_seconds_sum{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        legendFormat='Max % of time doing {{gc}} in cluster {{cluster}}',
+      )
+    )
+  )
+  .addPanel(
+    graphPanel.new(
       'Garbage Collection Time',
       description='Max garbage collection duration per cluster',
       format='s',
@@ -703,7 +729,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (gc, environment, cluster) (rate(jvm_gc_collection_seconds_sum{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
-        legendFormat='Maximum {{gc}} duration per minute in cluster {{cluster}}',
+        legendFormat='Maximum {{gc}} duration (ms/s) in cluster {{cluster}}',
       )
     )
   )
