@@ -33,3 +33,9 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['stress:9500', 'stress2:9500']
+        labels:
+          environment: PickleLabs
+          cluster: FunkyTesting
+          datacenter: AwesomeDC
+          rack: RadRack
+          node: stress01
