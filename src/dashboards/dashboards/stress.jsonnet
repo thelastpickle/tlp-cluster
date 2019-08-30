@@ -68,6 +68,7 @@ dashboard.new(
             sparklineShow=true,
             timeFrom='30s',
             datasource='$PROMETHEUS_DS',
+            valueName="current",
             )
             .addTarget(
                 prometheus.target(
@@ -83,6 +84,7 @@ dashboard.new(
             sparklineShow=true,
             timeFrom='30s',
             datasource='$PROMETHEUS_DS',
+            valueName="current",
             )
             .addTarget(
                 prometheus.target(
@@ -98,6 +100,7 @@ dashboard.new(
             sparklineShow=true,
             timeFrom='30s',
             datasource='$PROMETHEUS_DS',
+            valueName="current",
             )
             .addTarget(
                 prometheus.target(
