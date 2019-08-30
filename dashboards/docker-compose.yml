@@ -14,10 +14,10 @@ services:
     volumes:
       - "../src/test/resources/monitoring-environment/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
 
-  node_exporter:
+  node_exporter_seed:
     image: prom/node-exporter:v0.18.1
-    ports:
-      - "9100:9100"
+    expose:
+      - "9100"
     volumes:
       - "/proc:/host/proc:ro"
       - "/sys:/host/sys:ro"
@@ -29,6 +29,26 @@ services:
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
       - "--collector.ntp"
       - "--collector.meminfo"
+    links:
+      - cassandra_seed
+
+  node_exporter_2:
+    image: prom/node-exporter:v0.18.1
+    expose:
+      - "9100"
+    volumes:
+      - "/proc:/host/proc:ro"
+      - "/sys:/host/sys:ro"
+      - "/:/rootfs:ro"
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--collector.ntp"
+      - "--collector.meminfo"
+    links:
+      - cassandra_node_2
 
   grafana:
     image: grafana/grafana
@@ -42,26 +62,46 @@ services:
       # Attempts to get a nice nodes up/total panel...
       - "GF_PANELS_DISABLE_SANITIZE_HTML=true"
 
-  cassandra:
+  cassandra_seed:
     image: cassandra:3.11.4
     ports:
-      - "9501:9501"
-      - "9042:9042"
+      - "9042:9042"   # Native transport
+    expose:
+      - "9501"   # jmx_prometheus_javaagent
+      - "7000"   # Gossip communications
+      - "7199"   # JMX
     volumes:
       - "../src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/jmx_prometheus_javaagent-0.12.0.jar.txt:/usr/share/jmx_prometheus_javaagent-0.12.0.jar:ro"
       - "../src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/config.yaml:/usr/share/config.yaml:ro"
     environment:
       JVM_EXTRA_OPTS: '-javaagent:/usr/share/jmx_prometheus_javaagent-0.12.0.jar=9501:/usr/share/config.yaml'
 
+  cassandra_node_2:
+    image: cassandra:3.11.4
+    expose:
+      - "9501"   # jmx_prometheus_javaagent
+      - "9042"   # Native transport
+      - "7000"   # Gossip communications
+      - "7199"   # JMX
+    command: /bin/bash -c "echo 'Waiting for seed node' && sleep 30 && /docker-entrypoint.sh cassandra -f"
+    volumes:
+      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/jmx_prometheus_javaagent-0.12.0.jar.txt:/usr/share/jmx_prometheus_javaagent-0.12.0.jar:ro"
+      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/config.yaml:/usr/share/config.yaml:ro"
+    environment:
+      JVM_EXTRA_OPTS: '-javaagent:/usr/share/jmx_prometheus_javaagent-0.12.0.jar=9501:/usr/share/config.yaml'
+      CASSANDRA_SEEDS: cassandra_seed
+    depends_on:
+      - "cassandra_seed"
+
   stress:
     image: thelastpickle/tlp-stress:latest
     ports:
       - "9500:9500"
     environment:
-      - "TLP_STRESS_CASSANDRA_HOST=cassandra"
+      - "TLP_STRESS_CASSANDRA_HOST=cassandra_seed"
     command: "run KeyValue --rate 100 -d 1d -r .8"
     depends_on:
-      - cassandra
+      - cassandra_seed
 
   stress2:
     image: thelastpickle/tlp-stress:latest
@@ -77,5 +117,5 @@ services:
   start_dependencies:
     image: dadarek/wait-for-dependencies
     depends_on:
-      - cassandra
-    command: cassandra:9042
+      - cassandra_seed
+    command: cassandra_seed:9042

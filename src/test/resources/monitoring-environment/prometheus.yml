@@ -10,24 +10,32 @@ scrape_configs:
   - job_name: 'cassandra'
     scrape_interval: 5s
     static_configs:
-      - targets: ['cassandra:9501']
+      - targets: ['cassandra_seed:9501', 'cassandra_node_2:9501']
         labels:
           environment: PickleLabs
           cluster: FunkyTesting
           datacenter: AwesomeDC
           rack: RadRack
-          node: Cassandra_01
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '^(.+):\d+$'
+        replacement: '${1}'
+        target_label: node
 
   - job_name: 'node_exporter'
     scrape_interval: 5s
     static_configs:
-      - targets: ['node_exporter:9100']
+      - targets: ['node_exporter_seed:9100', 'node_exporter_2:9100']
         labels:
           environment: PickleLabs
           cluster: FunkyTesting
           datacenter: AwesomeDC
           rack: RadRack
-          node: Cassandra_01
+    relabel_configs:
+      - source_labels: [__address__]
+        regex: '^node_exporter_(.+):\d+$'
+        replacement: 'cassandra_${1}'
+        target_label: node
 
   - job_name: 'stress'
     scrape_interval: 5s
