@@ -1,13 +1,14 @@
 #!/bin/sh
 
 set -ex
-
 eval $(ssh-agent)
 ssh-add /root/.ssh/aws-private-key
 
 cd /local
 
-parallel-rsync \
+echo "Starting parallel rsync"
+
+prsync \
     -avrz  \
     -H "${PSSH_HOSTNAMES}" \
     -l ubuntu \
