@@ -117,12 +117,12 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
                 }
                 scrape_config {
                     job_name = "cassandra-os"
-
+                    scrape_interval = "5s"
                     fileSdConfigs[0]["files"]?.add(fileSdConfigBaseDir + "cassandra-os.yml")
                 }
                 scrape_config {
                     job_name = "stress"
-
+                    scrape_interval = "5s"
 
                     fileSdConfigs[0]["files"]?.add(fileSdConfigBaseDir + "stress.yml")
                 }
