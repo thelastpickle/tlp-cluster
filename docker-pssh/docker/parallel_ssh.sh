@@ -7,7 +7,7 @@ ssh-add /root/.ssh/aws-private-key
 
 cd /local
 
-parallel-ssh \
+pssh \
     -ivl ubuntu \
     -O StrictHostKeyChecking=no \
     -O UserKnownHostsFile=/dev/null \

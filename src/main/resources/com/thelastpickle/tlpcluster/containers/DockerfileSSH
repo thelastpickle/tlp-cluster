@@ -1,8 +1,0 @@
-FROM ubuntu:bionic
-
-
-RUN apt-get update && apt-get install -y pssh rsync curl jq
-
-RUN mkdir /tlp
-RUN mkdir /root/.ssh
-

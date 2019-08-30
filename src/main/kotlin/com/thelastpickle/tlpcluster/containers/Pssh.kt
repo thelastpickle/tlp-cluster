@@ -11,16 +11,23 @@ import org.apache.logging.log4j.kotlin.logger
  * This is currently flawed in that it only allows for SSH'ing to Cassandra
  */
 class Pssh(val context: Context, val sshKey: String) {
-    private val dockerImageTag = "thelastpickle/tlp-cluster_pssh"
-
+    private val dockerImageTag = "thelastpickle/pssh"
+    private val tag = "1.0"
     private val provisionCommand = "cd provisioning; chmod +x install.sh; sudo ./install.sh"
     private val postStartCommand = "cd provisioning; chmod +x post_start.sh; sudo ./post_start.sh"
+
 
     val log = logger()
     init {
         val docker = Docker(context)
-        docker.pullImage("ubuntu:bionic", "bionic")
-        docker.buildContainer("DockerfileSSH", dockerImageTag)
+
+        if(!docker.exists(dockerImageTag, tag)) {
+            log.info("Pulling $dockerImageTag")
+            docker.pullImage(dockerImageTag, tag)
+        }
+        else {
+            log.info("Skipping pulling pssh, already local.")
+        }
     }
 
 
@@ -48,24 +55,20 @@ class Pssh(val context: Context, val sshKey: String) {
 
     private fun execute(scriptName: String, scriptCommand: String, nodeType: ServerType) : Result<String> {
         val docker = Docker(context)
-        val script = javaClass.getResourceAsStream(scriptName)
-        val scriptFile = ResourceFile(script)
-
-        val scriptPathInContainer = "/scripts/$scriptName"
-        val containerCommands = mutableListOf("/bin/sh", scriptPathInContainer)
-
-        if (scriptCommand.isNotEmpty()) {
-            containerCommands.add(scriptCommand)
-        }
 
         val hosts = "PSSH_HOSTNAMES=${context.tfstate.getHosts(nodeType).map { it.public }.joinToString(" ")}"
         log.info("Starting container with $hosts")
 
         return docker
                 .addVolume(VolumeMapping(sshKey, "/root/.ssh/aws-private-key", AccessMode.ro))
+                .also {
+                    log.info("Added $sshKey to container")
+                }
                 .addVolume(VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
-                .addVolume(VolumeMapping(scriptFile.path, scriptPathInContainer, AccessMode.rw))
+                .also {
+                    log.info("Added ${context.cwdPath} to /local")
+                }
                 .addEnv(hosts)
-                .runContainer(dockerImageTag, containerCommands, "")
+                .runContainer(dockerImageTag, mutableListOf("/usr/local/bin/$scriptName", scriptCommand), "")
     }
 }

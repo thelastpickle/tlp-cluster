@@ -16,3 +16,4 @@ include 'services:webservice'
 */
 
 rootProject.name = 'tlp-cluster'
+include "docker-pssh"

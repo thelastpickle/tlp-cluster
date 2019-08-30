@@ -41,7 +41,10 @@ class Docker(val context: Context) {
         return this
     }
 
-
+    fun exists(name: String, tag: String) : Boolean {
+        val result = context.docker.listImagesCmd().withImageNameFilter("$name:$tag").exec()
+        return result.size > 0
+    }
     /**
      * Tag is required here, otherwise we pull every tag
      * and that isn't fun
