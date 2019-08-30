@@ -53,4 +53,17 @@ dashboard.new(
             )
         )
     )
+    .addPanel(
+        graphPanel.new(
+            "CPU",
+            description="CPU Usage",
+            datasource='$PROMETHEUS_DS',
+        )
+        .addTarget(
+            prometheus.target(
+                '100-(100 * avg(rate(node_cpu_seconds_total{mode="idle"}[30s])) by (instance))',
+                legendFormat="{{instance}}"
+            )
+        )
+    )
 )
