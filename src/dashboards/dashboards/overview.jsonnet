@@ -12,7 +12,7 @@ dashboard.new(
   'Cassandra Overview',
   schemaVersion=14,
   refresh='1m',
-  time_from='now-3h',
+  time_from='now-15m',
   editable=true,
   tags=['Cassandra', 'Overview'],
 )

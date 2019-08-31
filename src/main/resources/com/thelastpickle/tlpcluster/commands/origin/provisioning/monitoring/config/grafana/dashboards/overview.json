@@ -2203,7 +2203,7 @@
       ]
    },
    "time": {
-      "from": "now-3h",
+      "from": "now-15m",
       "to": "now"
    },
    "timepicker": {
