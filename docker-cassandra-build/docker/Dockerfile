@@ -1,7 +1,6 @@
 FROM ubuntu:bionic
 
-RUN apt-get update && \
-   apt-get -y install \
+RUN apt update && apt-get install -y  \
    ant \
    build-essential \
    curl \
@@ -17,6 +16,9 @@ RUN apt-get update && \
    sudo \
    equivs
 
+COPY excludes.txt /
+COPY unpack_cassandra.sh /usr/local/bin/
+COPY build_cassandra.sh /usr/local/bin/
 
 RUN mkdir /cassandra && \
     mkdir /local

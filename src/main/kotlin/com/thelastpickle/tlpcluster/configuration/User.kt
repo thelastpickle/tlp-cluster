@@ -1,11 +1,10 @@
 package com.thelastpickle.tlpcluster.configuration
 
 import com.thelastpickle.tlpcluster.Context
+import com.thelastpickle.tlpcluster.EC2
 import com.thelastpickle.tlpcluster.Utils
 import org.apache.logging.log4j.kotlin.logger
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.ec2.Ec2Client
 import java.io.File
 import software.amazon.awssdk.services.ec2.model.CreateKeyPairRequest
 import java.nio.file.Files
@@ -53,7 +52,7 @@ data class User(
             // create the key pair
 
             println("Attempting to validate credentials and generate tlp-cluster login keys")
-
+            /*
             val creds = AwsBasicCredentials.create(awsAccessKey, awsSecret)
 
             // TODO: Abstract the provider out
@@ -62,12 +61,15 @@ data class User(
             val ec2 = Ec2Client.builder().region(region)
                     .credentialsProvider { creds }
                     .build()
+            */
+            val ec2 = EC2(awsAccessKey, awsSecret, region)
+            val ec2Client = ec2.client
 
             val keyName = "tlp-cluster-${UUID.randomUUID()}"
             val request = CreateKeyPairRequest.builder()
                     .keyName(keyName).build()
 
-            val response = ec2.createKeyPair(request)
+            val response = ec2Client.createKeyPair(request)
 
             // write the private key into the ~/.tlp-cluster/profiles/<profile>/ dir
 

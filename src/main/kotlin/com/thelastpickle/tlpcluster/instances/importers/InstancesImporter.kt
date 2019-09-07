@@ -34,7 +34,11 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
                         val ebs_as_nvme: Boolean,
                         val storage: Storage?) {
 
+        /**
+         * This doesn't seem to work all the time
+         */
         val isInstanceRootVolume get() = this.storage != null
+
     }
 
 

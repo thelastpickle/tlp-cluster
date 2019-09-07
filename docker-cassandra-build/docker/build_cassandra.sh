@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 BUILD_DIRECTORY=/workspace
+set -x
 
 # external mount
 cd /cassandra
@@ -9,13 +10,12 @@ cd /cassandra
 
 mkdir /build
 
-rsync -av --exclude '/.git/' --exclude '/build/' --exclude /cassandra/data/ --exclude '/logs/*' /cassandra/ $BUILD_DIRECTORY
+rsync -av --exclude-from=/excludes.txt . $BUILD_DIRECTORY
 
 cd $BUILD_DIRECTORY
 
 export JAVA8_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
-
 
 # Install build dependencies and build package
 echo "y" | mk-build-deps --install

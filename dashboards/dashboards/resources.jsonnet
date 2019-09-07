@@ -77,6 +77,8 @@ dashboard.new(
             "Network Traffit - Transmit",
             description="Network Transmit Usage",
             datasource='$PROMETHEUS_DS',
+            format="bytes",
+
         )
         .addTarget(
             prometheus.target(
@@ -85,4 +87,19 @@ dashboard.new(
             )
         )
     )
+     .addPanel(
+            graphPanel.new(
+                "Network Traffit - Receiving",
+                description="Network Receiving Usage",
+                datasource='$PROMETHEUS_DS',
+                format="bytes",
+
+            )
+            .addTarget(
+                prometheus.target(
+                    'sum(rate(node_network_receive_bytes_total[1m])) by (instance)',
+                    legendFormat="{{instance}}"
+                )
+            )
+        )
 )

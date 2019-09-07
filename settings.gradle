@@ -16,4 +16,11 @@ include 'services:webservice'
 */
 
 rootProject.name = 'tlp-cluster'
+
+include "dashboards"
+
+include "docker-cassandra-build"
+include "docker-grafonnet"
 include "docker-pssh"
+
+include "manual"
