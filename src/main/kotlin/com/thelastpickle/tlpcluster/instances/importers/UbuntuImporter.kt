@@ -26,7 +26,7 @@ data class UbuntuImporter(val aaData: List<Ami>) {
     data class Ami(val region: String,
                    val release: String,
                    val releaseDate: String,
-                   val instance_type: String, // hvm:instance-store or hvm:ebs
+                   val instance_type: String, // hvm:instance-store or hvm:ebs or hvm:ebs-ssd
                    val ami: String) {
 
         val isInstanceRootVolume get() = this.instance_type.contains("instance-store")
@@ -50,7 +50,7 @@ data class UbuntuImporter(val aaData: List<Ami>) {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
         val image = "bionic"
-        val targetReleaseDate = "20190320"
+        val targetReleaseDate = "20190814"
 
         val log = logger()
 

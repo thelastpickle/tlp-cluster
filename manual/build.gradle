@@ -1,0 +1,22 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.9.2'
+    }
+}
+
+
+apply plugin: 'org.asciidoctor.convert'
+
+asciidoctor {
+    sourceDir = file("src")
+    attributes "TLP_CLUSTER_VERSION" : rootProject.version.toString()
+
+}
+
+task publish(type: Copy) {
+    from "${asciidoctor.outputDir}/html5"
+    into "${rootProject.projectDir}/docs/"
+}

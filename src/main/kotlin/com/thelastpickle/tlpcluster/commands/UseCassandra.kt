@@ -54,7 +54,9 @@ class UseCassandra(val context: Context) : ICommand {
             val cacheLocation = File(System.getProperty("user.home"), ".tlp-cluster/cache")
             println("Using released version $name")
             val unpacker = CassandraUnpack(context, name, artifactDest.toPath(), Optional.of(cacheLocation.toPath()))
+            log.info("Downloading")
             unpacker.download()
+            log.info("Extracting conf")
             unpacker.extractConf()
 
         } else {

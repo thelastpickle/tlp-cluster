@@ -1,0 +1,17 @@
+plugins {
+    id 'com.bmuschko.docker-remote-api'
+}
+
+
+version "1.0"
+
+import com.bmuschko.gradle.docker.tasks.image.*
+
+ext {
+    container = "thelastpickle/cassandra-build"
+}
+
+task buildDocker(type: DockerBuildImage) {
+    tags = ["$container:$version".toString()]
+    inputDir = file("docker")
+}
