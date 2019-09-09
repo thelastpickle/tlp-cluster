@@ -13,6 +13,8 @@ services:
       - "9090:9090"
     volumes:
       - "../src/test/resources/monitoring-environment/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+    networks:
+      - tlp_cluster_net
 
   node_exporter_seed:
     image: prom/node-exporter:v0.18.1
@@ -29,8 +31,10 @@ services:
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
       - "--collector.ntp"
       - "--collector.meminfo"
-    links:
+    depends_on:
       - cassandra_seed
+    networks:
+      - tlp_cluster_net
 
   node_exporter_2:
     image: prom/node-exporter:v0.18.1
@@ -47,8 +51,10 @@ services:
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
       - "--collector.ntp"
       - "--collector.meminfo"
-    links:
+    depends_on:
       - cassandra_node_2
+    networks:
+      - tlp_cluster_net
 
   grafana:
     image: grafana/grafana
@@ -61,12 +67,13 @@ services:
     environment:
       # Attempts to get a nice nodes up/total panel...
       - "GF_PANELS_DISABLE_SANITIZE_HTML=true"
+    networks:
+      - tlp_cluster_net
 
   cassandra_seed:
     image: cassandra:3.11.4
-    ports:
-      - "9042:9042"   # Native transport
     expose:
+      - "9042"   # Native transport
       - "9501"   # jmx_prometheus_javaagent
       - "7000"   # Gossip communications
       - "7199"   # JMX
@@ -75,6 +82,8 @@ services:
       - "../src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/config.yaml:/usr/share/config.yaml:ro"
     environment:
       JVM_EXTRA_OPTS: '-javaagent:/usr/share/jmx_prometheus_javaagent-0.12.0.jar=9501:/usr/share/config.yaml'
+    networks:
+      - tlp_cluster_net
 
   cassandra_node_2:
     image: cassandra:3.11.4
@@ -90,18 +99,28 @@ services:
     environment:
       JVM_EXTRA_OPTS: '-javaagent:/usr/share/jmx_prometheus_javaagent-0.12.0.jar=9501:/usr/share/config.yaml'
       CASSANDRA_SEEDS: cassandra_seed
+    healthcheck:
+        test: ["CMD", "echo", "'SELECT * FROM system.peers LIMIT 1;'", "|", "cqlsh"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
     depends_on:
-      - "cassandra_seed"
+      - cassandra_seed
+    networks:
+      - tlp_cluster_net
 
   stress:
     image: thelastpickle/tlp-stress:latest
     ports:
       - "9500:9500"
+    restart: unless-stopped
     environment:
       - "TLP_STRESS_CASSANDRA_HOST=cassandra_seed"
-    command: "run KeyValue --rate 100 -d 1d -r .8"
+    command: run KeyValue --rate 100 -d 1d -r .8
     depends_on:
       - cassandra_seed
+    networks:
+      - tlp_cluster_net
 
   stress2:
     image: thelastpickle/tlp-stress:latest
@@ -119,3 +138,9 @@ services:
     depends_on:
       - cassandra_seed
     command: cassandra_seed:9042
+    networks:
+      - tlp_cluster_net
+
+networks:
+  tlp_cluster_net:
+    driver: bridge
