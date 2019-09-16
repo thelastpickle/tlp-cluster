@@ -1,10 +1,7 @@
 package com.thelastpickle.tlpcluster.containers
 
 import com.github.dockerjava.api.model.AccessMode
-import com.thelastpickle.tlpcluster.Context
-import com.thelastpickle.tlpcluster.Docker
-import com.thelastpickle.tlpcluster.ResourceFile
-import com.thelastpickle.tlpcluster.VolumeMapping
+import com.thelastpickle.tlpcluster.*
 import org.apache.commons.io.FileUtils
 import org.apache.logging.log4j.kotlin.logger
 import java.io.File
@@ -59,16 +56,9 @@ class CassandraUnpack(val context: Context,
         // required that the download have already run
         check(File(dest.toFile(), getFileName()).exists())
 
-        val container = "thelastpickle/cassandra-build"
-        val version = "1.0"
-        val containerAndVersion = "$container:$version"
-
-        if(!docker.exists(container, version))
-            docker.pullImage(container, version)
-
         return docker
                 .addVolume(VolumeMapping(dest.toAbsolutePath().toString(), "/working", AccessMode.rw))
-                .runContainer("thelastpickle/cassandra-build:1.0",
+                .runContainer(Containers.CASSANDRA_BUILD,
                 mutableListOf("sh", "/usr/local/bin/unpack_cassandra.sh", getFileName()),
                 "/working/"
         )
