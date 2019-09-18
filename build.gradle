@@ -3,7 +3,7 @@ buildscript {
     ext.kotlin_version = "1.3.50"
     ext.jcommander_version = "1.72"
     ext.docker_compose_version = "0.9.4"
-    
+
     repositories {
         mavenCentral()
         jcenter()
@@ -16,7 +16,9 @@ buildscript {
     }
 }
 
-
+plugins {
+    id 'com.bmuschko.docker-remote-api' version "5.0.0"
+}
 
 // Apply the java plugin to add support for Java
 apply plugin: 'idea'
@@ -26,7 +28,6 @@ apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: "nebula.ospackage"
 apply plugin: 'nebula.ospackage-application'
-
 
 group 'com.thelastpickle'
 version '0.4'
@@ -43,8 +44,16 @@ allprojects {
         mavenCentral()
         jcenter()
     }
-}
 
+    docker {
+        registryCredentials {
+            url = 'https://index.docker.io/v1/'
+            username = System.getenv("DOCKER_USERNAME")
+            password = System.getenv("DOCKER_PASSWORD")
+            email = System.getenv("DOCKER_EMAIL")
+        }
+    }
+}
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
@@ -55,7 +64,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlin_version
-
 
     compile group: 'com.beust', name: 'jcommander', version: jcommander_version
     compile 'com.google.guava:guava:27.0-jre'
@@ -81,7 +89,7 @@ dependencies {
 
     compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+"
 
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.3.1'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
 
     // https://mvnrepository.com/artifact/org.assertj/assertj-core
     testCompile group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
@@ -90,16 +98,13 @@ dependencies {
 
     testCompile "io.mockk:mockk:1.9.3"
 
+    implementation project(":dashboards")
+
 }
 
 build.dependsOn(":docker-pssh:buildDocker")
-
-task docs(type:Exec) {
-    environment "TLP_CLUSTER_VERSION", version
-    commandLine 'docker-compose', 'up', 'docs'
-    group = "Documentation"
-    description = "Build website documentation"
-}
+build.dependsOn(":docker-grafonnet:buildDocker")
+build.dependsOn(":dashboards:generateDashboards")
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
@@ -111,7 +116,6 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
     kotlinOptions.freeCompilerArgs = ["-Xallow-result-return-type"]
 }
-
 
 
 sourceSets {
@@ -128,6 +132,11 @@ sourceSets {
         }
         resources.srcDir file('src/integration-test/resources')
     }
+    main {
+        resources {
+
+        }
+    }
 }
 
 configurations {
@@ -142,64 +151,6 @@ task integrationTest(type: Test) {
     description = "Runs the full end to end tests.  Will create a cluster in AWS.  Errors might require manual cluster tear down."
     group = "Verification"
 }
-
-task buildJsonnet(type: Exec) {
-    workingDir 'src/dashboards'
-    commandLine "docker-compose", "build"
-    standardOutput = new ByteArrayOutputStream()
-    group = "dashboard"
-    description = "Rebuild the jsonnet container"
-    //extension method stopTomcat.output() can be used to obtain the output:
-    ext.output = {
-        return standardOutput.toString()
-    }
-
-}
-
-task generateDashboards(type: Exec) {
-    workingDir 'src/dashboards'
-    commandLine "docker-compose", "up", "--exit-code-from", "grafonnet"
-
-
-    standardOutput = new ByteArrayOutputStream()
-    errorOutput = new ByteArrayOutputStream()
-
-    group = "dashboard"
-    description = "Regenerate the Grafana Dashboards using Docker."
-    inputs.files(project.fileTree(dir: "src/dashboards"))
-
-    ignoreExitValue true
-    doLast {
-        logger.info(standardOutput.toString())
-        logger.error(errorOutput.toString())
-        if (execResult.getExitValue() != 0) {
-            print(standardOutput)
-            throw new GradleScriptException("non zero exit code")
-        }
-    }
-}
-
-compileKotlin.dependsOn(generateDashboards)
-
-task startPreviewDependencies(type:Exec) {
-    group = "dashboard"
-    description = "Start Cassandra and wait for it to be up"
-    commandLine "docker-compose", "-f", "docker-compose-monitoring-dev.yml", "run", "start_dependencies"
-}
-
-task previewDashboards(type:Exec) {
-    group = "dashboard"
-    description = "Start the dashboard dev environment"
-    commandLine "docker-compose", "-f", "docker-compose-monitoring-dev.yml", "up"
-    dependsOn startPreviewDependencies
-}
-
-task stopPreview(type:Exec) {
-    group = "dashboard"
-    description = "Stops the docker compose environment"
-    commandLine  "docker-compose", "-f", "docker-compose-monitoring-dev.yml", "stop"
-}
-
 
 test {
     useJUnitPlatform()
@@ -280,3 +231,9 @@ task uploadAll  {
 
 
 assemble.mustRunAfter clean
+
+build {
+    dependsOn(":docker-cassandra-build:buildDocker")
+    dependsOn(":docker-grafonnet:buildDocker")
+    dependsOn(":docker-pssh:buildDocker")
+}

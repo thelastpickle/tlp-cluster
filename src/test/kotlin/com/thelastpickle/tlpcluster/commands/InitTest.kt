@@ -7,9 +7,11 @@ import io.mockk.mockkObject
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
+
 internal class InitTest {
     val testContext = Context.testContext()
     val testConfiguration = Configuration("ticket", "client", "purpose", "us-west-2", testContext)
+
 
     @Test
     fun testExpand() {
@@ -30,10 +32,6 @@ internal class InitTest {
         every { init.writeTerraformConfig(any()) } returns Result.success("")
         every { init.initializeDirectory(any(), any(), any()) } returns testConfiguration
 
-
         init.execute()
-
-
     }
-
 }

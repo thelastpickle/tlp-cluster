@@ -6,15 +6,16 @@ plugins {
 import com.bmuschko.gradle.docker.tasks.image.*
 import com.bmuschko.gradle.docker.tasks.container.*
 
-
+version "1.0"
 
 ext {
     container = "thelastpickle/pssh"
-    dockerTag = 1.0
 }
 
+
 task buildDocker(type: DockerBuildImage) {
-    tags = ["$container:latest".toString(), "$container:$dockerTag".toString()]
+    tags = ["$container:latest".toString(), "$container:$version".toString()]
+    inputDir = file("docker")
 }
 
 task push(type: DockerPushImage) {
@@ -22,14 +23,7 @@ task push(type: DockerPushImage) {
     imageName = "thelastpickle/pssh"
 }
 
-docker {
-    registryCredentials {
-        url = 'https://index.docker.io/v1/'
-        username = System.getenv("DOCKER_USERNAME")
-        password = System.getenv("DOCKER_PASSWORD")
-        email = System.getenv("DOCKER_EMAIL")
-    }
-}
+
 
 dockerCompose {
 

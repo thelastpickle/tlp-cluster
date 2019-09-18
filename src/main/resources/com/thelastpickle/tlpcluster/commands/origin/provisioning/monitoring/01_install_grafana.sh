@@ -17,7 +17,7 @@ sudo chown root:grafana /etc/grafana/provisioning/datasources/datasource.yaml
 sudo mkdir -p  /var/lib/grafana/dashboards
 
 sudo cp config/grafana/dashboards.yaml /etc/grafana/provisioning/dashboards/
-sudo cp config/grafana/dashboards/*.json /var/lib/grafana/dashboards
+sudo cp dashboards/*.json /var/lib/grafana/dashboards
 
 sudo chown -R grafana /var/lib/grafana/dashboards/
 

@@ -6,7 +6,7 @@
 .tags*
 /.gradle/
 /out/
-/build/
+build/
 .jira-url
 /test/
 /.terraform*
@@ -23,8 +23,6 @@
 /terraform.tfstate
 /terraform.tfvars
 /terraform.tfstate.backup
-/DockerfileSSH*
-/DockerfileCassandra_*
 logs/
 sshConfig
 /scripts
@@ -113,3 +111,4 @@ tlp-cluster.ipr
 tlp-cluster.iws
 
 /prometheus_labels.yml
+/src/main/dashboards/

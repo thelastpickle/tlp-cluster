@@ -32,7 +32,6 @@ class BuildCassandra(val context: Context)  : ICommand {
         val cassandraBuilder = CassandraBuildJava8(context)
 
         // create the container
-        cassandraBuilder.buildContainer()
         println("Starting cassandra build process")
         
         cassandraBuilder.runBuild(dir.absolutePath, name)

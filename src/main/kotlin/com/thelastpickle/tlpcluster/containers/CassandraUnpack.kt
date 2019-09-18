@@ -12,6 +12,7 @@ import java.net.URL
 import java.nio.file.Path
 import java.util.*
 
+
 class CassandraUnpack(val context: Context,
                       val version: String,
                       val dest: Path,
@@ -54,25 +55,25 @@ class CassandraUnpack(val context: Context,
     }
 
 
-
     fun extractConf() : Result<String> {
         // required that the download have already run
         check(File(dest.toFile(), getFileName()).exists())
 
-        val shellScript = ResourceFile(javaClass.getResourceAsStream("unpack_cassandra.sh"))
+        val container = "thelastpickle/cassandra-build"
+        val version = "1.0"
+        val containerAndVersion = "$container:$version"
 
-        docker.pullImage("ubuntu:bionic", "bionic")
+        if(!docker.exists(container, version))
+            docker.pullImage(container, version)
+
         return docker
                 .addVolume(VolumeMapping(dest.toAbsolutePath().toString(), "/working", AccessMode.rw))
-                .addVolume(VolumeMapping(shellScript.path, "/unpack_cassandra.sh", AccessMode.ro))
-                .runContainer("ubuntu:bionic",
-                mutableListOf("sh", "/unpack_cassandra.sh", getFileName()),
+                .runContainer("thelastpickle/cassandra-build:1.0",
+                mutableListOf("sh", "/usr/local/bin/unpack_cassandra.sh", getFileName()),
                 "/working/"
         )
-
     }
 
     fun getURL() = "http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/" + getFileName()
     fun getFileName() = "cassandra_${version}_all.deb"
-
 }

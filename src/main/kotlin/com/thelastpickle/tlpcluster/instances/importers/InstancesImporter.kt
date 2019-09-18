@@ -1,6 +1,5 @@
 package com.thelastpickle.tlpcluster.instances.importers
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
@@ -34,6 +33,9 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
                         val ebs_as_nvme: Boolean,
                         val storage: Storage?) {
 
+        /**
+         * This doesn't seem to work all the time
+         */
         val isInstanceRootVolume get() = this.storage != null
     }
 
@@ -84,9 +86,11 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
 
     }
 
+
     override fun iterator(): Iterator<Instance> {
         return instances.iterator()
     }
+
 
     fun getInstance(name: String): Instance {
         return instances.filter {
@@ -94,12 +98,13 @@ class InstancesImporter(val instances : List<Instance>) : Iterable<InstancesImpo
         }.first()
     }
 
+
     fun write() {
         val fp = File("src/main/resources/com/thelastpickle/tlpcluster/instances/instances.yaml")
         yaml.writeValue(fp, this.instances)
     }
-
 }
+
 
 fun main() {
     val instances = InstancesImporter.loadFromCompressedCSV()

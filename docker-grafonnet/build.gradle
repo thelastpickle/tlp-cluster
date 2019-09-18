@@ -1,0 +1,22 @@
+plugins {
+    id 'com.bmuschko.docker-remote-api'
+}
+
+version "1.0"
+
+import com.bmuschko.gradle.docker.tasks.image.*
+
+ext {
+    container = "thelastpickle/grafonnet"
+}
+
+task buildDocker(type: DockerBuildImage) {
+    tags = ["$container:latest".toString(), "$container:$version".toString()]
+    inputDir = file("docker")
+}
+
+task push(type: DockerPushImage) {
+    dependsOn buildDocker
+    imageName = container
+}
+

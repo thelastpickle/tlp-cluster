@@ -1,0 +1,55 @@
+= tlp-cluster Development Guide
+Jon Haddad <jon@thelastpickle.com>
+:toc: left
+:icons: font
+
+Hello there.  If you're reading this, you've probably decided to contribute to tlp-cluster or use the tools for your own work.  Very cool.
+
+INFO:: These docs are a WIP and we are aware of a number of sections that are yet to be completed.
+
+== Overview
+
+tlp-cluster is broken into several subprojects to make each compontent a bit more managable.  Some of these are docker (which are prefixed with `docker-`), some are text generation (such as the manual you're reading now), and others are simply a bit of code that download an artifact.  Each subproject is versioned and may potentially create an artifact which can be downloaded separately, such as the `dashboards` subproject.
+
+
+== Docker
+
+Each container is versioned and can be built locally using the following:
+
+[source,bash]
+----
+./gradlew :PROJECT-NAME:buildDocker
+----
+
+where `PROJECT-NAME` is one of the subproject directories you see in the top level.
+
+=== Setup
+
+We recommend updating your local Docker service to use 8GB of memory. This is necessary when running dashboard previews locally. The preview is configured to run multiple Cassandra containers at once.
+
+== Subprojects
+
+=== dashboards
+
+This subproject provides tools to preview the dashboards and build them using the Grafonnet Docker container (from the docker-grafonnet subproject).
+
+=== docker-cassandra-build
+
+This container builds the DEB package that installs Cassandra on a node.
+
+=== docker-pssh
+
+This subproject provides tools to perform provisioning operations in parallel on nodes in the cluster.
+
+=== docker-grafonnet
+
+This container builds the JSON files that define the Grafana dashboards.
+
+
+== Publishing
+
+
+[source,bash]
+----
+./gradlew build uploadAll
+----

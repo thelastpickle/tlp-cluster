@@ -1,11 +1,11 @@
 package com.thelastpickle.tlpcluster.commands
 
-import com.beust.jcommander.IStringConverter
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.commands.converters.AZConverter
+import com.thelastpickle.tlpcluster.configuration.Dashboards
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import java.io.File
@@ -102,7 +102,6 @@ class Init(val context: Context) : ICommand {
                 println("Next you'll want to run ${green("tlp-cluster up")} to start your instances.")
             }
         }
-
     }
 
 
@@ -140,9 +139,14 @@ class Init(val context: Context) : ICommand {
         val agent = File(dir, "$agentName.txt")
         agent.renameTo(File(dir, agentName))
 
+        // dashboards
+        val dashboardLocation = File("provisioning/monitoring/dashboards")
+        val dash = Dashboards(dashboardLocation)
+        dash.copyDashboards()
 
         return Configuration(ticket, client, purpose, context.userConfig.region , context = context)
     }
+
 
     fun writeTerraformConfig(config: Configuration): Result<String> {
         val configOutput = File("terraform.tf.json")
@@ -153,14 +157,9 @@ class Init(val context: Context) : ICommand {
     }
 
 
-
     companion object {
         fun expand(region: String, azs: List<String>) : List<String> = azs.map { region + it }
 
         val log = logger()
-
-
     }
-
-
 }

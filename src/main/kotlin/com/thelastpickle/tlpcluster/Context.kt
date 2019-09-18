@@ -16,6 +16,7 @@ data class Context(val tlpclusterUserDirectory: File) {
     val cassandraBuildDir = File(tlpclusterUserDirectory, "builds")
     var profilesDir = File(tlpclusterUserDirectory, "profiles")
     var profileDir = File(profilesDir, "default")
+    val terraformCacheDir = File(tlpclusterUserDirectory, "terraform_cache").also { it.mkdirs() }
 
     var nettyInitialised = false
     val cassandraRepo = Cassandra()
