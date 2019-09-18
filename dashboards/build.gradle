@@ -12,7 +12,10 @@ def dashboardOutput = "$dashboardSourceLocation/com/thelastpickle/dashboards"
 task startDependencies(type:Exec) {
     group = "dashboard"
     description = "Start Cassandra and wait for it to be up"
+
     environment  "DASHBOARD_DIR", dashboardOutput
+    environment "BUILD_DIR", dashboardOutput
+
     commandLine "docker-compose", "run", "start_dependencies"
 }
 
@@ -37,7 +40,6 @@ task stopPreview(type:Exec) {
     commandLine  "docker-compose", "stop"
 }
 
-
 task generateDashboards(type: Exec) {
     commandLine "docker-compose", "up", "--exit-code-from", "grafonnet", "grafonnet"
 
@@ -47,7 +49,8 @@ task generateDashboards(type: Exec) {
     errorOutput = new ByteArrayOutputStream()
     group = "dashboard"
     description = "Regenerate the Grafana Dashboards using Docker."
-    inputs.files(project.fileTree(dir: "src/dashboards"))
+
+    inputs.files(project.fileTree(dir: "dashboards"))
 
     outputs.dir(dashboardOutput)
             .withPropertyName("dashboards")

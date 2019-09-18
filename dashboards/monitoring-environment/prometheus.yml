@@ -18,6 +18,14 @@ scrape_configs:
           rack: RadRack
           node: Cassandra_01
 
+      - targets: ['cassandra2:9501']
+        labels:
+          environment: PickleLabs
+          cluster: FunkyTesting
+          datacenter: AwesomeDC
+          rack: RadRack2
+          node: Cassandra_02
+
   - job_name: 'node_exporter'
     scrape_interval: 5s
     static_configs:
