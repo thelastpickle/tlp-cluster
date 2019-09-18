@@ -30,7 +30,7 @@ apply plugin: "nebula.ospackage"
 apply plugin: 'nebula.ospackage-application'
 
 group 'com.thelastpickle'
-version '0.5'
+version '0.6-SNAPSHOT'
 sourceCompatibility = 1.8
 
 application {
