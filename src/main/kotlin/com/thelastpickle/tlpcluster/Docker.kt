@@ -45,11 +45,16 @@ class Docker(val context: Context) {
         val result = context.docker.listImagesCmd().withImageNameFilter("$name:$tag").exec()
         return result.size > 0
     }
+
+    internal fun pullImage(container: Containers) {
+        return pullImage(container.containerName, container.tag)
+    }
+
     /**
      * Tag is required here, otherwise we pull every tag
      * and that isn't fun
      */
-    fun pullImage(name: String, tag: String) {
+    private fun pullImage(name: String, tag: String) {
         log.debug { "Creating pull object" }
 
         var pullCommand = context.docker.pullImageCmd(name)
@@ -124,7 +129,15 @@ class Docker(val context: Context) {
         return imageId
     }
 
-    fun runContainer(
+    fun runContainer(container: Containers, command: MutableList<String>, workingDirectory: String) : Result<String> {
+        if(!exists(container.containerName, container.tag)) {
+            pullImage(container)
+        }
+
+        return runContainer(container.imageWithTag,  command, workingDirectory)
+    }
+
+    internal fun runContainer(
             imageTag: String,
             command: MutableList<String>,
             workingDirectory : String) : Result<String> {

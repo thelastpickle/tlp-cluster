@@ -11,25 +11,10 @@ import org.apache.logging.log4j.kotlin.logger
  * This is currently flawed in that it only allows for SSH'ing to Cassandra
  */
 class Pssh(val context: Context, val sshKey: String) {
-    private val dockerImageTag = "thelastpickle/pssh"
-    private val tag = "1.0"
     private val provisionCommand = "cd provisioning; chmod +x install.sh; sudo ./install.sh"
     private val postStartCommand = "cd provisioning; chmod +x post_start.sh; sudo ./post_start.sh"
 
-
     val log = logger()
-    init {
-        val docker = Docker(context)
-
-        if(!docker.exists(dockerImageTag, tag)) {
-            log.info("Pulling $dockerImageTag")
-            docker.pullImage(dockerImageTag, tag)
-        }
-        else {
-            log.info("Skipping pulling pssh, already local.")
-        }
-    }
-
 
     fun copyProvisioningResources(nodeType: ServerType) : Result<String> {
         return execute("copy_provisioning_resources.sh", "", nodeType)
@@ -59,8 +44,6 @@ class Pssh(val context: Context, val sshKey: String) {
         val hosts = "PSSH_HOSTNAMES=${context.tfstate.getHosts(nodeType).map { it.public }.joinToString(" ")}"
         log.info("Starting container with $hosts")
 
-        val imageAndTag = "$dockerImageTag:$tag"
-
         return docker
                 .addVolume(VolumeMapping(sshKey, "/root/.ssh/aws-private-key", AccessMode.ro))
                 .also {
@@ -71,6 +54,6 @@ class Pssh(val context: Context, val sshKey: String) {
                     log.info("Added ${context.cwdPath} to /local")
                 }
                 .addEnv(hosts)
-                .runContainer(imageAndTag, mutableListOf("/usr/local/bin/$scriptName", scriptCommand), "")
+                .runContainer(Containers.PSSH, mutableListOf("/usr/local/bin/$scriptName", scriptCommand), "")
     }
 }
