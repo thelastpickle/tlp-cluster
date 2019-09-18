@@ -55,6 +55,12 @@ This container builds the JSON files that define the Grafana dashboards.
 [source,bash]
 ----
 ./gradlew :manual:asciidoctor :manual:publish
+
+# optional, if docker containers have changed
+./gradlew :docker-cassandra-build:push
+./gradlew :docker-grafonnet:push
+./gradlew :docker-pssh:push
+# end of optional stuff
 ./gradlew build uploadAll
 ----
 
