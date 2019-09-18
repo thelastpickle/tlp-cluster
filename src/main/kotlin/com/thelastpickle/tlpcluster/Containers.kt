@@ -8,9 +8,4 @@ enum class Containers(val containerName: String, val tag: String) {
 
     val imageWithTag : String
         get() = "$containerName:$tag"
-
 }
-
-//sealed class Containers(val name: String, val tag: String) {
-//    data class Grafonnet(name: String, tag: String) : Containers(name, tag)
-//}
