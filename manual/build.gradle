@@ -13,7 +13,6 @@ apply plugin: 'org.asciidoctor.convert'
 asciidoctor {
     sourceDir = file("src")
     attributes "TLP_CLUSTER_VERSION" : rootProject.version.toString()
-
 }
 
 task publish(type: Copy) {

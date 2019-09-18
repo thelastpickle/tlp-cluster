@@ -13,8 +13,6 @@ import java.nio.file.attribute.PosixFilePermission
 import java.util.HashSet
 
 
-
-
 data class User(
     var email : String,
     var region: String,
@@ -52,16 +50,6 @@ data class User(
             // create the key pair
 
             println("Attempting to validate credentials and generate tlp-cluster login keys")
-            /*
-            val creds = AwsBasicCredentials.create(awsAccessKey, awsSecret)
-
-            // TODO: Abstract the provider out
-            // tlp cluster should have its own provider that uses the following order:
-            // tlp-cluster config, AWS config
-            val ec2 = Ec2Client.builder().region(region)
-                    .credentialsProvider { creds }
-                    .build()
-            */
             val ec2 = EC2(awsAccessKey, awsSecret, region)
             val ec2Client = ec2.client
 
@@ -95,7 +83,6 @@ data class User(
 
             context.yaml.writeValue(location, user)
         }
-
     }
 }
 

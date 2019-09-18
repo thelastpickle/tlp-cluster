@@ -12,6 +12,7 @@ import java.net.URL
 import java.nio.file.Path
 import java.util.*
 
+
 class CassandraUnpack(val context: Context,
                       val version: String,
                       val dest: Path,
@@ -54,7 +55,6 @@ class CassandraUnpack(val context: Context,
     }
 
 
-
     fun extractConf() : Result<String> {
         // required that the download have already run
         check(File(dest.toFile(), getFileName()).exists())
@@ -72,10 +72,8 @@ class CassandraUnpack(val context: Context,
                 mutableListOf("sh", "/usr/local/bin/unpack_cassandra.sh", getFileName()),
                 "/working/"
         )
-
     }
 
     fun getURL() = "http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/" + getFileName()
     fun getFileName() = "cassandra_${version}_all.deb"
-
 }

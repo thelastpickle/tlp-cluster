@@ -20,8 +20,6 @@ import org.apache.logging.log4j.kotlin.logger
 // "hvm"
 
 data class UbuntuImporter(val aaData: List<Ami>) {
-
-
     @JsonDeserialize(using = AmiDeserializer::class)
     data class Ami(val region: String,
                    val release: String,
@@ -30,7 +28,6 @@ data class UbuntuImporter(val aaData: List<Ami>) {
                    val ami: String) {
 
         val isInstanceRootVolume get() = this.instance_type.contains("instance-store")
-
     }
 
 
@@ -39,13 +36,10 @@ data class UbuntuImporter(val aaData: List<Ami>) {
             val data = json.readValue(p, List::class.java).map { it.toString() }
             return Ami(data[0], data[1], data[5], data[4], extractAmi(data[6]))
         }
-
     }
 
 
     companion object {
-
-
         val json = ObjectMapper().registerKotlinModule()
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
@@ -53,6 +47,7 @@ data class UbuntuImporter(val aaData: List<Ami>) {
         val targetReleaseDate = "20190814"
 
         val log = logger()
+
 
         fun loadFromResource() : UbuntuImporter {
             val data = this::class.java.getResourceAsStream("ubuntu.json")
@@ -64,12 +59,14 @@ data class UbuntuImporter(val aaData: List<Ami>) {
             })
         }
 
+
         fun extractAmi(link: String) : String {
             val regex = ">(ami-[^<]+)".toRegex()
             val match = regex.find(link)!!
             return match.groupValues[1]
         }
     }
+
 
     fun getAmis(region: String) : List<Ami> {
        return aaData.filter {
@@ -84,6 +81,4 @@ data class UbuntuImporter(val aaData: List<Ami>) {
             it.isInstanceRootVolume == instanceRoot
         }.first()
     }
-
-
 }

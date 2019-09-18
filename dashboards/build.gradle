@@ -73,14 +73,12 @@ sourceSets {
 }
 
 distributions {
-    
     main {
         baseName = "tlp-dashboards"
 
         contents {
             from dashboardOutput
         }
-
     }
 }
 

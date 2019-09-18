@@ -13,7 +13,6 @@ ext {
 task buildDocker(type: DockerBuildImage) {
     tags = ["$container:latest".toString(), "$container:$version".toString()]
     inputDir = file("docker")
-
 }
 
 task push(type: DockerPushImage) {

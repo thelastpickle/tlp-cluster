@@ -1,6 +1,5 @@
 package com.thelastpickle.tlpcluster.commands
 
-import com.beust.jcommander.IStringConverter
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.github.ajalt.mordant.TermColors
@@ -103,7 +102,6 @@ class Init(val context: Context) : ICommand {
                 println("Next you'll want to run ${green("tlp-cluster up")} to start your instances.")
             }
         }
-
     }
 
 
@@ -150,7 +148,6 @@ class Init(val context: Context) : ICommand {
     }
 
 
-
     fun writeTerraformConfig(config: Configuration): Result<String> {
         val configOutput = File("terraform.tf.json")
         config.write(configOutput)
@@ -160,14 +157,9 @@ class Init(val context: Context) : ICommand {
     }
 
 
-
     companion object {
         fun expand(region: String, azs: List<String>) : List<String> = azs.map { region + it }
 
         val log = logger()
-
-
     }
-
-
 }

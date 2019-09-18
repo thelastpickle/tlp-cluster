@@ -14,14 +14,17 @@ class Terraform(val context: Context) {
 
     private var localDirectory = "/local"
 
+
     init {
-        if(!docker.exists("hashicorp/terraform", dockerTag))
-            docker.pullImage(dockerImageTag, "0.11.14")
+        if(!docker.exists(dockerImage, dockerTag))
+            docker.pullImage(dockerImageTag, dockerTag)
     }
+
 
     fun init() : Result<String> {
         return execute("init")
     }
+
 
     fun up(autoApprove : Boolean = false) : Result<String> {
         val commands = mutableListOf("apply")
@@ -30,6 +33,7 @@ class Terraform(val context: Context) {
         }
         return execute(*commands.toTypedArray())
     }
+
 
     fun down(autoApprove: Boolean) : Result<String> {
         val commands = mutableListOf("destroy")
@@ -47,7 +51,5 @@ class Terraform(val context: Context) {
                 .addVolume(VolumeMapping(context.terraformCacheDir.absolutePath, "/tcache", AccessMode.rw))
                 .addEnv("TF_PLUGIN_CACHE_DIR=/tcache")
                 .runContainer(dockerImageTag, args, localDirectory)
-
     }
-
 }
