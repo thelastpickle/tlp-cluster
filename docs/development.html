@@ -538,19 +538,45 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_publishing">Publishing</h2>
 <div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>First check circle ci to ensure the build is clean and green.</p>
+</li>
+<li>
+<p>Ensure the following are set: <code>BINTRAY_USER</code>, <code>BINTRAY_KEY</code>, <code>DOCKER_USERNAME</code>, <code>DOCKER_PASSWORD</code>, <code>DOCKER_EMAIL</code>.  These will be removed</p>
+</li>
+<li>
+<p>Perform the following:</p>
+</li>
+</ol>
+</div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash"># bump the version
-./gradlew :manual:asciidoctor :manual:publish
-./gradlew build uploadAll</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash">./gradlew :manual:asciidoctor :manual:publish
+
+# optional, if docker containers have changed
+./gradlew :docker-cassandra-build:push
+./gradlew :docker-grafonnet:push
+./gradlew :docker-pssh:push
+# end of optional stuff
+
+./gradlew buildAll uploadAll</code></pre>
 </div>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Bump the version in <code>build.gradle</code>.</p>
+</li>
+</ol>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-09-18 10:59:24 -0700
+Last updated 2019-09-18 12:20:28 -0700
 </div>
 </div>
 </body>
