@@ -11,10 +11,8 @@ If you're looking for tools to help manage Cassandra in _production_ environment
 
 == Prerequisites
 
-There are some AWS resources tlp-cluster expects to exist in us-west-2 (support for other regions will come soon):
-
-- An AWS access key and secret.  tlp-cluster uses https://www.terraform.io/[Terraform] to create and destroy instances.
-- A security group that allows inbound SSH traffic, and all machines in that group can talk to each other.  This requirement will be lifted soon (see https://github.com/thelastpickle/tlp-cluster/issues/42[Issue #42]).
+- An AWS access key and secret.  tlp-cluster uses https://www.terraform.io/[Terraform] to create and destroy instances.  You will be prompted for these the first time you start tlp-cluster.
+- The access key needs permissions to create an S3 bucket as well as create SSH keys.  Separate keys are used by default for security reasons.
 
 == Installation
 

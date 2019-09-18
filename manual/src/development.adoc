@@ -48,8 +48,14 @@ This container builds the JSON files that define the Grafana dashboards.
 
 == Publishing
 
+. First check circle ci to ensure the build is clean and green.
+. Ensure the following are set: `BINTRAY_USER`, `BINTRAY_KEY`, `DOCKER_USERNAME`, `DOCKER_PASSWORD`, `DOCKER_EMAIL`.  These will be removed
+. Perform the following:
 
 [source,bash]
 ----
+./gradlew :manual:asciidoctor :manual:publish
 ./gradlew build uploadAll
 ----
+
+. Bump the version in `build.gradle`.

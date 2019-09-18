@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.8">
 <meta name="author" content="Jon Haddad">
-<title>tlp-cluster</title>
+<title>tlp-cluster Development Guide</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -434,7 +434,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article toc2 toc-left">
 <div id="header">
-<h1>tlp-cluster</h1>
+<h1>tlp-cluster Development Guide</h1>
 <div class="details">
 <span id="author" class="author">Jon Haddad</span><br>
 <span id="email" class="email"><a href="mailto:jon@thelastpickle.com">jon@thelastpickle.com</a></span><br>
@@ -442,22 +442,21 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="toc" class="toc2">
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
-<li><a href="#_prerequisites">Prerequisites</a></li>
-<li><a href="#_installation">Installation</a>
+<li><a href="#_overview">Overview</a></li>
+<li><a href="#_docker">Docker</a>
 <ul class="sectlevel2">
-<li><a href="#_installing_a_package">Installing a Package</a></li>
-</ul>
-</li>
 <li><a href="#_setup">Setup</a></li>
-<li><a href="#_initialize_a_cluster">Initialize a Cluster</a></li>
-<li><a href="#_launch_instances">Launch Instances</a></li>
-<li><a href="#_installing_cassandra">Installing Cassandra</a>
-<ul class="sectlevel2">
-<li><a href="#_the_easy_way_use_a_released_build">The Easy Way - Use a Released Build</a></li>
-<li><a href="#_the_hard_way_use_a_custom_build">The Hard Way - Use a custom Build</a></li>
 </ul>
 </li>
-<li><a href="#_dashboards">Dashboards</a></li>
+<li><a href="#_subprojects">Subprojects</a>
+<ul class="sectlevel2">
+<li><a href="#_dashboards">dashboards</a></li>
+<li><a href="#_docker_cassandra_build">docker-cassandra-build</a></li>
+<li><a href="#_docker_pssh">docker-pssh</a></li>
+<li><a href="#_docker_grafonnet">docker-grafonnet</a></li>
+</ul>
+</li>
+<li><a href="#_publishing">Publishing</a></li>
 </ul>
 </div>
 </div>
@@ -465,528 +464,93 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>This is the manual for tlp-cluster, a provisioning tool for Apache Cassandra designed for developers looking to benchmark and test Apache Cassandra.  It assists with builds and starting instances on AWS.</p>
+<p>Hello there.  If you&#8217;re reading this, you&#8217;ve probably decided to contribute to tlp-cluster or use the tools for your own work.  Very cool.</p>
 </div>
-<div class="paragraph">
-<p>If you are looking for a tool to aid in benchmarking these clusters please see the companion project <a href="http://thelastpickle.com/tlp-stress/">tlp-stress</a>.</p>
-</div>
-<div class="paragraph">
-<p>If you&#8217;re looking for tools to help manage Cassandra in <em>production</em> environments please see the <a href="http://cassandra-reaper.io/">Reaper</a> project and <a href="https://github.com/spotify/cstar">cstar</a></p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_prerequisites">Prerequisites</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>An AWS access key and secret.  tlp-cluster uses <a href="https://www.terraform.io/">Terraform</a> to create and destroy instances.  You will be prompted for these the first time you start tlp-cluster.</p>
-</li>
-<li>
-<p>The access key needs permissions to create an S3 bucket as well as create SSH keys.  Separate keys are used by default for security reasons.</p>
-</li>
-</ul>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">INFO</dt>
+<dd>
+<p>These docs are a WIP and we are aware of a number of sections that are yet to be completed.</p>
+</dd>
+</dl>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_installation">Installation</h2>
+<h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The easiest way to get started is to use one of our prebuilt packages.</p>
+<p>tlp-cluster is broken into several subprojects to make each compontent a bit more managable.  Some of these are docker (which are prefixed with <code>docker-</code>), some are text generation (such as the manual you&#8217;re reading now), and others are simply a bit of code that download an artifact.  Each subproject is versioned and may potentially create an artifact which can be downloaded separately, such as the <code>dashboards</code> subproject.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_docker">Docker</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Each container is versioned and can be built locally using the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-bash" data-lang="bash">./gradlew :PROJECT-NAME:buildDocker</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>where <code>PROJECT-NAME</code> is one of the subproject directories you see in the top level.</p>
 </div>
 <div class="sect2">
-<h3 id="_installing_a_package">Installing a Package</h3>
+<h3 id="_setup">Setup</h3>
 <div class="paragraph">
-<p>The easiest way to get started is to use your favorite package manager.</p>
-</div>
-<div class="paragraph">
-<p>The current version is 0.5.</p>
-</div>
-<div class="sect3">
-<h4 id="_deb_packages">Deb Packages</h4>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>$ echo "deb https://dl.bintray.com/thelastpickle/tlp-tools-deb weezy main" | sudo tee -a /etc/apt/sources.list
-$ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 2895100917357435
-$ sudo apt update
-$ sudo apt install tlp-cluster</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_rpm_packages">RPM Packages</h4>
-<div class="paragraph">
-<p>You&#8217;ll need the bintray repo set up on your machine.  Create this <code>/etc/yum.repos.d/tlp-tools.repo</code>:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>[bintraybintray-thelastpickle-tlp-tools-rpm]
-name=bintray-thelastpickle-tlp-tools-rpm
-baseurl=https://dl.bintray.com/thelastpickle/tlp-tools-rpm
-gpgcheck=0
-repo_gpgcheck=0
-enabled=1</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Then run the following to install:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>$ yum install tlp-cluster</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="_tarball_install">Tarball Install</h4>
-<div class="paragraph">
-<p>If you&#8217;re using mac, for now you&#8217;ll need to grab our tarball using:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>$ curl -L -O "https://dl.bintray.com/thelastpickle/tlp-tools-tarball/tlp-cluster-0.5.tar
-$ tar -xzf tlp-cluster-0.5.tar</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>To get started, add the bin directory of tlp-cluster to your $PATH.  For example:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">export PATH="$PATH:/path/to/tlp-cluster/bin"
-cd /path/to/tlp-cluster
-./gradlew assemble</code></pre>
-</div>
-</div>
+<p>We recommend updating your local Docker service to use 8GB of memory. This is necessary when running dashboard previews locally. The preview is configured to run multiple Cassandra containers at once.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_setup">Setup</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>We currently have a dependency on shell scripts meaning you&#8217;ll need a Mac or Linux box to use this tool.</p>
-</div>
-<div class="paragraph">
-<p>If you&#8217;ve never used to the tool before, the first time you run a command you&#8217;ll be asked to supply some information, which will generate a configuration file which will be placed in your <code>$HOME/.tlp-cluster/profiles/default/settings.yaml</code>.</p>
-</div>
-<div class="admonitionblock important">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-important" title="Important"></i>
-</td>
-<td class="content">
-We currently only support the ubuntu 16 ami in us-west-2.  We&#8217;d love a pull request to improve this!
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>Running the command without any arguments will print out the usage:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>You&#8217;ll see the help.  It looks like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>Usage: tlp-cluster [options] [command] [command options]
-  Options:
-    --help, -h
-      Shows this help.
-      Default: false
-  Commands:
-    init      Initialize this directory for tlp-cluster
-      Usage: init [options] Client, Ticket, Purpose
-        Options:
-          --ami
-            AMI
-            Default: ami-51537029
-          --cassandra, -c
-            Number of Cassandra instances
-            Default: 3
-          --instance
-            Instance Type
-            Default: c5d.2xlarge
-          --monitoring, -m
-            Enable monitoring (beta)
-            Default: false
-          --region
-            Region
-            Default: us-west-2
-          --stress, -s
-            Number of stress instances
-            Default: 0
-          --up
-            Start instances automatically
-            Default: false
-
-    up      Starts instances
-      Usage: up [options]
-        Options:
-          --auto-approve, -a, --yes
-            Auto approve changes
-            Default: false
-
-    start      Start cassandra on all nodes via service command
-      Usage: start [options]
-        Options:
-          --all, -a
-            Start all services on all instances. This overrides all other
-            options
-            Default: false
-          --monitoring, -m
-            Start services on monitoring instances
-            Default: false
-
-    stop      Stop cassandra on all nodes via service command
-      Usage: stop [options]
-        Options:
-          --all, -a
-            Start all services on all instances. This overrides all other
-            options
-            Default: false
-          --monitoring, -m
-            Start services on monitoring instances
-            Default: false
-
-    install      Install Everything
-      Usage: install
-
-    down      Shut down a cluster
-      Usage: down [options]
-        Options:
-          --auto-approve, -a, --yes
-            Auto approve changes
-            Default: false
-
-    build      Create a custom named Cassandra build from a working directory.
-      Usage: build [options] Path to build
-        Options:
-          -n
-            Name of build
-
-    ls      List available builds
-      Usage: ls
-
-    use      Use a Cassandra build
-      Usage: use [options]
-        Options:
-          --config, -c
-            Configuration settings to change in the cassandra.yaml file
-            specified in the format key:value,...
-            Default: []
-
-    clean      null
-      Usage: clean
-
-    hosts      null
-      Usage: hosts
-
-
-Done</code></pre>
-</div>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_initialize_a_cluster">Initialize a Cluster</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>The tool uses the current working directory as a project, of sorts. To get started, run the following, substituting your customer / project, ticket and purpose.</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster init CLIENT TICKET PURPOSE</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Where:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>CLIENT</code> - Name of the customer, client, or project associated with the work you are doing with <code>tlp-cluster</code>.</p>
-</li>
-<li>
-<p><code>TICKET</code> - Jira or github ticket number associated with the work you are doing with <code>tlp-cluster</code>.</p>
-</li>
-<li>
-<p><code>PURPOSE</code> - Reason why you are creating the cluster.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>This will initialize the current directory with a terraform.tf.json. You can open this up in an editor. Here you can change the number of nodes in the cluster, as well as configure the number of stress nodes you want. You can also change the instance type.  Generally speaking though, you shouldn&#8217;t have to do this.  If you find yourself doing it often, please submit an <a href="https://github.com/thelastpickle/tlp-cluster/issues">issue</a> describing your requirements and we&#8217;ll work with you to solve the problem.</p>
-</div>
-<div class="paragraph">
-<p>Certain instances types may not work with the ami that&#8217;s hard coded at the moment, we&#8217;re looking to fix / improve this.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_launch_instances">Launch Instances</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>Launch your instances with the following:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster up</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Terraform will eventually ask you to type <code>yes</code> and fire up your instances.  Optionally you can pass <code>--yes</code> to the <code>-up</code> command and you won&#8217;t be prompted.</p>
-</div>
-<div class="paragraph">
-<p>tlp-cluster will create a file, <code>env.sh</code>, which has helpful aliases and bash functions that will help you run your cluster.  Run the following:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">source env.sh</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will set up SSH, SCP, SFTP, and rsync to use a local sshConfig file, as well as some other helpful aliases.</p>
-</div>
-<div class="paragraph">
-<p>SSH alises for all Cassandra nodes are automatically created as <code>c0</code>-<code>cN</code>.  <code>ssh</code> is not required.  For example:</p>
-</div>
-<div class="paragraph">
-<p><code>c0 nodetool status</code></p>
-</div>
-<div class="paragraph">
-<p>In addition, the following are defined:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><strong>c-all</strong> executes a command on every node in the cluster sequentially.</p>
-</li>
-<li>
-<p><strong>c-collect-artifacts</strong> will collect metrics, nodetool output and system information into the artifacts directory.  It takes a name as a parameter.  This is useful when doing performance testing to capture the state of the system at a given moment.</p>
-</li>
-<li>
-<p><strong>c-start</strong> Starts cassandra on all nodes.</p>
-</li>
-<li>
-<p><strong>c-restart</strong> Restarts cassandra on all nodes.  Not a graceful operation.  To test true rolling restarts we recommend using <a href="https://github.com/spotify/cstar">cstar</a>.</p>
-</li>
-<li>
-<p><strong>c-status</strong>: Executes <code>nodetool status</code> on cassandra0.</p>
-</li>
-<li>
-<p><strong>c-tpstats</strong>: Executes <code>nodetool tpstats</code> on all nodes.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_installing_cassandra">Installing Cassandra</h2>
+<h2 id="_subprojects">Subprojects</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_the_easy_way_use_a_released_build">The Easy Way - Use a Released Build</h3>
+<h3 id="_dashboards">dashboards</h3>
 <div class="paragraph">
-<p>The easiest path forward to getting a cluster up and running is the following:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster use 3.11.4
-tlp-cluster install
-tlp-cluster start</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Simply replace 3.11.4 with the release version.</p>
+<p>This subproject provides tools to preview the dashboards and build them using the Grafonnet Docker container (from the docker-grafonnet subproject).</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_the_hard_way_use_a_custom_build">The Hard Way - Use a custom Build</h3>
+<h3 id="_docker_cassandra_build">docker-cassandra-build</h3>
 <div class="paragraph">
-<p>To install Cassandra on your instances, you will need to follow these steps:</p>
+<p>This container builds the DEB package that installs Cassandra on a node.</p>
 </div>
-<div class="olist arabic">
-<ol class="arabic">
-<li>
-<p>Build the version you need and give it a build name (optional)</p>
-</li>
-<li>
-<p>Tell tlp-cluster to use the custom build</p>
-</li>
-</ol>
 </div>
+<div class="sect2">
+<h3 id="_docker_pssh">docker-pssh</h3>
 <div class="paragraph">
-<p>The first step is optional because you may already have a build in the <code>~/.tlp-cluster/build</code> directory that you want to use.</p>
+<p>This subproject provides tools to perform provisioning operations in parallel on nodes in the cluster.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_docker_grafonnet">docker-grafonnet</h3>
 <div class="paragraph">
-<p>If you have no builds you will need to run the following:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster build -n BUILD_NAME /path/to/repo</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Where:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>BUILD_NAME</code> - Name you want to give the build e.g. my-build-cass-4.0.</p>
-</li>
-<li>
-<p><code>/path/to/repo</code> - Full path to clone of the Cassandra repository.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>If you already have a build that you would like to use you can run the following:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster use BUILD_NAME</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will copy the binaries and configuration files to the <code>provisioning/cassandra</code> directory in your <code>tlp-cluster</code> repository. The <code>provisioning</code> directory contains a number of files that can be used to set up your instances. Being realistic, since we do so much non-standard work (EBS vs instance store, LVM vs FS directly on a device, caches, etc) we need the ability to run arbitrary commands. This isn’t a great use case for puppet / chef / salt / ansible (yet), so we are just using easy to modify scripts for now.</p>
-</div>
-<div class="paragraph">
-<p>If you want to install other binaries or perform other operations during provisioning of the instances, you can add them to the <code>provisioning/cassandra</code> directory. Note that any new scripts you add should be prefixed with a number which is used to determine the order they are executed by the <code>install.sh</code> script.</p>
-</div>
-<div class="paragraph">
-<p>To provision the instances run the following:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">tlp-cluster install</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Where:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p><code>SSH_KEY_PATH</code> - Is the full path to the private key from the key pair used when creating the instances.</p>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>This will push the contents of the <code>provisioning/cassandra</code> directory up to each of the instances you have created and install Cassandra on them.</p>
+<p>This container builds the JSON files that define the Grafana dashboards.</p>
 </div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_dashboards">Dashboards</h2>
+<h2 id="_publishing">Publishing</h2>
 <div class="sectionbody">
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-This documentation is <em>very</em> rough, and needs improvment before the 1.0 release.
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>The dashboards are built using a tool called jsonnet, with a library called grafonnet.  The jsonnet files are here: <code>src/dashboards/dashboards</code></p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-if you want to do anything in the dashboards, you’d need to run <code>./gradlew buildJsonnet</code> to build the container
-</td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>You can regenerate the dashboards using the following:</p>
-</div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>./gradlew generateDashboards</code></pre>
+<pre class="highlight"><code class="language-bash" data-lang="bash"># bump the version
+./gradlew :manual:asciidoctor :manual:publish
+./gradlew build uploadAll</code></pre>
 </div>
-</div>
-<div class="paragraph">
-<p>Optionally you can add the <code>-t</code> flag and Gradle will watch for changes, and rebuild the dashboards when it detects changes.</p>
-</div>
-<div class="paragraph">
-<p>They get output here: <code>src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/monitoring/config/grafana/dashboards</code></p>
-</div>
-<div class="paragraph">
-<p>There&#8217;s a docker-compose file, <code>docker-compose-monitoring-dev.yml</code>, which has all the necessary configuration to start a full environment designed to make editing dashboards easier.  You can start it with:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="highlight"><code>./gradlew previewDashboards</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>This will start Cassandra, tlp-stress, Prometheus and Grafana.</p>
-</div>
-<div class="paragraph">
-<p>The following ports are open:</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Port</th>
-<th class="tableblock halign-left valign-top">Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3000</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Grafana web interface</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9090</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Prometheus Web Interface</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9042</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Cassandra Native Protocol (cql)</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9500</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">tlp-stress prometheus port</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">9501</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Cassandra prometheus port</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p>the normal ports are all mapped for you so you can reach prometheus on 9090 and grafana on 3000</p>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-09-18 11:02:27 -0700
+Last updated 2019-09-18 10:59:24 -0700
 </div>
 </div>
 </body>
