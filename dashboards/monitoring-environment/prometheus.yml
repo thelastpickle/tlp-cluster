@@ -36,6 +36,13 @@ scrape_configs:
           datacenter: AwesomeDC
           rack: RadRack
           node: Cassandra_01
+      - targets: ['node_exporter2:9100']
+        labels:
+          environment: PickleLabs
+          cluster: FunkyTesting
+          datacenter: AwesomeDC
+          rack: RadRack
+          node: Cassandra_02
 
   - job_name: 'stress'
     scrape_interval: 5s
