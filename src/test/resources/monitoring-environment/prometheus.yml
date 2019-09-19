@@ -34,7 +34,7 @@ scrape_configs:
     relabel_configs:
       - source_labels: [__address__]
         regex: '^node_exporter_(.+):\d+$'
-        replacement: 'cassandra_${1}'
+        replacement: 'cassandra_node_${1}'
         target_label: node
 
   - job_name: 'stress'

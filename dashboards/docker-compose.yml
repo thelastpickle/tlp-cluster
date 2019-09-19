@@ -3,12 +3,16 @@ version: "3.0"
 services:
   grafonnet:
     image: "thelastpickle/grafonnet:1.0"
+    restart: unless-stopped
     volumes:
       - "./dashboards/:/input:ro"
       - "${BUILD_DIR}:/output"
+    networks:
+      - tlp_cluster_net
 
   prometheus:
     image: prom/prometheus:v2.11.1
+    restart: unless-stopped
     ports:
       - "9090:9090"
     volumes:
@@ -18,6 +22,7 @@ services:
 
   node_exporter_seed:
     image: prom/node-exporter:v0.18.1
+    restart: unless-stopped
     expose:
       - "9100"
     volumes:
@@ -29,7 +34,7 @@ services:
       - "--path.rootfs=/rootfs"
       - "--path.sysfs=/host/sys"
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
-      - "--collector.ntp"
+      # - "--collector.ntp"
       - "--collector.meminfo"
     depends_on:
       - cassandra_seed
@@ -38,6 +43,7 @@ services:
 
   node_exporter_2:
     image: prom/node-exporter:v0.18.1
+    restart: unless-stopped
     expose:
       - "9100"
     volumes:
@@ -49,7 +55,7 @@ services:
       - "--path.rootfs=/rootfs"
       - "--path.sysfs=/host/sys"
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
-      - "--collector.ntp"
+      # - "--collector.ntp"
       - "--collector.meminfo"
     depends_on:
       - cassandra_node_2
@@ -58,6 +64,7 @@ services:
 
   grafana:
     image: grafana/grafana
+    restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
@@ -72,6 +79,7 @@ services:
 
   cassandra_seed:
     image: cassandra:3.11.4
+    restart: unless-stopped
     expose:
       - "9042"   # Native transport
       - "9501"   # jmx_prometheus_javaagent
@@ -82,11 +90,17 @@ services:
       - "../src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/config.yaml:/usr/share/config.yaml:ro"
     environment:
       JVM_EXTRA_OPTS: '-javaagent:/usr/share/jmx_prometheus_javaagent-0.12.0.jar=9501:/usr/share/config.yaml'
+    healthcheck:
+        test: ["CMD", "echo", "'SELECT * FROM system.peers LIMIT 1;'", "|", "cqlsh"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
     networks:
       - tlp_cluster_net
 
   cassandra_node_2:
     image: cassandra:3.11.4
+    restart: unless-stopped
     expose:
       - "9501"   # jmx_prometheus_javaagent
       - "9042"   # Native transport
@@ -94,8 +108,8 @@ services:
       - "7199"   # JMX
     command: /bin/bash -c "echo 'Waiting for seed node' && sleep 30 && /docker-entrypoint.sh cassandra -f"
     volumes:
-      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/jmx_prometheus_javaagent-0.12.0.jar.txt:/usr/share/jmx_prometheus_javaagent-0.12.0.jar:ro"
-      - "./src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/config.yaml:/usr/share/config.yaml:ro"
+      - "../src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/jmx_prometheus_javaagent-0.12.0.jar.txt:/usr/share/jmx_prometheus_javaagent-0.12.0.jar:ro"
+      - "../src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/cassandra/config.yaml:/usr/share/config.yaml:ro"
     environment:
       JVM_EXTRA_OPTS: '-javaagent:/usr/share/jmx_prometheus_javaagent-0.12.0.jar=9501:/usr/share/config.yaml'
       CASSANDRA_SEEDS: cassandra_seed
@@ -112,11 +126,11 @@ services:
   stress:
     image: thelastpickle/tlp-stress:latest
     ports:
-      - "9500:9500"
+      - "9500"
     restart: unless-stopped
     environment:
       - "TLP_STRESS_CASSANDRA_HOST=cassandra_seed"
-    command: run KeyValue --rate 100 -d 1d -r .8
+    command: "run KeyValue --rate 100 -d 1d -r .8"
     depends_on:
       - cassandra_seed
     networks:
@@ -126,12 +140,15 @@ services:
     image: thelastpickle/tlp-stress:latest
     ports:
       - "9500"
+    restart: unless-stopped
     environment:
-      - "TLP_STRESS_CASSANDRA_HOST=cassandra"
+      - "TLP_STRESS_CASSANDRA_HOST=cassandra_seed"
     command: "run BasicTimeSeries --rate 100 -d 1d -r .9"
     depends_on:
-      - cassandra
+      - cassandra_seed
       - stress
+    networks:
+      - tlp_cluster_net
 
   start_dependencies:
     image: dadarek/wait-for-dependencies
