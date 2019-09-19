@@ -8,6 +8,24 @@ local textPanel = grafana.text;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 
+local StandardGraphPanel(name, description, format="µs") =
+     graphPanel.new(
+          name,
+          description=description,
+          format=format,
+          datasource='$PROMETHEUS_DS',
+          transparent=true,
+          fill=0,
+          legend_show=true,
+          legend_values=true,
+          legend_current=true,
+          legend_alignAsTable=true,
+          legend_sort='current',
+          legend_sortDesc=true,
+          shared_tooltip=false,
+          min=0,
+        );
+
 dashboard.new(
   'Cassandra Overview',
   schemaVersion=14,
@@ -98,31 +116,16 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'sum by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite", name=~"Latency|ViewWriteLatency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='{{scope}} Request Rate for {{cluster}}',
+        legendFormat='{{scope}}',
       )
     )
   )
   .addPanel(
-    graphPanel.new(
-      'Error throughputs',
-      description='Total Timeouts, Failures, Unavailable Rates for each cluster',
-      format='rps',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      min=0,
-    )
+    StandardGraphPanel('Error throughputs', description='Total Timeouts, Failures, Unavailable Rates for each cluster', format='rps')
     .addTarget(
       prometheus.target(
         'sum by (name, environment, cluster) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite", name!~"Latency|ViewWriteLatency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Sum of {{name}} Requests for cluster {{cluster}}',
+        legendFormat='{{name}}',
       )
     )
   )
@@ -162,46 +165,38 @@ dashboard.new(
     )
   )
   .addPanel(
-    graphPanel.new(
-      'Read Latency',
-      description='Read latency maximum for coordinated reads',
-      format='µs',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      min=0,
-    )
+
+    StandardGraphPanel("Read Latency", 'Read latency p99 maximum for coordinated reads')
     .addTarget(
       prometheus.target(
         'max by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Max {{scope}} 99th percentile for {{cluster}}',
+        legendFormat='max',
       )
+    )
+    .addTarget(
+      prometheus.target(
+        'min by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='min',
+      )
+    )
+    .addTarget(
+      prometheus.target(
+        'avg by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
+        legendFormat='avg',
+      )
+    )
+    .addSeriesOverride(
+        {"alias": "max",
+        "fillBelowTo": "min",
+        "lines": false}
+    )
+    .addSeriesOverride(
+        {"alias": "min",
+            "lines": false}
     )
   )
   .addPanel(
-    graphPanel.new(
-      'Write Latency',
-      description='Write latency maximum for coordinated reads',
-      format='µs',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      min=0,
-    )
+    StandardGraphPanel('Write Latency', description='Write latency maximum for coordinated reads')
     .addTarget(
       prometheus.target(
         'max by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
@@ -210,22 +205,7 @@ dashboard.new(
     )
   )
   .addPanel(
-    graphPanel.new(
-      'Other Latencies',
-      description='Other latencies on p99 for coordinated requests',
-      format='µs',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      min=0,
-    )
+    StandardGraphPanel('Other Latencies', description='Other latencies on p99 for coordinated requests')
     .addTarget(
       prometheus.target(
         # In scope!~"Write|Read|.*-.*", we want to exclude charts above and all the per-consistency_level info like "Read-LOCAL_ONE"
@@ -304,46 +284,20 @@ dashboard.new(
     )
   )
   .addPanel(
-    graphPanel.new(
-      'Total Data Size',
-      description='Total sizes of the data on distinct nodes',
-      format='bytes',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-    )
+    StandardGraphPanel('Total Data Size', description='Total sizes of the data on distinct nodes')
     .addTarget(
       prometheus.target(
         'sum by (name, environment, cluster)
         (org_apache_cassandra_metrics_table_value{name=~"LiveDiskSpaceUsed|TotalDiskSpaceUsed", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"} )',
-        legendFormat='Sum of {{name}} for nodes in cluster: {{cluster}}',
+        legendFormat='{{name}}',
       )
     )
   )
   .addPanel(
-    graphPanel.new(
+    StandardGraphPanel(
       'SSTable Count',
       description='SSTable Count Max and Average per table',
-      format='short',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      min=0,
-    )
+      format='short')
     .addTarget(
       prometheus.target(
         'max by (keyspace, scope, environment, cluster) (org_apache_cassandra_metrics_table_value{name="LiveSSTableCount", keyspace=~".+", scope=~".+", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
@@ -358,25 +312,10 @@ dashboard.new(
     )
   )
   .addPanel(
-    graphPanel.new(
+    StandardGraphPanel(
       'Pending Compactions',
       description='Maximum pending compactions on any node in the cluster',
-      format='short',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      min=0,
-      bars=false,
-      lines=true,
-      stack=false,
-      decimals=0,
+      format='short'
     )
     .addTarget(
       prometheus.target(
@@ -757,21 +696,10 @@ dashboard.new(
     )
   )
   .addPanel(
-    graphPanel.new(
+    StandardGraphPanel(
       'JVM Heap Memory Utilisation',
       description='Maximum JVM Heap Memory size (worst node)',
-      format='bytes',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      fill=1,
-      linewidth=2,
+      format='bytes'
     )
     .addTarget(
       prometheus.target(
