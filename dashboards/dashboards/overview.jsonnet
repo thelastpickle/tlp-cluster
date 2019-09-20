@@ -8,14 +8,14 @@ local textPanel = grafana.text;
 local prometheus = grafana.prometheus;
 local template = grafana.template;
 
-local StandardGraphPanel(name, description, format="µs") =
+local StandardGraphPanel(name, description, format="µs", fill=0, min=0, formatY1=null) =
      graphPanel.new(
           name,
           description=description,
           format=format,
           datasource='$PROMETHEUS_DS',
           transparent=true,
-          fill=0,
+          fill=fill,
           legend_show=true,
           legend_values=true,
           legend_current=true,
@@ -23,7 +23,8 @@ local StandardGraphPanel(name, description, format="µs") =
           legend_sort='current',
           legend_sortDesc=true,
           shared_tooltip=false,
-          min=0,
+          min=min,
+          formatY1=formatY1,
         );
 
 dashboard.new(
@@ -194,6 +195,7 @@ dashboard.new(
         {"alias": "min",
             "lines": false}
     )
+    .addYaxis(format="bytes", min=null)
   )
   .addPanel(
     StandardGraphPanel('Write Latency', description='Write latency maximum for coordinated reads')
@@ -325,25 +327,10 @@ dashboard.new(
     )
   )
   .addPanel(
-    graphPanel.new(
+    StandardGraphPanel(
       'Pending Compactions per Table',
       description='Maximum pending compactions per table',
-      format='short',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      min=0,
-      bars=false,
-      lines=true,
-      stack=true,
-      decimals=0,
+      format='short'
     )
     .addTarget(
       prometheus.target(
@@ -356,26 +343,15 @@ dashboard.new(
 .addRow(
   row.new(title='Cassandra Internals',)
   .addPanel(
-    graphPanel.new(
+    StandardGraphPanel(
       'Cluster Wide Pending Messages',
       description='Cluster Wide Pending threads rate, by Thread Pool',
-      format='short',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      min=0,
+      format='short'
     )
     .addTarget(
       prometheus.target(
         'sum by (scope, environment) (org_apache_cassandra_metrics_threadpools_value{name="PendingTasks", scope!~"RPC-Thread", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Sum for Cluster/Thread Pool: {{cluster}}/{{scope}}',
+        legendFormat='{{scope}}',
       )
     )
   )
@@ -592,55 +568,38 @@ dashboard.new(
     ) */
   )
   .addPanel(
-    graphPanel.new(
+    StandardGraphPanel(
       'Network I/O',
       description='Network In and Out per cluster',
       format='bytes',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      bars=true,
+      fill=1,
+      min=null,
     )
     .addTarget(
       prometheus.target(
         'sum by (environment, cluster) (rate(node_network_transmit_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
-        legendFormat='Sum of Network Outgoing, cluster: {{cluster}}',
+        legendFormat='Outgoing',
       )
     )
     .addTarget(
       prometheus.target(
         'sum by (environment, cluster) (rate(node_network_receive_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
-        legendFormat='Sum of Network Incoming, cluster: {{cluster}}',
+        legendFormat='Incoming',
       )
     )
+    .addSeriesOverride({
+        "alias": "Incoming",
+        "transform": "negative-Y"
+    })
   )
 )
 .addRow(
   row.new(title='JVM / Garbage Collection',)
   .addPanel(
-    graphPanel.new(
+    StandardGraphPanel(
       'Garbage Collection Throughput (Time not spent in GC)',
       description='Percentage of the time node is NOT doing GC per cluster',
-      format='percentunit',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
-      decimals=2,
-      max=1,
+      format='percentunit'
     )
     .addTarget(
       prometheus.target(
@@ -650,20 +609,10 @@ dashboard.new(
     )
   )
   .addPanel(
-    graphPanel.new(
+  StandardGraphPanel(
       'Garbage Collection Time',
       description='Max garbage collection duration per cluster',
-      format='s',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
+      format='s'
     )
     .addTarget(
       prometheus.target(
@@ -673,20 +622,10 @@ dashboard.new(
     )
   )
   .addPanel(
-    graphPanel.new(
+    StandardGraphPanel(
       'Garbage Collection Count',
       description='Garbage Collection Count',
-      format='short',
-      datasource='$PROMETHEUS_DS',
-      transparent=true,
-      fill=0,
-      legend_show=true,
-      legend_values=true,
-      legend_current=true,
-      legend_alignAsTable=true,
-      legend_sort='current',
-      legend_sortDesc=true,
-      shared_tooltip=false,
+      format='short'
     )
     .addTarget(
       prometheus.target(
