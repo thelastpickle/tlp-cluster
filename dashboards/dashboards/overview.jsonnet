@@ -1,12 +1,56 @@
 local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local row = grafana.row;
-local graphPanel = grafana.graphPanel;
+
+local prometheus = grafana.prometheus;
+
+// add extra TLP stuff to the graph panel
+local graphPanel = grafana.graphPanel + {
+    // this is a little weird... i'm not sure how to fix it at the moment
+    // here we add addTargetsAndSeriesOverride to the graphpanel.
+    // all good - but the calls to addTarget need to be done with super since the new graphpanel doesn't seem to know
+    // about the old.  i think it's a problem with jsonnet, but hard to tell.
+    // the last call to addSeriesOverride is going to return the old graphPanel, not this subclassed one
+    // we might need to fix it at some point but I'm honestly not sure how
+    // fortunately we don't need to chain graph panels
+    // object composition might be the wrong tool here
+    addMinMaxTargetsAndSeriesOverride(metric):
+        super.addTarget(
+          prometheus.target(
+            'max by ' + metric,
+            legendFormat='max',
+          )
+        )
+        .addTarget(
+          prometheus.target(
+            'min by ' + metric,
+            legendFormat='min',
+          )
+        )
+        .addTarget(
+          prometheus.target(
+            'avg by ' + metric,
+            legendFormat='avg',
+          )
+        )
+        .addSeriesOverride(
+            {"alias": "max",
+            "fillBelowTo": "min",
+            "lines": false}
+        )
+        .addSeriesOverride(
+            {"alias": "min",
+                "lines": false}
+        ),
+
+};
+
 local tablePanel = grafana.tablePanel;
 local singleStatPanel = grafana.singlestat;
 local textPanel = grafana.text;
-local prometheus = grafana.prometheus;
 local template = grafana.template;
+
+
 
 local StandardGraphPanel(name, description, format="µs", fill=0, min=0, formatY1=null) =
      graphPanel.new(
@@ -26,6 +70,7 @@ local StandardGraphPanel(name, description, format="µs", fill=0, min=0, formatY
           min=min,
           formatY1=formatY1,
         );
+
 
 dashboard.new(
   'Cassandra Overview',
@@ -168,33 +213,7 @@ dashboard.new(
   .addPanel(
 
     StandardGraphPanel("Read Latency", 'Read latency p99 maximum for coordinated reads')
-    .addTarget(
-      prometheus.target(
-        'max by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='max',
-      )
-    )
-    .addTarget(
-      prometheus.target(
-        'min by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='min',
-      )
-    )
-    .addTarget(
-      prometheus.target(
-        'avg by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='avg',
-      )
-    )
-    .addSeriesOverride(
-        {"alias": "max",
-        "fillBelowTo": "min",
-        "lines": false}
-    )
-    .addSeriesOverride(
-        {"alias": "min",
-            "lines": false}
-    )
+    .addMinMaxTargetsAndSeriesOverride('org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})')
     .addYaxis(format="bytes", min=null)
   )
   .addPanel(
