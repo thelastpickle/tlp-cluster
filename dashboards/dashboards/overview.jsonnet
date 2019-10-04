@@ -98,7 +98,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'sum by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite", name=~"Latency|ViewWriteLatency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='{{scope}} Request Rate for {{cluster}}',
+        legendFormat='{{scope}}',
       )
     )
   )
@@ -122,7 +122,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'sum by (name, environment, cluster) (org_apache_cassandra_metrics_clientrequest_oneminuterate{scope=~"Read|Write|CASRead|CASWrite|RangeSlice|ViewRead|ViewWrite", name!~"Latency|ViewWriteLatency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Sum of {{name}} Requests for cluster {{cluster}}',
+        legendFormat='{{name}}',
       )
     )
   )
@@ -164,7 +164,7 @@ dashboard.new(
   .addPanel(
     graphPanel.new(
       'Read Latency',
-      description='Read latency maximum for coordinated reads',
+      description='p99 Read latency maximum for coordinated reads',
       format='µs',
       datasource='$PROMETHEUS_DS',
       transparent=true,
@@ -181,14 +181,14 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Read", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Max {{scope}} 99th percentile for {{cluster}}',
+        legendFormat='max',
       )
     )
   )
   .addPanel(
     graphPanel.new(
       'Write Latency',
-      description='Write latency maximum for coordinated reads',
+      description='p99 Write latency maximum for coordinated reads',
       format='µs',
       datasource='$PROMETHEUS_DS',
       transparent=true,
@@ -205,14 +205,14 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope="Write", name="Latency", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Max {{scope}} 99th percentile for {{cluster}}',
+        legendFormat='max',
       )
     )
   )
   .addPanel(
     graphPanel.new(
       'Other Latencies',
-      description='Other latencies on p99 for coordinated requests',
+      description='Other p99 latencies for coordinated requests',
       format='µs',
       datasource='$PROMETHEUS_DS',
       transparent=true,
@@ -230,7 +230,7 @@ dashboard.new(
       prometheus.target(
         # In scope!~"Write|Read|.*-.*", we want to exclude charts above and all the per-consistency_level info like "Read-LOCAL_ONE"
         'max by (scope, environment, cluster) (org_apache_cassandra_metrics_clientrequest_99thpercentile{scope!~"Write|Read|.*-.*", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Max {{scope}} 99th percentile for {{cluster}}'
+        legendFormat='max {{scope}}'
       )
     )
   )
@@ -323,7 +323,7 @@ dashboard.new(
       prometheus.target(
         'sum by (name, environment, cluster)
         (org_apache_cassandra_metrics_table_value{name=~"LiveDiskSpaceUsed|TotalDiskSpaceUsed", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"} )',
-        legendFormat='Sum of {{name}} for nodes in cluster: {{cluster}}',
+        legendFormat='{{name}}',
       )
     )
   )
@@ -347,13 +347,13 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (keyspace, scope, environment, cluster) (org_apache_cassandra_metrics_table_value{name="LiveSSTableCount", keyspace=~".+", scope=~".+", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Maximum on any node in {{cluster}} for table: {{keyspace}}.{{scope}}',
+        legendFormat='max',
       )
     )
     .addTarget(
       prometheus.target(
         'max by (environment, cluster) (org_apache_cassandra_metrics_table_value{name="LiveSSTableCount", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Maximum on any node for cluster: {{cluster}}',
+        legendFormat='max',
       )
     )
   )
@@ -381,7 +381,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (environment, cluster) (org_apache_cassandra_metrics_table_value{name="PendingCompactions", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Maximum on any node for cluster: {{cluster}}',
+        legendFormat='max',
       )
     )
   )
@@ -409,7 +409,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'Max by (keyspace, scope, environment, cluster) (org_apache_cassandra_metrics_table_value{name="PendingCompactions", keyspace=~".+", scope=~".+", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Maximum for table: {{keyspace}}.{{scope}} in {{cluster}}',
+        legendFormat='max for {{keyspace}}.{{scope}}',
       )
     )
   )
@@ -436,7 +436,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'sum by (scope, environment) (org_apache_cassandra_metrics_threadpools_value{name="PendingTasks", scope!~"RPC-Thread", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Sum for Cluster/Thread Pool: {{cluster}}/{{scope}}',
+        legendFormat='{{cluster}}/{{scope}}',
       )
     )
   )
@@ -460,7 +460,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'sum by (scope, environment, cluster) (org_apache_cassandra_metrics_droppedmessage_oneminuterate{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Sum for Cluster/Thread Pool: {{cluster}}/{{scope}}',
+        legendFormat='{{scope}}',
       )
     )
   )
@@ -484,7 +484,7 @@ dashboard.new(
      .addTarget(
        prometheus.target(
          'sum by (environment, cluster) (org_apache_cassandra_metrics_threadpools_value{name="ActiveTasks", scope="ReadRepairStage", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-         legendFormat='Sum for Cluster: {{cluster}}',
+         legendFormat='count',
        )
      )
    )
@@ -508,7 +508,7 @@ dashboard.new(
      .addTarget(
        prometheus.target(
          'sum by (environment, cluster) (org_apache_cassandra_db_storageproxy_hintsinprogress{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-         legendFormat='Sum for Cluster: {{cluster}}',
+         legendFormat='count',
        )
      )
    )
@@ -538,7 +538,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (environment, cluster) (100 * (1 - min by (mode, environment, cluster) (rate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
-        legendFormat='Maximum in Cluster: {{cluster}}',
+        legendFormat='max',
       )
     )
   )
@@ -561,7 +561,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (environment, cluster) (node_load1{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Maximum Load (1m rate) in {{cluster}}',
+        legendFormat='max',
       )
     )
   )
@@ -594,14 +594,14 @@ dashboard.new(
         - node_memory_PageTables_bytes{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}
         - node_memory_VmallocUsed_bytes{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}
         )',
-        legendFormat='Max memory used on any node in cluster: {{cluster}}',
+        legendFormat='max',
       )
     )
     .addTarget(
       prometheus.target(
         'min by (environment, cluster)
         (node_memory_MemTotal_bytes{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Min memory available on any node in cluster: {{cluster}}',
+        legendFormat='min',
       )
     )
   )
@@ -626,7 +626,7 @@ dashboard.new(
         'max by (environment, cluster)
         (100 * rate(node_disk_read_time_seconds_total{device=~".*", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[5m])
         / rate(node_disk_reads_completed_total{device=~".*", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[5m]))',
-        legendFormat='Max r_await in: {{cluster}}',
+        legendFormat='max r_await',
       )
     )
     .addTarget(
@@ -634,7 +634,7 @@ dashboard.new(
         'max by (environment, cluster)
         (100 * rate(node_disk_write_time_seconds_total{device=~".*", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[5m])
         / rate(node_disk_writes_completed_total{device=~".*", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[5m]))',
-        legendFormat='Max w_await in: {{cluster}}',
+        legendFormat='max w_await',
       )
     )
     /* .addTarget(
@@ -659,7 +659,7 @@ dashboard.new(
       format='bytes',
       datasource='$PROMETHEUS_DS',
       transparent=true,
-      fill=0,
+      fill=1,
       legend_show=true,
       legend_values=true,
       legend_current=true,
@@ -667,20 +667,24 @@ dashboard.new(
       legend_sort='current',
       legend_sortDesc=true,
       shared_tooltip=false,
-      bars=true,
     )
     .addTarget(
       prometheus.target(
-        'sum by (environment, cluster) (rate(node_network_transmit_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
-        legendFormat='Sum of Network Outgoing, cluster: {{cluster}}',
+        'sum by (environment, cluster) (irate(node_network_transmit_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        legendFormat='outgoing',
       )
     )
     .addTarget(
       prometheus.target(
-        'sum by (environment, cluster) (rate(node_network_receive_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
-        legendFormat='Sum of Network Incoming, cluster: {{cluster}}',
+        'sum by (environment, cluster) (irate(node_network_receive_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
+        legendFormat='incoming',
       )
     )
+    .addSeriesOverride({
+          "alias": "incoming",
+          "transform": "negative-Y"
+    })
+
   )
 )
 .addRow(
@@ -706,14 +710,14 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (gc, environment, cluster) (1-rate(jvm_gc_collection_seconds_sum{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
-        legendFormat='Max % of time doing {{gc}} in cluster {{cluster}}',
+        legendFormat='Max % of time doing {{gc}}',
       )
     )
   )
   .addPanel(
     graphPanel.new(
       'Garbage Collection Time',
-      description='Max garbage collection duration per cluster',
+      description='Max garbage collection duration',
       format='s',
       datasource='$PROMETHEUS_DS',
       transparent=true,
@@ -729,7 +733,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (gc, environment, cluster) (rate(jvm_gc_collection_seconds_sum{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
-        legendFormat='Maximum {{gc}} duration (ms/s) in cluster {{cluster}}',
+        legendFormat='Maximum {{gc}} duration (ms/s)',
       )
     )
   )
@@ -752,7 +756,7 @@ dashboard.new(
     .addTarget(
       prometheus.target(
         'max by (gc, environment, cluster) (rate(jvm_gc_collection_seconds_count{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))',
-        legendFormat='Maximum {{gc}} count per minute in cluster {{cluster}}',
+        legendFormat='Maximum {{gc}} count per minute',
       )
     )
   )
@@ -777,14 +781,14 @@ dashboard.new(
       prometheus.target(
         'max by (environment, cluster)
         (jvm_memory_bytes_used{area="heap", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Max heap size used for nodes in cluster: {{cluster}}',
+        legendFormat='Max heap size used',
       )
     )
     .addTarget(
       prometheus.target(
         'min by (environment, cluster)
         (jvm_memory_bytes_max{area="heap", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='Min heap memory available for nodes in cluster: {{cluster}}',
+        legendFormat='Min heap memory available',
       )
     )
   )
