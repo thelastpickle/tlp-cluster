@@ -72,7 +72,7 @@ dashboard.new(
             )
             .addTarget(
                 prometheus.target(
-                    'sum(rate(mutations_count{job="stress"}[15s]))'
+                    'sum(irate(mutations_count{job="stress"}[15s]))'
                     )
                 )
             )
@@ -88,7 +88,7 @@ dashboard.new(
             )
             .addTarget(
                 prometheus.target(
-                    'sum(rate(selects_count{job="stress"}[15s]))'
+                    'sum(irate(selects_count{job="stress"}[15s]))'
                     )
                 )
             )
@@ -104,7 +104,7 @@ dashboard.new(
             )
             .addTarget(
                 prometheus.target(
-                    'sum(rate(errors_total{job="stress"}[15s]))'
+                    'sum(irate(errors_total{job="stress"}[15s]))'
                     )
                 )
             )
