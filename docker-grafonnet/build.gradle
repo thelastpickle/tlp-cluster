@@ -2,7 +2,7 @@ plugins {
     id 'com.bmuschko.docker-remote-api'
 }
 
-version "2.0"
+version "3.0"
 
 import com.bmuschko.gradle.docker.tasks.image.*
 
@@ -28,4 +28,3 @@ task push(type: DockerPushImage) {
     dependsOn buildDocker
     imageName = container
 }
-
