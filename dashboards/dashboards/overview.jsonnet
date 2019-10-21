@@ -590,19 +590,19 @@ dashboard.new(
     )
     .addTarget(
       prometheus.target(
-        'max by (environment, cluster) (100 * (1 - avg by (mode, environment, cluster) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
+        'max by (environment, cluster) (100 * (1 - avg by (mode, environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
         legendFormat='max',
       )
     )
     .addTarget(
       prometheus.target(
-        'min by (environment, cluster) (100 * (1 - avg by (mode, environment, cluster) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
+        'min by (environment, cluster) (100 * (1 - avg by (mode, environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
         legendFormat='min',
       )
     )
     .addTarget(
       prometheus.target(
-        'avg by (environment, cluster) (100 * (1 - avg by (mode, environment, cluster) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
+        'avg by (environment, cluster) (100 * (1 - avg by (mode, environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
         legendFormat='avg',
       )
     )
