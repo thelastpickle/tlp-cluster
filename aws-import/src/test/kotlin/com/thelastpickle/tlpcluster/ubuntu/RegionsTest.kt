@@ -1,6 +1,6 @@
-package com.thelastpickle.tlpcluster.instances.importers
+package com.thelastpickle.tlpcluster.ubuntu
 
-import com.thelastpickle.tlpcluster.instances.Regions
+import com.thelastpickle.tlpcluster.ubuntu.Regions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,16 +25,6 @@ internal class RegionsTest {
         val data = Regions.createRegions()
         println("hello")
     }
-
-    @Test
-    fun testGetAmi() {
-
-        val expected = "ami-090820dead4048ccd"
-        val ami = regions.getAmi("us-east-1", "c5d.xlarge")
-        assertThat(ami).isEqualTo(expected)
-    }
-
-
 
 }
 

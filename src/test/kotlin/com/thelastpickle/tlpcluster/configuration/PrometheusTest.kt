@@ -1,11 +1,10 @@
 package com.thelastpickle.tlpcluster.configuration
 
 import com.fasterxml.jackson.databind.util.ByteBufferBackedOutputStream
-import com.thelastpickle.tlpcluster.YamlDelegate
+import com.thelastpickle.tlpcluster.core.YamlDelegate
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.io.File
 import java.io.OutputStream
 import java.nio.ByteBuffer
 

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.configuration.ServerType
-import com.thelastpickle.tlpcluster.instances.Regions
+import com.thelastpickle.tlpcluster.ubuntu.Regions
 import java.io.File
 import java.net.URL
 
@@ -35,7 +35,10 @@ class Configuration(val ticket: String,
 
     //monitoring
     var monitoringInstanceType = "c3.2xlarge"
-    var monitoringAMI = regionLookup.getAmi(region, monitoringInstanceType)
+
+    var regionObj = regionLookup.get(region)!!
+
+    var monitoringAMI = regionObj.getAmi(monitoringInstanceType)
 
     private val config  = TerraformConfig(region, context.userConfig.awsAccessKey, context.userConfig.awsSecret)
 
@@ -45,6 +48,7 @@ class Configuration(val ticket: String,
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
         mapper.enable(SerializationFeature.INDENT_OUTPUT)
     }
+
 
     var azs = regionLookup.getAzs(region)
 
@@ -86,8 +90,10 @@ class Configuration(val ticket: String,
 
 
     private fun build() : Configuration {
-        var cassandraAMI = regionLookup.getAmi(region, cassandraInstanceType)
-        val stressAMI = regionLookup.getAmi(region, stressInstanceType)
+        val regionObj = regionLookup.get(region)!!
+
+        var cassandraAMI = regionObj.getAmi(cassandraInstanceType)
+        val stressAMI = regionObj.getAmi(stressInstanceType)
 
         setVariable("email", email)
         setVariable("key_name", context.userConfig.keyName)

@@ -1,4 +1,4 @@
-package com.thelastpickle.tlpcluster.instances.importers
+package com.thelastpickle.tlpcluster.ubuntu
 
 import org.junit.jupiter.api.Assertions.*
 
