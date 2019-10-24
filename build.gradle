@@ -7,6 +7,9 @@ buildscript {
     repositories {
         mavenCentral()
         jcenter()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
@@ -33,6 +36,17 @@ group 'com.thelastpickle'
 version '0.6-SNAPSHOT'
 sourceCompatibility = 1.8
 
+ext {
+    log4j_api_version = "1.0.0"
+    log4j_core_version = "2.11.1"
+    slf4j_version = "2.11.2"
+    jackson_dataformat_version = "2.9.0"
+    jackson_kotlin_version = "2.9.+"
+    jupiter_version = '5.5.2'
+    assertj_version = '3.11.1'
+}
+
+
 application {
     applicationName = "tlp-cluster"
     mainClassName = "com.thelastpickle.tlpcluster.MainKt"
@@ -46,12 +60,13 @@ allprojects {
     }
 }
 
+
 // In this section you declare the dependencies for your production and test code
 dependencies {
 
-    compile "org.apache.logging.log4j:log4j-api-kotlin:1.0.0"
-    compile "org.apache.logging.log4j:log4j-core:2.11.1"
-    compile 'org.apache.logging.log4j:log4j-slf4j18-impl:2.11.2'
+    compile "org.apache.logging.log4j:log4j-api-kotlin:$log4j_api_version"
+    compile "org.apache.logging.log4j:log4j-core:$log4j_core_version"
+    compile group: "org.apache.logging.log4j", name: "log4j-slf4j18-impl", version: slf4j_version
 
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlin_version
@@ -71,26 +86,22 @@ dependencies {
 
     compile group: 'software.amazon.awssdk', name: 'ec2', version: '2.5.8'
 
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.0'
-    // Declare the dependency for your favourite test framework you want to use in your tests.
-    // TestNG is also supported by the Gradle Test task. Just change the
-    // testCompile dependency to testCompile 'org.testng:testng:6.8.1' and add
-    // 'test.useTestNG()' to your build script.
-    // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: jackson_dataformat_version
+    compile group: 'com.fasterxml.jackson.module', name:'jackson-module-kotlin', version: jackson_kotlin_version
 
-    compile "com.fasterxml.jackson.module:jackson-module-kotlin:2.9.+"
 
-    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.5.2'
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: jupiter_version
 
     // https://mvnrepository.com/artifact/org.assertj/assertj-core
-    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.11.1'
+    testCompile group: 'org.assertj', name: 'assertj-core', version: assertj_version
 
     compile 'com.github.ajalt:mordant:1.2.1'
 
     testCompile "io.mockk:mockk:1.9.3"
 
     implementation project(":dashboards")
-
+    implementation project(":core")
+    implementation project(":aws-import")
 }
 
 build.dependsOn(":docker-pssh:buildDocker")
@@ -112,6 +123,7 @@ compileTestKotlin {
 sourceSets {
     main.java.srcDirs += "src/main/kotlin"
     test.java.srcDirs += "src/test/kotlin"
+    main.resources.srcDirs += "build/aws"
 }
 
 sourceSets {
@@ -121,14 +133,10 @@ sourceSets {
             runtimeClasspath += main.output + test.output
             srcDir file('src/integration-test/kotlin')
         }
-        resources.srcDir file('src/integration-test/resources')
-    }
-    main {
-        resources {
-
-        }
     }
 }
+
+
 
 configurations {
     integrationTestCompile.extendsFrom testCompile
@@ -223,8 +231,22 @@ task uploadAll  {
 
 assemble.mustRunAfter clean
 
+evaluationDependsOn(":aws-import")
+task copyRegion(type: Copy, dependsOn: ':aws-import:generateRegionYaml') {
+    from tasks.getByPath("aws-import:generateRegionYaml").outputs
+    into "build/aws/com/thelastpickle/tlpcluster/ubuntu"
+}
+
+/*
+ * This forces the CopyTask copyRegion to run before we compile any of the main sources
+ * Without it, we won't be able to pull the region yaml into the main JAR and we can't pick the right AMI for a region
+ */
+compileKotlin.dependsOn(copyRegion)
+
 build {
     dependsOn(":docker-cassandra-build:buildDocker")
     dependsOn(":docker-grafonnet:buildDocker")
     dependsOn(":docker-pssh:buildDocker")
+
 }
+

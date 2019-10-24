@@ -1,9 +1,10 @@
-package com.thelastpickle.tlpcluster.instances.importers
+package com.thelastpickle.tlpcluster.ubuntu
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import java.io.File
 
 /**
  * Pulled from https://raw.githubusercontent.com/jsonmaur/aws-regions/master/regions.json
@@ -37,7 +38,7 @@ data class RegionImporter(val regions: List<Region>) {
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
 
         fun loadFromJson() : RegionImporter {
-            val stream = this::class.java.getResourceAsStream("regions.json")
+            val stream = File("data/regions.json").inputStream()
             return RegionImporter(json.readValue(stream))
         }
     }

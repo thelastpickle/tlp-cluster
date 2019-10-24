@@ -1,4 +1,4 @@
-package com.thelastpickle.tlpcluster
+package com.thelastpickle.tlpcluster.core
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper

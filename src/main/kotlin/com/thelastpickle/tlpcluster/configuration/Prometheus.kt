@@ -2,7 +2,7 @@ package com.thelastpickle.tlpcluster.configuration
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.thelastpickle.tlpcluster.YamlDelegate
+import com.thelastpickle.tlpcluster.core.YamlDelegate
 import java.io.File
 import java.io.OutputStream
 

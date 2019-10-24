@@ -7,6 +7,7 @@ import com.github.dockerjava.core.DockerClientBuilder
 import com.github.dockerjava.netty.NettyDockerCmdExecFactory
 import com.thelastpickle.tlpcluster.configuration.TFState
 import com.thelastpickle.tlpcluster.configuration.User
+import com.thelastpickle.tlpcluster.core.YamlDelegate
 import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.nio.file.Files

@@ -4,7 +4,7 @@ import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
-import com.thelastpickle.tlpcluster.YamlDelegate
+import com.thelastpickle.tlpcluster.core.YamlDelegate
 import com.thelastpickle.tlpcluster.configuration.*
 import com.thelastpickle.tlpcluster.containers.CassandraUnpack
 import org.apache.commons.io.FileUtils

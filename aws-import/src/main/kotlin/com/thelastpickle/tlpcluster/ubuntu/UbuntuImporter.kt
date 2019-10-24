@@ -1,4 +1,4 @@
-package com.thelastpickle.tlpcluster.instances.importers
+package com.thelastpickle.tlpcluster.ubuntu
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.apache.logging.log4j.kotlin.logger
+import java.io.File
 
 //"us-east-1",
 // "artful",
@@ -50,11 +51,11 @@ data class UbuntuImporter(val aaData: List<Ami>) {
 
 
         fun loadFromResource() : UbuntuImporter {
-            val data = this::class.java.getResourceAsStream("ubuntu.json")
+            val data = File("data/ubuntu.json").inputStream()
             val tmp = json.readValue<UbuntuImporter>(data)
 
             // get rid of the images we don't use
-            return UbuntuImporter( tmp.aaData.filter {
+            return UbuntuImporter(tmp.aaData.filter {
                 it.release == image && it.releaseDate == targetReleaseDate
             })
         }
@@ -72,13 +73,5 @@ data class UbuntuImporter(val aaData: List<Ami>) {
        return aaData.filter {
            it.region == region
        }
-    }
-
-
-    fun getAmi(region: String, instanceRoot: Boolean) : Ami {
-        log.debug("Looking up ami for region $region, using instance storage: $instanceRoot")
-        return getAmis(region).filter {
-            it.isInstanceRootVolume == instanceRoot
-        }.first()
     }
 }
