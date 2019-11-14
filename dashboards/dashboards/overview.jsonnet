@@ -18,6 +18,18 @@ local removeMinlineSeriesOverrides = {
     "lines": false
 };
 
+// used in the single stat panels where higher is better - cache hit rates for example
+local reversedColors =[
+ '#d44a3a',
+ 'rgba(237, 129, 40, 0.89)',
+ '#299c46',
+];
+
+local smallGrid = {
+  "w": 4,
+  "h": 4
+};
+
 dashboard.new(
   'Cassandra Overview',
   schemaVersion=14,
@@ -84,6 +96,80 @@ dashboard.new(
     current='all',
     includeAll=true,
     multi=true,
+  )
+)
+.addRow(
+  row.new("Quick Stats")
+  .addPanel(
+    singleStatPanel.new("Avg CPU",
+      gaugeShow=true,
+      timeFrom="",
+      datasource='$PROMETHEUS_DS',
+      span=2,
+      format="percent",
+      decimals=0,
+      thresholds="50,75",
+      gaugeMaxValue=100,
+
+    ).addTarget(
+        prometheus.target(
+        'avg(1- avg by (instance)  (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m])))'
+        )
+    ), smallGrid
+  )
+  .addPanel(
+    singleStatPanel.new("Avg Network Throughput",
+      timeFrom="",
+      datasource='$PROMETHEUS_DS',
+      sparklineShow=true,
+      format="bps",
+      span=2,
+    ).addTarget(
+        prometheus.target(
+        'avg(irate(node_network_receive_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))
+        + avg(irate(node_network_transmit_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))'
+        )
+    ), smallGrid
+  )
+  .addPanel(
+    singleStatPanel.new("Average Disk Throughput",
+      timeFrom="",
+      datasource='$PROMETHEUS_DS',
+      sparklineShow=true,
+      format="bps",
+      span=2,
+    ).addTarget(
+        prometheus.target(
+        'avg(irate(node_disk_read_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))'
+        )
+    ), smallGrid
+  )
+  .addPanel(
+    singleStatPanel.new("Requests per Second",
+        timeFrom="",
+        datasource='$PROMETHEUS_DS',
+        span=2,
+        decimals=0,
+        format="rps",
+        sparklineShow=true,
+    )
+    .addTarget(
+        prometheus.target(
+            'sum(irate(org_apache_cassandra_metrics_threadpools_value{scope="Native-Transport-Requests", name="CompletedTasks", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack",}[1m]))'
+        )
+    ), smallGrid
+  )
+  .addPanel(
+    singleStatPanel.new("Blocked Tasks",
+        timeFrom="",
+        datasource='$PROMETHEUS_DS',
+        span=2,
+    )
+    .addTarget(
+        prometheus.target(
+          'sum(irate(org_apache_cassandra_metrics_threadpools_count{name="TotalBlockedTasks", name="CompletedTasks", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))'
+        )
+    ), smallGrid
   )
 )
 .addRow(
