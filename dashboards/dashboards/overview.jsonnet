@@ -99,6 +99,179 @@ dashboard.new(
   )
 )
 .addRow(
+  row.new(title='Nodes Status',)
+  .addPanel(
+    singleStatPanel.new(
+      'Nodes Count',
+      description='Nodes up and down in the cluster',
+      format='short',
+      datasource='$PROMETHEUS_DS',
+      transparent=true,
+      decimals=0,
+      prefix='Total:',
+      postfix=' Nodes',
+      postfixFontSize='80%',
+      valueFontSize='80%',
+      span=4
+    )
+    .addTarget(
+      prometheus.target(
+        'count by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (up{job="cassandra", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}))',
+        legendFormat='Total Number Of Nodes',
+      )
+    )
+  )
+  .addPanel(
+    graphPanel.new(
+      'Nodes Status History',
+      description='Nodes up and down in the cluster per protocol/activity',
+      format='short',
+      datasource='$PROMETHEUS_DS',
+      transparent=true,
+      decimals=0,
+      fill=0,
+      legend_show=true,
+      legend_values=true,
+      legend_current=true,
+      legend_alignAsTable=true,
+      legend_sort='current',
+      legend_sortDesc=false,
+      shared_tooltip=false,
+      min=0,
+      span=8
+    )
+    .addTarget(
+      prometheus.target(
+        'count by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (up{job="cassandra", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}))',
+        legendFormat='Total Number Of Nodes',
+      )
+    )
+    .addTarget(
+      prometheus.target(
+        'sum by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (changes(org_apache_cassandra_metrics_threadpools_value{scope="Native-Transport-Requests", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])) > bool 0)',
+        legendFormat='Nodes Coordinating Requests (Native protocol)',
+      )
+    )
+    .addTarget(
+      prometheus.target(
+        'sum by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (changes(org_apache_cassandra_metrics_threadpools_value{scope="GossipStage", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])) > bool 0)',
+        legendFormat='Nodes With Internal Activity (Gossip protocol)',
+      )
+    )
+    .addTarget(
+      prometheus.target(
+        'sum by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (up{job="cassandra", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}))',
+        legendFormat='Node Reporting Metrics (Monitoring)',
+      )
+    )
+  )
+  .addPanel(
+    singleStatPanel.new(
+      'Native Up?',
+      datasource='$PROMETHEUS_DS',
+      description='Nodes up and down in the cluster from a client perspective (ie. Native requests are received)',
+      format='percent',
+      transparent=true,
+      decimals=0,
+      valueFontSize='80%',
+      valueName="current",
+      thresholds='80,95,100',
+      timeFrom='1m',
+      colors=[
+      "#F2495C",
+      "#FF9830",
+      "#73BF69"
+      ],
+      gaugeShow=true,
+      gaugeMinValue=0,
+      gaugeMaxValue=100,
+      gaugeThresholdLabels=false,
+      gaugeThresholdMarkers=false,
+      sparklineFull=false,
+      sparklineShow=false,
+      span=4
+    )
+    .addTarget(
+      prometheus.target(
+        '(sum by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (changes(org_apache_cassandra_metrics_threadpools_value{scope="Native-Transport-Requests", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])) > bool 0))
+        * 100
+        / (count by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (up{job="cassandra", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})))',
+        legendFormat='Nodes Coordinating Requests',
+      )
+    )
+  )
+  .addPanel(
+    singleStatPanel.new(
+      'Gossip Up?',
+      datasource='$PROMETHEUS_DS',
+      description='Nodes up and down in the cluster from an internal perspective (ie. Gossip messages are received)',
+      format='percent',
+      transparent=true,
+      decimals=0,
+      valueFontSize='80%',
+      valueName="current",
+      thresholds='80,95,100',
+      timeFrom='1m',
+      colors=[
+      "#F2495C",
+      "#FF9830",
+      "#73BF69"
+      ],
+      gaugeShow=true,
+      gaugeMinValue=0,
+      gaugeMaxValue=100,
+      gaugeThresholdLabels=false,
+      gaugeThresholdMarkers=false,
+      sparklineFull=false,
+      sparklineShow=false,
+      span=4
+    )
+    .addTarget(
+      prometheus.target(
+        '(sum by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (changes(org_apache_cassandra_metrics_threadpools_value{scope="GossipStage", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])) > bool 0))
+        * 100
+        / (count by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (up{job="cassandra", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})))',
+        legendFormat='Nodes With Internal Activity (Gossip protocol)',
+      )
+    )
+  )
+  .addPanel(
+    singleStatPanel.new(
+      'Reporting Up?',
+      datasource='$PROMETHEUS_DS',
+      description='Nodes up and down in the cluster from a metrics reporting perspective - not critical',
+      format='percent',
+      transparent=true,
+      decimals=0,
+      valueFontSize='80%',
+      valueName="current",
+      thresholds='80,95,100',
+      timeFrom='1m',
+      colors=[
+      "#F2495C",
+      "#FF9830",
+      "#73BF69"
+      ],
+      gaugeShow=true,
+      gaugeMinValue=0,
+      gaugeMaxValue=100,
+      gaugeThresholdLabels=false,
+      gaugeThresholdMarkers=false,
+      sparklineFull=false,
+      sparklineShow=false,
+      span=4
+    )
+    .addTarget(
+      prometheus.target(
+        '(sum by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (up{job="cassandra", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})))
+        * 100
+        / (count by (environment, cluster) (max by (environment, cluster, datacenter, rack, node) (up{job="cassandra", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})))',
+        legendFormat='Node Reporting Metrics (Monitoring)',
+      )
+    )
+  )
+)
+.addRow(
   row.new(title='Quick Stats')
   .addPanel(
     singleStatPanel.new(

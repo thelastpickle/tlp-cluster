@@ -69,8 +69,8 @@ services:
     networks:
       - tlp_cluster_net
     environment:
-      # Attempts to get a nice nodes up/total panel...
-      - "GF_PANELS_DISABLE_SANITIZE_HTML=true"
+      - "GF_INSTALL_PLUGINS=grafana-polystat-panel"
+
 
   cassandra:
     image: cassandra:3.11.4
