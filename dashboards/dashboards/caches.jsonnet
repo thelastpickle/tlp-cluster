@@ -17,32 +17,33 @@ local reversedColors =[
 ];
 
 local smallGrid = {
-  "w": 4,
-  "h": 4
+  'w': 4,
+  'h': 4
 };
 
 local singleStatCachePanel(name, scope) =
-    singleStatPanel.new(name,
+    singleStatPanel.new(
+              name,
               span=2,
               colors=reversedColors,
               datasource='$PROMETHEUS_DS',
-              format='percent',
+              format='percentunit',
               decimals=0,
               gaugeShow=true,
-              timeFrom="",
+              gaugeMaxValue=1,
+              timeFrom='',
               valueMaps=[
                   {
-                    "op": "=",
-                    "text": "0",
-                    "value": "null"
+                    'op': '=',
+                    'text': '0',
+                    'value': 'null'
                   }
                 ],
-              thresholds="80,90",
-
+              thresholds='0.80,0.90',
             )
             .addTarget(
               prometheus.target(
-                  'avg(irate(org_apache_cassandra_metrics_cache_count{scope="%(scope)s", name="Hits"}[1m]) / on (instance) irate(org_apache_cassandra_metrics_cache_count{scope="%(scope)s", name="Requests"}[1m])) * 100' % {scope:scope}
+                  'avg(irate(org_apache_cassandra_metrics_cache_count{scope="%(scope)s", name="Hits"}[1m]) / on (instance) irate(org_apache_cassandra_metrics_cache_count{scope="%(scope)s", name="Requests"}[1m]))' % {scope:scope}
               )
             );
 
@@ -55,7 +56,7 @@ local cacheGraphPanel(name, scope) =
             .addTarget(
               prometheus.target(
                   'org_apache_cassandra_metrics_cache_oneminuterate{scope="%(scope)s", name="Hits"} / on (instance) org_apache_cassandra_metrics_cache_oneminuterate{scope="%(scope)s", name="Requests"} ' % {scope:scope},
-                  legendFormat="{{instance}}"
+                  legendFormat='{{instance}}'
               )
             );
 
@@ -90,30 +91,27 @@ dashboard.new(
 )
 
 .addRow(
-  row.new("Quick Stats")
-   .addPanel(singleStatCachePanel("Key Cache Hit Rate", "KeyCache"), smallGrid)
-   .addPanel(singleStatCachePanel("Counter Cache Hit Rate", "CounterCache"), smallGrid)
-   .addPanel(singleStatCachePanel("Row Cache Hit Rate", "RowCache"), smallGrid)
-   .addPanel(singleStatCachePanel("Chunk Cache Hit Rate", "ChunkCache"), smallGrid)
+  row.new(title='Quick Stats')
+    .addPanel(singleStatCachePanel('Key Cache Hit Rate', 'KeyCache'), smallGrid)
+    .addPanel(singleStatCachePanel('Counter Cache Hit Rate', 'CounterCache'), smallGrid)
+    .addPanel(singleStatCachePanel('Row Cache Hit Rate', 'RowCache'), smallGrid)
+    .addPanel(singleStatCachePanel('Chunk Cache Hit Rate', 'ChunkCache'), smallGrid)
 )
 .addRow(
-    row.new("Key Cache")
-    .addPanel(cacheGraphPanel("Key Cache", "KeyCache"))
-
-)
-.addRow(
-    row.new("Counter Cache")
-    .addPanel(cacheGraphPanel("Counter Cache", "CounterCache"))
-)
-.addRow(
-    row.new("Row Cache")
-    .addPanel(cacheGraphPanel("Row Cache", "RowCache"))
+    row.new(title='Key Cache')
+    .addPanel(cacheGraphPanel('Key Cache', 'KeyCache'))
 
 )
 .addRow(
-    row.new("Chunk Cache")
-    .addPanel(cacheGraphPanel("Chunk Cache", "ChunkCache"))
+    row.new(title='Counter Cache')
+    .addPanel(cacheGraphPanel('Counter Cache', 'CounterCache'))
 )
+.addRow(
+    row.new(title='Row Cache')
+    .addPanel(cacheGraphPanel('Row Cache', 'RowCache'))
 
-
-
+)
+.addRow(
+    row.new(title='Chunk Cache')
+    .addPanel(cacheGraphPanel('Chunk Cache', 'ChunkCache'))
+)

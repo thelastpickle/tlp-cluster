@@ -9,13 +9,13 @@ local prometheus = grafana.prometheus;
 local template = grafana.template;
 
 local fillMinMaxSeriesOverrides = {
-    "alias": "/.*max.*/",
-    "fillBelowTo": "min",
-    "lines": false
+    'alias': '/.*max.*/',
+    'fillBelowTo': 'min',
+    'lines': false
 };
 local removeMinlineSeriesOverrides = {
-    "alias": "/.*min.*/",
-    "lines": false
+    'alias': '/.*min.*/',
+    'lines': false
 };
 
 // used in the single stat panels where higher is better - cache hit rates for example
@@ -26,8 +26,8 @@ local reversedColors =[
 ];
 
 local smallGrid = {
-  "w": 4,
-  "h": 4
+  'w': 4,
+  'h': 4
 };
 
 dashboard.new(
@@ -99,81 +99,97 @@ dashboard.new(
   )
 )
 .addRow(
-  row.new("Quick Stats")
+  row.new(title='Quick Stats')
   .addPanel(
-    singleStatPanel.new("Avg CPU",
+    singleStatPanel.new(
+      'Avg CPU',
+      description='Average of CPU usage',
+      transparent=true,
+      timeFrom='',
       gaugeShow=true,
-      timeFrom="",
       datasource='$PROMETHEUS_DS',
       span=2,
-      format="percent",
+      format='percentunit',
       decimals=0,
-      thresholds="50,75",
-      gaugeMaxValue=100,
+      thresholds='0.50,0.75',
+      gaugeMaxValue=1,
 
     ).addTarget(
         prometheus.target(
-        'avg(1- avg by (instance)  (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m])))'
+        'avg by (environment, cluster) (1 - avg by (environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m])))'
         )
     ), smallGrid
   )
   .addPanel(
-    singleStatPanel.new("Avg Network Throughput",
-      timeFrom="",
+    singleStatPanel.new(
+      'Avg Network Throughput',
+      description='Average of network throughput (in + out)',
+      transparent=true,
+      timeFrom='',
       datasource='$PROMETHEUS_DS',
       sparklineShow=true,
-      format="bps",
+      format='bps',
       span=2,
     ).addTarget(
         prometheus.target(
-        'avg(irate(node_network_receive_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))
-        + avg(irate(node_network_transmit_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))'
+        'avg by (environment, cluster) (irate(node_network_receive_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))
+        + avg by (environment, cluster) (irate(node_network_transmit_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))'
         )
     ), smallGrid
   )
   .addPanel(
-    singleStatPanel.new("Average Disk Throughput",
-      timeFrom="",
+    singleStatPanel.new(
+      'Average Disk Throughput',
+      description='Average of disk throughput (reads + writes)',
+      transparent=true,
+      timeFrom='',
       datasource='$PROMETHEUS_DS',
       sparklineShow=true,
-      format="bps",
+      format='bps',
       span=2,
     ).addTarget(
         prometheus.target(
-        'avg(irate(node_disk_read_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))'
+        'avg by (environment, cluster) (irate(node_disk_read_bytes_total{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))'
         )
     ), smallGrid
   )
   .addPanel(
-    singleStatPanel.new("Requests per Second",
-        timeFrom="",
+    singleStatPanel.new(
+        'Requests per Second',
+        description='Request throughput, "RF * numberOfClientRequests"',
+        transparent=true,
+        timeFrom='',
         datasource='$PROMETHEUS_DS',
         span=2,
         decimals=0,
-        format="rps",
+        format='rps',
         sparklineShow=true,
     )
     .addTarget(
         prometheus.target(
-            'sum(irate(org_apache_cassandra_metrics_threadpools_value{scope="Native-Transport-Requests", name="CompletedTasks", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack",}[1m]))'
+            'sum by (environment, cluster) (irate(org_apache_cassandra_metrics_threadpools_value{scope="Native-Transport-Requests", name="CompletedTasks", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack",}[1m]))'
         )
     ), smallGrid
   )
   .addPanel(
-    singleStatPanel.new("Blocked Tasks",
-        timeFrom="",
+    singleStatPanel.new(
+        'Blocked Tasks',
         datasource='$PROMETHEUS_DS',
+        description='Sum of blocked tasks',
+        timeFrom='',
+        transparent=true,
+        format='short',
         span=2,
     )
     .addTarget(
         prometheus.target(
-          'sum(irate(org_apache_cassandra_metrics_threadpools_count{name="TotalBlockedTasks", name="CompletedTasks", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))'
+          'sum by (environment, cluster) (irate(org_apache_cassandra_metrics_threadpools_count{name="TotalBlockedTasks", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack"}[1m]))'
         )
     ), smallGrid
   )
 )
 .addRow(
-  row.new(title='Cluster Requests (Coordinator Perspective)',)
+  row.new(title='Cluster Requests (Coordinator Perspective)')
   .addPanel(
     graphPanel.new(
       'Request Throughputs',
@@ -235,7 +251,7 @@ dashboard.new(
       valueName="current",
       decimals=2,
       thresholds='0.25,0.5,0.75',
-      timeFrom='1m',
+      timeFrom='',
       colors=[
         "#DEB6F2",
         "#CA95E5",
@@ -554,7 +570,7 @@ dashboard.new(
   )
 )
 .addRow(
-  row.new(title='Cassandra Internals',)
+  row.new(title='Cassandra Internals')
   .addPanel(
     graphPanel.new(
       'Cluster Wide Pending Messages',
@@ -653,12 +669,12 @@ dashboard.new(
    )
 )
 .addRow(
-  row.new(title='Hardware / Operating System',)
+  row.new(title='Hardware / Operating System')
  .addPanel(
     graphPanel.new(
       'CPU Utilization',
       description='Maximum CPU utilisation (max 100%)',
-      format='percent',
+      format='percentunit',
       datasource='$PROMETHEUS_DS',
       transparent=true,
       fill=0,
@@ -672,23 +688,23 @@ dashboard.new(
       percentage=true,
       decimals=1,
       min=0,
-      max=105,
+      max=1,
     )
     .addTarget(
       prometheus.target(
-        'max by (environment, cluster) (100 * (1 - avg by (mode, environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
+        'max by (environment, cluster) (1 - avg by (environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])))',
         legendFormat='max',
       )
     )
     .addTarget(
       prometheus.target(
-        'min by (environment, cluster) (100 * (1 - avg by (mode, environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
+        'min by (environment, cluster) (1 - avg by (environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])))',
         legendFormat='min',
       )
     )
     .addTarget(
       prometheus.target(
-        'avg by (environment, cluster) (100 * (1 - avg by (mode, environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m]))))',
+        'avg by (environment, cluster) (1 - avg by (environment, cluster, datacenter, rack, node) (irate(node_cpu_seconds_total{mode="idle", environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}[1m])))',
         legendFormat='avg',
       )
     )
@@ -761,14 +777,14 @@ dashboard.new(
         - node_memory_PageTables_bytes{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}
         - node_memory_VmallocUsed_bytes{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"}
         )',
-        legendFormat='max',
+        legendFormat='max memory used',
       )
     )
     .addTarget(
       prometheus.target(
         'min by (environment, cluster)
         (node_memory_MemTotal_bytes{environment="$environment", cluster="$cluster", datacenter=~"$datacenter", rack=~"$rack", node=~"$node"})',
-        legendFormat='min',
+        legendFormat='min memory available',
       )
     )
   )
@@ -856,7 +872,7 @@ dashboard.new(
   )
 )
 .addRow(
-  row.new(title='JVM / Garbage Collection',)
+  row.new(title='JVM / Garbage Collection')
   .addPanel(
     graphPanel.new(
       'Garbage Collection rate (% time spent doing GC)',
