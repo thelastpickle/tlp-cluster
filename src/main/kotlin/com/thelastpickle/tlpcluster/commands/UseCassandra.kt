@@ -47,7 +47,7 @@ class UseCassandra(val context: Context) : ICommand {
         }
 
         // if we're been passed a version, use the debs we get from apache
-        val versionRegex = """\d+\.\d+\.\d+""".toRegex()
+        val versionRegex = """\d+\.\d+[\.~]\w+""".toRegex()
 
 
         if(versionRegex.matches(name)) {
