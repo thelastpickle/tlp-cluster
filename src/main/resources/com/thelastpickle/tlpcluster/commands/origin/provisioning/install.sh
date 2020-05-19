@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-
+set +o pipefail
+set -x
+set +e
 # pass either cassandra, stress or monitor to execute all files
 export DEBIAN_FRONTEND=noninteractive
+export APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=true
 
 echo "Updating local apt database"
 sudo apt-get update

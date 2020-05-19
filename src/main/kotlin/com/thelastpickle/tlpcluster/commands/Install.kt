@@ -10,7 +10,8 @@ import java.io.File
 
 @Parameters(commandNames = ["install"], commandDescription = "Install Everything")
 class Install(val context: Context) : ICommand {
-    private val retryMessage = "This could be a transient error; try rerunning the install command."
+    private val retryMessage = "This could be a transient error, trying again..."
+    private val failureMessage = "This could be a transient error; try rerunning the install command."
 
     override fun execute() {
         val sshKeyPath = context.userConfig.sshKeyPath
@@ -61,21 +62,24 @@ class Install(val context: Context) : ICommand {
     private fun provisionServer(server: ServerType, parallelSsh: Pssh) : Boolean {
         println("Provisioning ${server.serverType}")
         val serverTypeItr = server
-        // we only want to run the install if the copy was successful
-        parallelSsh.copyProvisioningResources(serverTypeItr).fold({
-            // need to create a new instance here b/c of duplicate volume mapping issues
-            parallelSsh.provisionNode(serverTypeItr).fold({
-                println("Keys, provisioning scripts, and packages have been pushed to the nodes " +
-                        "and installed on ${serverTypeItr.serverType} nodes.")
-            }, {
-                println("Failed to provision all ${serverTypeItr.serverType} nodes. ${it.message} $retryMessage")
-                return false
-            })
-        }, {
-            println("Failed to copy provisioning resources to all ${serverTypeItr.serverType} nodes. ${it.message} $retryMessage")
-            return false
-        })
+        for (attempts in 0..5) {
+            // we only want to run the install if the copy was successful
+            parallelSsh.copyProvisioningResources(serverTypeItr).fold({
+                // need to create a new instance here b/c of duplicate volume mapping issues
+                parallelSsh.provisionNode(serverTypeItr).fold({
+                    println("Keys, provisioning scripts, and packages have been pushed to the nodes " +
+                            "and installed on ${serverTypeItr.serverType} nodes.")
+                    return true
 
-        return true
+                }, {
+                    println("Failed to provision all ${serverTypeItr.serverType} nodes. ${it.message} $retryMessage")
+                })
+            }, {
+                println("Failed to copy provisioning resources to all ${serverTypeItr.serverType} nodes. ${it.message} $retryMessage")
+            })
+        }
+
+        println("Failed to provision all ${serverTypeItr.serverType} nodes. $failureMessage)")
+        return false
     }
 }
