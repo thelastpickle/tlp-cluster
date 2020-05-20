@@ -12,24 +12,28 @@ echo -e "To undo these changes exit this terminal.\n"
 
 
 SSH_CONFIG="$(pwd)/sshConfig"
-alias ssh="ssh -F $SSH_CONFIG"
+alias ssh="ssh -i $HOME/.tlp-cluster/profiles/default/secret.pem -A -F $SSH_CONFIG"
 alias sftp="sftp -F $SSH_CONFIG"
 alias scp="scp -F $SSH_CONFIG"
 alias rsync="rsync -ave 'ssh -F $SSH_CONFIG'"
 
+x_all () {
+  echo "${SERVERS[@]}" | xargs -n 1 -P 32 -I {} ssh -F $SSH_CONFIG -A -o StrictHostKeyChecking=no -t {} $@
+}
+
 # general purpose function for executing commands on all cassandra nodes
-c-all () {
+c_all () {
     for i in "${SERVERS[@]}"
     do
         ssh $i $@
     done
 }
 
-alias c-restart="c-all sudo systemctl restart cassandra.service"
-alias c-status="c0 nodetool status"
-alias c-tpstats="c-all nodetool tpstats"
+alias c_restart="c-all sudo systemctl restart cassandra.service"
+alias c_status="c0 nodetool status"
+alias c_tpstats="x-all nodetool tpstats"
 
-c-collect-artifacts() {
+c_collect_artifacts() {
     NAME="$1"
     if [ -z "$NAME" ]
     then
@@ -82,10 +86,10 @@ c-collect-artifacts() {
     done
 }
 
-alias c-start="c-all sudo systemctl start cassandra.service"
-alias c-df="c-all df -h | grep -E 'cassandra|Filesystem'"
+alias c_start="c-all sudo systemctl start cassandra.service"
+alias c_df="x-all df -h | grep -E 'cassandra|Filesystem'"
 
-c-flame() {
+c_flame() {
   HOST=$1
   OUTPUT=$2
 

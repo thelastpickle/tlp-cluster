@@ -140,12 +140,13 @@ SSH alises for all Cassandra nodes are automatically created as `c0`-`cN`.  `ssh
 
 In addition, the following are defined:
 
-* *c-all* executes a command on every node in the cluster sequentially.
-* *c-collect-artifacts* will collect metrics, nodetool output and system information into the artifacts directory.  It takes a name as a parameter.  This is useful when doing performance testing to capture the state of the system at a given moment.
-* *c-start* Starts cassandra on all nodes.
-* *c-restart* Restarts cassandra on all nodes.  Not a graceful operation.  To test true rolling restarts we recommend using https://github.com/spotify/cstar[cstar].
-* *c-status*: Executes `nodetool status` on cassandra0.
-* *c-tpstats*: Executes `nodetool tpstats` on all nodes.
+* *c_all* executes a command on every node in the cluster sequentially.
+* *x_all* executes a command on every node in the cluster concurrently.
+* *c_collect_artifacts* will collect metrics, nodetool output and system information into the artifacts directory.  It takes a name as a parameter.  This is useful when doing performance testing to capture the state of the system at a given moment.
+* *c_start* Starts cassandra on all nodes.
+* *c_restart* Restarts cassandra on all nodes.  Not a graceful operation.  To test true rolling restarts we recommend using https://github.com/spotify/cstar[cstar].
+* *c_status*: Executes `nodetool status` on cassandra0.
+* *c_tpstats*: Executes `nodetool tpstats` on all nodes.
 
 
 == Installing Cassandra
@@ -252,3 +253,70 @@ The following ports are open:
 
 
 the normal ports are all mapped for you so you can reach prometheus on 9090 and grafana on 3000
+
+== Add ons
+
+=== Express cluster build
+
+A helper script named `build_cluster.sh` has been added to the `bin/` directory to automate cluster creation and startup:
+
+```
+% build_cluster.sh -h
+build-cluster: automation script for tlp-cluster
+
+
+options:
+-h, --help                                  show brief help
+-n, --name=CLUSTER_NAME                     Cluster name
+-s, --stress=STRESS_NODES                   specify the number of stress nodes
+-v, --cassandra-version=CASSANDRA_VERSION   specify the version of Cassandra to install
+-d, --extra-deb-package=EXTRA_DEB           optional deb package to install on the nodes
+-c, --cassandra-nodes=3                     number of Cassandra nodes to start (default: 3)
+-i, --instance-type=r3.2xlarge              Instance type for Cassandra nodes (default: m3.xlarge)
+-d, --extra-deb-package=EXTRA_DEB           optional deb package to install on the nodes
+--gc=G1                                     GC algorithm to use. Possible values: G1, Shenandoah, ZGC, CMS (default)
+--heap=8                                    Heap size in GB (8, 16, 32, ...)
+--jdk=8                                     OpenJDK version to use (8, 11, 14)
+```
+
+The script will pause before the install phase to allow customizing the configuration before it gets deployed. It'll also retry on failure during the install and start phases to handle transient failures.
+
+=== Install and configure Reaper
+
+Reaper can be installed in sidecar mode after the cluster was created using `bin/install_reaper.sh`:
+
+```
+% install_reaper.sh -h
+install_reaper: automation script for tlp-cluster
+
+
+options:
+-h, --help                                  show brief help
+-b                                          Install Reaper latest beta
+--cluster=CLUSTER_NAME                      Cluster on which Reaper should be installed
+```
+
+The cluster name is not required if the script runs from within the cluster directory created by tlp-cluster.
+The latest stable version will be installed by default, unless the `-b` flag is used to enforce using the latest beta instead.
+Connect to any node on port 8080 after the installation has succeeded and use admin/admin as default credentials.
+
+=== Install and configure Medusa
+
+Install and configure Medusa using S3 as storage backend.
+
+```
+% install_medusa.sh -h
+install_medusa: automation script for tlp-cluster
+
+
+options:
+-h, --help                                  show brief help
+-b, --bucket=bucket-name                    S3 storage bucket name
+-c, --credentials=/path/to/credentials      AWS credentials file (defaults to ~/.aws/credentials)
+-s, --storage-provider=CASSANDRA_VERSION    Libcloud storage provider (defaults to s3_us_west_oregon)
+--cluster=CLUSTER_NAME                      Cluster on which Medusa should be installed
+```
+
+The cluster name is not required if the script runs from within the cluster directory created by tlp-cluster.
+AWS credentials will get uploaded to the Cassandra nodes under `/etc/medusa/credentials`.
+

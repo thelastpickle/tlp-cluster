@@ -24,12 +24,14 @@ if [[ "$1" == "cassandra" ]]; then
     echo "Running all shell scripts"
     # subshell
     (
-    cd "$1/post_start"
-    for f in $(ls [0-9]*.sh)
-    do
-        bash ${f}
-    done
-
+    if [ -d "$1/post_start" ];
+    then
+      cd "$1/post_start"
+      for f in $(ls [0-9]*.sh)
+      do
+          bash ${f}
+      done
+    fi
     echo "Done with shell scripts"
     )
 fi
