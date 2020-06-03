@@ -30,30 +30,41 @@ class Install(val context: Context) : ICommand {
             System.exit(1)
         }
 
-        val parallelSsh = Pssh(context, sshKeyPath)
+        var installSuccessful: Boolean? = null
+        var attempts = 0
+        while (installSuccessful != true && attempts < 5) {
+            installSuccessful = null
+            attempts++
+            val parallelSsh = Pssh(context, sshKeyPath)
 
-        var installSuccessful = true
+            // iterate through the different sever types and run their install scripts (via the Pssh container)
+            // we use a filter to select only the instances we have provisioned e.g. if we only have Cassandra nodes, then
+            // we will only run the install functions for the cassandra hosts.
+            ServerType
+                    .values()
+                    .filter { context.tfstate.getHosts(it).count() > 0 }
+                    .forEach {
+                        // only do the install if we have had previous successful installs otherwise we should skip doing any
+                        // further installs.
+                        // we are unable to put a break in because it is unsupported in a forEach loop in Kotlin.
+                        if (installSuccessful != false) {
+                            installSuccessful = provisionServer(it, parallelSsh)
+                        } else {
+                            println("Skipping ${it.serverType} provisioning and install due to previous errors.")
+                        }
+                    }
 
-        // iterate through the different sever types and run their install scripts (via the Pssh container)
-        // we use a filter to select only the instances we have provisioned e.g. if we only have Cassandra nodes, then
-        // we will only run the install functions for the cassandra hosts.
-        ServerType
-            .values()
-            .filter { context.tfstate.getHosts(it).count() > 0 }
-            .forEach {
-                // only do the install if we have had previous successful installs otherwise we should skip doing any
-                // further installs.
-                // we are unable to put a break in because it is unsupported in a forEach loop in Kotlin.
-                if (installSuccessful) {
-                    installSuccessful = provisionServer(it, parallelSsh)
-                } else {
-                    println("Skipping ${it.serverType} provisioning and install due to previous errors.")
+            if (installSuccessful == true) {
+                with(TermColors()) {
+                    println("Now run ${green("tlp-cluster start")} to fire up the cluster.")
+
                 }
             }
+        }
 
-        if (installSuccessful) {
+        if (installSuccessful == false) {
             with(TermColors()) {
-                println("Now run ${green("tlp-cluster start")} to fire up the cluster.")
+                println("${red("Install failed!")} $failureMessage installSuccessful=$installSuccessful and attempts=$attempts")
 
             }
         }
@@ -62,24 +73,21 @@ class Install(val context: Context) : ICommand {
     private fun provisionServer(server: ServerType, parallelSsh: Pssh) : Boolean {
         println("Provisioning ${server.serverType}")
         val serverTypeItr = server
-        for (attempts in 0..5) {
-            // we only want to run the install if the copy was successful
-            parallelSsh.copyProvisioningResources(serverTypeItr).fold({
-                // need to create a new instance here b/c of duplicate volume mapping issues
-                parallelSsh.provisionNode(serverTypeItr).fold({
-                    println("Keys, provisioning scripts, and packages have been pushed to the nodes " +
-                            "and installed on ${serverTypeItr.serverType} nodes.")
-                    return true
-
-                }, {
-                    println("Failed to provision all ${serverTypeItr.serverType} nodes. ${it.message} $retryMessage")
-                })
+        // we only want to run the install if the copy was successful
+        parallelSsh.copyProvisioningResources(serverTypeItr).fold({
+            // need to create a new instance here b/c of duplicate volume mapping issues
+            parallelSsh.provisionNode(serverTypeItr).fold({
+                println("Keys, provisioning scripts, and packages have been pushed to the nodes " +
+                        "and installed on ${serverTypeItr.serverType} nodes.")
             }, {
-                println("Failed to copy provisioning resources to all ${serverTypeItr.serverType} nodes. ${it.message} $retryMessage")
+                println("Failed to provision all ${serverTypeItr.serverType} nodes. ${it.message}")
+                return false
             })
-        }
+        }, {
+            println("Failed to copy provisioning resources to all ${serverTypeItr.serverType} nodes. ${it.message}")
+            return false
+        })
 
-        println("Failed to provision all ${serverTypeItr.serverType} nodes. $failureMessage)")
-        return false
+        return true
     }
 }

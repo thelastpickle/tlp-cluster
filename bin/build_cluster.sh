@@ -251,7 +251,6 @@ then
   echo "-XX:SafepointTimeoutDelay=200" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
 fi
 
-
 read -p "Time to adjust the configuration/packages before install starts. Press any key to trigger the install." foo
 
 success=0
