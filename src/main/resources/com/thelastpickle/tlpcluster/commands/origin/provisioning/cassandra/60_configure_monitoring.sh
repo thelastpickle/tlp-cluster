@@ -7,28 +7,25 @@ EXPORTER_AGENT_JAR="jmx_prometheus_javaagent-${EXPORTER_AGENT_VERSION}.jar"
 
 CASSANDRA_LIB="/usr/share/cassandra/lib"
 
-if [[ ! -f "/etc/systemd/system/node_exporter.service" ]];
-then
+curl -LO https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.12.0/jmx_prometheus_javaagent-${EXPORTER_AGENT_VERSION}.jar
 
-  curl -LO https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.12.0/jmx_prometheus_javaagent-${EXPORTER_AGENT_VERSION}.jar
-
-  sudo mv ${EXPORTER_AGENT_JAR} ${CASSANDRA_LIB}/
-  sudo cp config.yaml /etc/cassandra/
+sudo mv ${EXPORTER_AGENT_JAR} ${CASSANDRA_LIB}/
+sudo cp config.yaml /etc/cassandra/
 
 
-  echo "JVM_OPTS=\"\$JVM_OPTS -javaagent:${CASSANDRA_LIB}/${EXPORTER_AGENT_JAR}=9501:/etc/cassandra/config.yaml\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
-  echo "Finished configuring Cassandra monitoring for the Cassandra process"
+echo "JVM_OPTS=\"\$JVM_OPTS -javaagent:${CASSANDRA_LIB}/${EXPORTER_AGENT_JAR}=9501:/etc/cassandra/config.yaml\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
+echo "Finished configuring Cassandra monitoring for the Cassandra process"
 
-  echo "Grabbing the node exporter for system metrics"
+echo "Grabbing the node exporter for system metrics"
 
-  sudo useradd --no-create-home --shell /bin/false node_exporter
+sudo useradd --no-create-home --shell /bin/false node_exporter
 
-  wget https://github.com/prometheus/node_exporter/releases/download/v0.17.0/node_exporter-0.17.0.linux-amd64.tar.gz
+wget https://github.com/prometheus/node_exporter/releases/download/v0.17.0/node_exporter-0.17.0.linux-amd64.tar.gz
 
-  tar zxvf node_exporter*
-  sudo cp node_exporter*/node_exporter /usr/local/bin/
+tar zxvf node_exporter*
+sudo cp node_exporter*/node_exporter /usr/local/bin/
 
-  cat <<EOF | sudo tee /etc/systemd/system/node_exporter.service
+cat <<EOF | sudo tee /etc/systemd/system/node_exporter.service
 [Unit]
 Description=Node Exporter
 Wants=network-online.target
@@ -45,9 +42,8 @@ WantedBy=multi-user.target
 
 EOF
 
-  sudo systemctl daemon-reload
-  sudo systemctl start node_exporter
-  sudo systemctl status node_exporter
+sudo systemctl daemon-reload
+sudo systemctl start node_exporter
+sudo systemctl status node_exporter
 
-  echo "Finished setting up node exporter"
-fi
+echo "Finished setting up node exporter"
