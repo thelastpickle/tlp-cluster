@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 
 internal class ConfigurationTest {
 
-    private val c = Configuration("TEST-1", "TEST CLIENT", "Testing tags", "us-west-2", context = Context.testContext())
+    private val c = Configuration("TEST-1", "TEST CLIENT", "Testing tags", "tomorrow", "us-west-2", context = Context.testContext())
 
     @Test
     fun ensureSetVariableWorks() {

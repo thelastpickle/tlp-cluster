@@ -13,6 +13,7 @@ export HEAP=8
 export INSTANCES=3
 export INSTANCE_TYPE=m3.xlarge
 export JDK=8
+export BYPASS_PAUSE=n
 while test $# -gt 0; do
   case "$1" in
     -h|--help)
@@ -27,10 +28,11 @@ while test $# -gt 0; do
       echo "-d, --extra-deb-package=EXTRA_DEB           optional deb package to install on the nodes"
       echo "-c, --cassandra-nodes=3                     number of Cassandra nodes to start (default: 3)"
       echo "-i, --instance-type=r3.2xlarge              Instance type for Cassandra nodes (default: m3.xlarge)"
-      echo "-d, --extra-deb-package=EXTRA_DEB           optional deb package to install on the nodes"
-      echo "--gc=G1                                     GC algorithm to use. Possible values: G1, Shenandoah"
+      echo "--gc=G1                                     GC algorithm to use. Possible values: G1, Shenandoah, CMS, ZGC"
       echo "--heap=8                                    Heap size in GB (8, 16, 32, ...)"
-      echo "--jdk=11                             OpenJDK version to use (8, 11, 14)"
+      echo "--jdk=11                                    OpenJDK version to use (8, 11, 14)"
+      echo "--cores=<number of cores>                   Number of cores for ConcGCThreads and ParallelGCThreads"
+      echo "-y                                          Bypass the pause before running the install phase"
       exit 0
       ;;
     -n)
@@ -38,7 +40,7 @@ while test $# -gt 0; do
       if test $# -gt 0; then
         export CLUSTER_NAME=$1
       else
-        echo "no stress nodes specified"
+        echo "no cluster name specified"
         exit 1
       fi
       shift
@@ -106,7 +108,7 @@ while test $# -gt 0; do
       if test $# -gt 0; then
         export INSTANCES=$1
       else
-        echo "no number of instances provided"
+        echo "no number of instances specified"
         exit 1
       fi
       shift
@@ -120,7 +122,7 @@ while test $# -gt 0; do
       if test $# -gt 0; then
         export INSTANCE_TYPE=$1
       else
-        echo "no instance type provided"
+        echo "no instance type specified"
         exit 1
       fi
       shift
@@ -128,7 +130,15 @@ while test $# -gt 0; do
     --instance-type*)
       export INSTANCE_TYPE=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
-      ;;      
+      ;;
+    --cores*)
+      export GC_CORES=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+    -y)
+      export BYPASS_PAUSE=y
+      shift
+      ;;
     *)
       break
       ;;
@@ -138,10 +148,9 @@ done
 mkdir -p $CLUSTER_NAME
 pushd $CLUSTER_NAME
 tlp-cluster clean
-tlp-cluster init TLP TLP-${CLUSTER_NAME} "TLP test cluster built by $USER: ${CLUSTER_NAME}" --stress $STRESS_NODES \
+tlp-cluster init $USER $USER-${CLUSTER_NAME} "Test cluster built by $USER: ${CLUSTER_NAME}" --stress $STRESS_NODES \
             -c $INSTANCES --instance $INSTANCE_TYPE --az a,b,c
 tlp-cluster up --auto-approve
-#source env.sh || echo "source env.sh failed... meh..."
 tlp-cluster use $CASSANDRA_VERSION
 
 if [ -z "$EXTRA_DEB" ]
@@ -170,40 +179,54 @@ then
   fi
 fi
 
+CONC_GC_CORES=""
+PARALLEL_GC_CORES=""
+if [ -n "$GC_CORES" ];
+then
+  CONC_GC_CORES="-XX:ConcGCThreads=$GC_CORES"
+  PARALLEL_GC_CORES="-XX:ParallelGCThreads=$GC_CORES"
+fi
+
 if [ "$GC" == "G1" ]
 then
   echo "Applying G1 as garbage collector..."
-  echo "-XX:+UseG1GC" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:G1RSetUpdatingPauseTimePercent=5" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:MaxGCPauseMillis=300" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:InitiatingHeapOccupancyPercent=70" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:ParallelGCThreads=8" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:ConcGCThreads=8" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-Xms${HEAP}G" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-Xmx${HEAP}G" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
+  cat << EOF >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
+-XX:+UseG1GC
+-XX:G1RSetUpdatingPauseTimePercent=5
+-XX:MaxGCPauseMillis=300
+-XX:InitiatingHeapOccupancyPercent=70
+-Xms${HEAP}G
+-Xmx${HEAP}G
+${CONC_GC_CORES}
+${PARALLEL_GC_CORES}
+EOF
 fi
 
 if [ "$GC" == "CMS" ]
 then
   echo "Applying CMS as garbage collector..."
+  NEW_GEN=$(($HEAP / 2))
   if [[ $CASSANDRA_VERSION != "4."* ]]
   then
     echo "-XX:+UseParNewGC" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
   fi
-  echo "-XX:+UseConcMarkSweepGC" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+CMSParallelRemarkEnabled" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:SurvivorRatio=8" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:MaxTenuringThreshold=1" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:CMSInitiatingOccupancyFraction=75" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+UseCMSInitiatingOccupancyOnly" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:CMSWaitDuration=10000" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+CMSParallelInitialMarkEnabled" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+CMSEdenChunksRecordAlways" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+CMSClassUnloadingEnabled" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-Xms${HEAP}G" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-Xmx${HEAP}G" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  NEW_GEN=$(($HEAP / 2))
-  echo "-Xmn${NEW_GEN}G" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
+  cat << EOF >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
+-XX:+UseConcMarkSweepGC
+-XX:+CMSParallelRemarkEnabled
+-XX:SurvivorRatio=8
+-XX:MaxTenuringThreshold=1
+-XX:CMSInitiatingOccupancyFraction=75
+-XX:+UseCMSInitiatingOccupancyOnly
+-XX:CMSWaitDuration=10000
+-XX:+CMSParallelInitialMarkEnabled
+-XX:+CMSEdenChunksRecordAlways
+-XX:+CMSClassUnloadingEnabled
+-Xms${HEAP}G
+-Xmx${HEAP}G
+-Xmn${NEW_GEN}G
+${CONC_GC_CORES}
+${PARALLEL_GC_CORES}
+EOF
 fi
 
 if [ "$GC" == "Shenandoah" ]
@@ -221,37 +244,38 @@ then
   then
     cp $BASE_CLUSTER_DIR/bin/build-cluster/20_java_shenandoah_14.sh ./provisioning/cassandra/20_java.sh
   fi
-  echo "-XX:+UnlockExperimentalVMOptions" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+UseShenandoahGC" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
   echo "Applying Shenandoah as garbage collector..."
-  #echo "-XX:ShenandoahGCHeuristics=static" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:ShenandoahFreeThreshold=70" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:ConcGCThreads=8" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:ParallelGCThreads=8" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+UseLargePages" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-verbose:gc" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-Dio.netty.leakDetection.level=DISABLED" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-Xms${HEAP}G" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-Xmx${HEAP}G" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
+  cat << EOF >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
+-XX:+UnlockExperimentalVMOptions
+-XX:+UseShenandoahGC
+-XX:+UseLargePages
+-verbose:gc
+-Xms${HEAP}G
+-Xmx${HEAP}G
+${CONC_GC_CORES}
+${PARALLEL_GC_CORES}
+EOF
 fi
 
 if [ "$GC" == "ZGC" ]
 then
-  echo "-XX:+UnlockExperimentalVMOptions" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+UseZGC" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
   echo "Applying ZGC as garbage collector..."
-  echo "-XX:ConcGCThreads=8" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:ParallelGCThreads=8" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+UseTransparentHugePages" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-verbose:gc" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-Xms${HEAP}G" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-Xmx${HEAP}G" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+SafepointTimeout" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:+UnlockDiagnosticVMOptions" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
-  echo "-XX:SafepointTimeoutDelay=200" >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
+  cat << EOF >> ./provisioning/cassandra/conf/${JVM_OPTIONS_FILE}
+-XX:+UnlockExperimentalVMOptions
+-XX:+UseZGC
+-XX:+UseTransparentHugePages
+-verbose:gc
+-Xms${HEAP}G
+-Xmx${HEAP}G
+${CONC_GC_CORES}
+${PARALLEL_GC_CORES}
+EOF
 fi
 
-read -p "Time to adjust the configuration/packages before install starts. Press any key to trigger the install." foo
+if [ "$BYPASS_PAUSE" == "n" ]
+then
+  read -p "Time to adjust the configuration/packages before install starts. Press any key to trigger the install."
+fi
 
 success=0
 attempts=1
@@ -259,7 +283,7 @@ while [ $success -eq  0 ] && [ $attempts -lt 5 ];
 do
     echo "Installing packages (attempt $attempts)"
     tlp-cluster install > install.log 2>&1 || echo "meh... install phase seem to have failed"
-    errs=$(grep "try rerunning the install" install.log)
+    grep "try rerunning the install" install.log > /dev/null 2>&1
     success=$? # 0 means we found errors in the logs, so we need to try again 
     attempts=$((attempts+1))    
 done
@@ -267,6 +291,7 @@ done
 if [ $success -eq  0 ]
 then
     echo "tlp-cluster install failed after $attempts retries. Exiting (╯°□°)╯︵ ┻━┻"
+    echo "You'll need to tear down the cluster manually by running the following command from within the ./$CLUSTER_NAME directory: tlp-cluster down --auto-approve"
     exit 1
 fi
 
@@ -276,7 +301,7 @@ while [ $success -eq  0 ]  && [ $attempts -lt 5 ];
 do
     echo "Starting Cassandra (attempt $attempts)"
     tlp-cluster start > start.log 2>&1 || echo "meh... start phase seem to have failed"
-    err=$(tail -3 start.log | grep "Non zero response returned")
+    tail -3 start.log | grep "Non zero response returned" > /dev/null 2>&1
     success=$?
     attempts=$((attempts+1))
 done
@@ -284,6 +309,7 @@ done
 if [ $success -eq 0 ]
 then
     echo "tlp-cluster start failed after $attempts retries. Exiting (╯°□°)╯︵ ┻━┻"
+    echo "You'll need to tear down the cluster manually by running the following command from within the ./$CLUSTER_NAME directory: tlp-cluster down --auto-approve"
     exit 1
 fi
 
