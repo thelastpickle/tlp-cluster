@@ -169,12 +169,16 @@ buildRpm {
 ospackage {
     os = LINUX
     link("/usr/local/bin/tlp-cluster", "/opt/tlp-cluster/bin/tlp-cluster" )
-    packager "Jon Haddad"
-    maintainer "Jon Haddad"
-    vendor "The Last Pickle"
+    link("/usr/local/bin/build_cluster.sh", "/opt/tlp-cluster/bin/build_cluster.sh" )
+    link("/usr/local/bin/install_reaper.sh", "/opt/tlp-cluster/bin/install_reaper.sh" )
+    link("/usr/local/bin/install_medusa.sh", "/opt/tlp-cluster/bin/install_medusa.sh" )
+    link("/usr/local/bin/build-cluster", "/opt/tlp-cluster/bin/build-cluster" )
+    packager "OSC"
+    maintainer "OSC"
+    vendor "Datastax"
     url "http://thelastpickle.com/tlp-cluster/"
     license "Apache License 2.0"
-    description "Cluster Experimentation Tool for Apache Cassandra by The Last Pickle"
+    description "Cluster Experimentation Tool for Apache Cassandra by Datastax"
 }
 
 buildDeb {

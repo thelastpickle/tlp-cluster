@@ -1,4 +1,4 @@
-#set -x
+#!/bin/bash
 
 shopt -s expand_aliases || setopt aliases
 
@@ -55,9 +55,12 @@ x_all "sudo cp /etc/cassandra-reaper/configs/cassandra-reaper-cassandra-sidecar.
 x_all 'sudo sed -i "s/contactPoints: \[\"127.0.0.1\"\]/contactPoints: [\"$(hostname)\"]/" /etc/cassandra-reaper/cassandra-reaper.yaml'  >> reaper.log 2>&1
 
 echo "Creating reaper_db keyspace..."
-echo "CREATE KEYSPACE IF NOT EXISTS reaper_db with replication = {'class':'SimpleStrategy', 'replication_factor':3};" > reaper_init.cql
-echo "CREATE TABLE IF NOT EXISTS reaper_db.schema_migration(applied_successful boolean, version int, script_name varchar, script text, executed_at timestamp, PRIMARY KEY (applied_successful, version));" >> reaper_init.cql
-echo "CREATE TABLE IF NOT EXISTS reaper_db.schema_migration_leader(keyspace_name text, leader uuid, took_lead_at timestamp, leader_hostname text, PRIMARY KEY (keyspace_name));" >> reaper_init.cql
+cat << EOF > ./reaper_init.cql
+CREATE KEYSPACE IF NOT EXISTS reaper_db with replication = {'class':'SimpleStrategy', 'replication_factor':3};
+CREATE TABLE IF NOT EXISTS reaper_db.schema_migration(applied_successful boolean, version int, script_name varchar, script text, executed_at timestamp, PRIMARY KEY (applied_successful, version));
+CREATE TABLE IF NOT EXISTS reaper_db.schema_migration_leader(keyspace_name text, leader uuid, took_lead_at timestamp, leader_hostname text, PRIMARY KEY (keyspace_name));
+EOF
+
 scp reaper_init.cql cassandra0:/home/ubuntu/provisioning  >> reaper.log 2>&1
 c0 "cqlsh \$(hostname) -f provisioning/reaper_init.cql" >> reaper.log 2>&1
 echo "Starting Reaper..."

@@ -12,6 +12,7 @@ echo -e "To undo these changes exit this terminal.\n"
 
 
 SSH_CONFIG="$(pwd)/sshConfig"
+ssh-add -t 30800 $HOME/.tlp-cluster/profiles/default/secret.pem
 alias ssh="ssh -i $HOME/.tlp-cluster/profiles/default/secret.pem -A -F $SSH_CONFIG"
 alias sftp="sftp -F $SSH_CONFIG"
 alias scp="scp -F $SSH_CONFIG"
@@ -26,6 +27,14 @@ c_all () {
     for i in "${SERVERS[@]}"
     do
         ssh $i $@
+    done
+}
+
+# general purpose function for uploading files on all cassandra nodes
+scp_all () {
+    for i in "${SERVERS[@]}"
+    do
+        scp $1 $i:$2
     done
 }
 

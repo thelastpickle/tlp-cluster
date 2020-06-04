@@ -7,6 +7,7 @@ import com.thelastpickle.tlpcluster.configuration.ServerType
 import com.thelastpickle.tlpcluster.containers.Pssh
 import org.apache.commons.io.FileUtils
 import java.io.File
+import kotlin.system.exitProcess
 
 @Parameters(commandNames = ["install"], commandDescription = "Install Everything")
 class Install(val context: Context) : ICommand {
@@ -27,7 +28,7 @@ class Install(val context: Context) : ICommand {
         val files = FileUtils.listFiles(File("provisioning", "cassandra"), arrayOf("deb"), false)
         if(files.isEmpty()) {
             println("Massive fail, no deb package for C*, you lose.")
-            System.exit(1)
+            exitProcess(1)
         }
 
         var installSuccessful: Boolean? = null
@@ -53,20 +54,15 @@ class Install(val context: Context) : ICommand {
                             println("Skipping ${it.serverType} provisioning and install due to previous errors.")
                         }
                     }
+        }
+        var installResultMessage = """$\{red("Install failed!")\} $failureMessage installSuccessful=$installSuccessful and attempts=$attempts"""
 
-            if (installSuccessful == true) {
-                with(TermColors()) {
-                    println("Now run ${green("tlp-cluster start")} to fire up the cluster.")
-
-                }
-            }
+        if (installSuccessful == true) {
+            installResultMessage = """Now run $\{green("tlp-cluster start")\} to fire up the cluster."""
         }
 
-        if (installSuccessful == false) {
-            with(TermColors()) {
-                println("${red("Install failed!")} $failureMessage installSuccessful=$installSuccessful and attempts=$attempts")
-
-            }
+        with(TermColors()) {
+            println(installResultMessage)
         }
     }
 

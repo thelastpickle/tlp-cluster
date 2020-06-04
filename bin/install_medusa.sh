@@ -1,22 +1,25 @@
-#set -x
+#!/bin/bash
 
 shopt -s expand_aliases || setopt aliases
 
 export STORAGE_PROVIDER="s3_us_west_oregon"
 export CREDENTIALS="$HOME/.aws/credentials"
 export CLUSTER_NAME=${PWD##*/}
+export PREFIX=$CLUSTER_NAME
 while test $# -gt 0; do
   case "$1" in
     -h|--help)
       echo "install-medusa: automation script for tlp-cluster"
-      echo " "
-      echo " "
+      echo
+      echo
       echo "options:"
       echo "-h, --help                                  show brief help"
       echo "-b, --bucket=bucket-name                    S3 storage bucket name"
       echo "-c, --credentials=/path/to/credentials      AWS credentials file"
       echo "-s, --storage-provider=CASSANDRA_VERSION    Libcloud storage provider (s3_us_west_oregon, ...)"
       echo "--cluster=CLUSTER_NAME                      Cluster on which Medusa should be installed"
+      echo "-p, --prefix=bucket_prefix                  Prefix for multitenant buckets (defaults to cluster name)"
+      echo "--branch=git_branch                         Branch to install from the GitHub repo"
       exit 0
       ;;
     -b)
@@ -63,6 +66,24 @@ while test $# -gt 0; do
       ;;
     --cluster*)
       export CLUSTER_NAME=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+    -p)
+      shift
+      if test $# -gt 0; then
+        export PREFIX=$1
+      else
+        echo "no prefix specified"
+        exit 1
+      fi
+      shift
+      ;;
+    --prefix*)
+      export PREFIX=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+    --branch*)
+      export BRANCH=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
     *)
@@ -150,4 +171,15 @@ else
   echo "NFS setup done!"
 fi
 
+if [ -n "$BRANCH" ];
+then
+  echo "Installing branch $BRANCH..."
+  x_all "sudo pip3 install git+https://github.com/thelastpickle/cassandra-medusa@${BRANCH} --upgrade" >> medusa.log 2>&1
+fi
+
+if [ -n "$PREFIX" ];
+then
+  echo "Applying prefix $PREFIX"
+  x_all "echo 'prefix = ${PREFIX}'|sudo tee -a /etc/medusa/medusa.ini" >> medusa.log 2>&1
+fi
 echo "Medusa was successfully installed on all nodes!"
