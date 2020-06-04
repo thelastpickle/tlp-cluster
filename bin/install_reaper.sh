@@ -37,25 +37,33 @@ then
   pushd $CLUSTER_NAME
 fi
 source env.sh
-x_all "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y jq"
-echo "Installing Reaper stable from the repo"
+echo "Installing required dependencies..."
+x_all "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y jq" > reaper.log 2>&1
+
 if [[ "$BETA" == "yes" ]];
 then
   # Install the latest beta
-  x_all "cd provisioning && latest=$(curl https://api.bintray.com/packages/thelastpickle/reaper-deb-beta/cassandra-reaper-beta/versions/_latest|jq -r '.name') && wget https://bintray.com/thelastpickle/reaper-deb-beta/download_file?file_path=reaper_\${latest}_amd64.deb -O reaper_\${latest}_amd64.deb && sudo apt-get install ./reaper_\${latest}_amd64.deb"
+  echo "Installing Reaper beta from the repo..."
+  x_all "cd provisioning && latest=$(curl https://api.bintray.com/packages/thelastpickle/reaper-deb-beta/cassandra-reaper-beta/versions/_latest|jq -r '.name') && wget https://bintray.com/thelastpickle/reaper-deb-beta/download_file?file_path=reaper_\${latest}_amd64.deb -O reaper_\${latest}_amd64.deb && sudo apt-get install ./reaper_\${latest}_amd64.deb" >> reaper.log 2>&1
 else
   # Install the latest stable
-  x_all "cd provisioning && latest=$(curl https://api.bintray.com/packages/thelastpickle/reaper-deb/cassandra-reaper/versions/_latest|jq -r '.name') && wget https://bintray.com/thelastpickle/reaper-deb/download_file?file_path=reaper_\${latest}_amd64.deb -O reaper_\${latest}_amd64.deb && sudo apt-get install ./reaper_\${latest}_amd64.deb"
+  echo "Installing Reaper stable from the repo..."
+  x_all "cd provisioning && latest=$(curl https://api.bintray.com/packages/thelastpickle/reaper-deb/cassandra-reaper/versions/_latest|jq -r '.name') && wget https://bintray.com/thelastpickle/reaper-deb/download_file?file_path=reaper_\${latest}_amd64.deb -O reaper_\${latest}_amd64.deb && sudo apt-get install ./reaper_\${latest}_amd64.deb"  >> reaper.log 2>&1
 fi
 
-x_all "sudo cp /etc/cassandra-reaper/configs/cassandra-reaper-cassandra-sidecar.yaml /etc/cassandra-reaper/cassandra-reaper.yaml"
-x_all 'sudo sed -i "s/contactPoints: \[\"127.0.0.1\"\]/contactPoints: [\"$(hostname)\"]/" /etc/cassandra-reaper/cassandra-reaper.yaml'
+x_all "sudo cp /etc/cassandra-reaper/configs/cassandra-reaper-cassandra-sidecar.yaml /etc/cassandra-reaper/cassandra-reaper.yaml"  >> reaper.log 2>&1
+x_all 'sudo sed -i "s/contactPoints: \[\"127.0.0.1\"\]/contactPoints: [\"$(hostname)\"]/" /etc/cassandra-reaper/cassandra-reaper.yaml'  >> reaper.log 2>&1
 
+echo "Creating reaper_db keyspace..."
 echo "CREATE KEYSPACE IF NOT EXISTS reaper_db with replication = {'class':'SimpleStrategy', 'replication_factor':3};" > reaper_init.cql
 echo "CREATE TABLE IF NOT EXISTS reaper_db.schema_migration(applied_successful boolean, version int, script_name varchar, script text, executed_at timestamp, PRIMARY KEY (applied_successful, version));" >> reaper_init.cql
 echo "CREATE TABLE IF NOT EXISTS reaper_db.schema_migration_leader(keyspace_name text, leader uuid, took_lead_at timestamp, leader_hostname text, PRIMARY KEY (keyspace_name));" >> reaper_init.cql
-scp reaper_init.cql cassandra0:/home/ubuntu/provisioning
-c0 "cqlsh \$(hostname) -f provisioning/reaper_init.cql"
-c0 "sudo service cassandra-reaper start && sleep 20"
-x_all "sudo service cassandra-reaper start"
+scp reaper_init.cql cassandra0:/home/ubuntu/provisioning  >> reaper.log 2>&1
+c0 "cqlsh \$(hostname) -f provisioning/reaper_init.cql" >> reaper.log 2>&1
+echo "Starting Reaper..."
+c0 "sudo service cassandra-reaper start && sleep 20" >> reaper.log 2>&1
+x_all "sudo service cassandra-reaper start" >> reaper.log 2>&1
 echo "Reaper was successfully started on all nodes!"
+echo "Reaper is available on all Cassandra nodes with the login 'admin', password 'admin'"
+servers=($(cat sshConfig |grep Hostname|cut -d' ' -f3))
+echo "  - Reaper:     http://${servers[1]}:8080/webui/"

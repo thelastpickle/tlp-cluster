@@ -85,8 +85,10 @@ then
   pushd $CLUSTER_NAME
 fi
 source env.sh
-x_all "sudo apt-get install python3-pip -y"
-x_all "sudo pip3 install cassandra-medusa[s3] --upgrade"
+echo "Installing pip3..."
+x_all "sudo apt-get install python3-pip -y" > medusa.log 2>&1
+echo "Installing Medusa..."
+x_all "sudo pip3 install cassandra-medusa[s3] --upgrade" >> medusa.log 2>&1
 
 # Create medusa.ini file
 echo "[cassandra]" > ./medusa.ini
@@ -94,6 +96,7 @@ echo "[storage]" >> ./medusa.ini
 echo "storage_provider = ${STORAGE_PROVIDER}" >> ./medusa.ini
 echo "bucket_name = ${BUCKET}" >> ./medusa.ini
 echo "key_file = /etc/medusa/credentials" >> ./medusa.ini
+echo "base_path = /mnt/cassandra-backups" >> ./medusa.ini
 echo "max_backup_age = 0" >> ./medusa.ini
 echo "max_backup_count = 0" >> ./medusa.ini
 echo "transfer_max_bandwidth = 50MB/s" >> ./medusa.ini
@@ -105,11 +108,46 @@ for i in "${SERVERS[@]}"
 do
     echo "Uploading medusa.ini to $i"
     scp ./medusa.ini $i:/home/ubuntu/medusa.ini
-    echo "Uploading credentials to $i"
-    scp $CREDENTIALS $i:/home/ubuntu/credentials
+    if [[ $STORAGE_PROVIDER == s3* ]];
+    then
+      echo "Uploading credentials to $i"
+      scp $CREDENTIALS $i:/home/ubuntu/credentials  >> medusa.log 2>&1
+    fi
 done
 
-x_all "sudo mv /home/ubuntu/medusa.ini /etc/medusa"
-x_all "sudo mv /home/ubuntu/credentials /etc/medusa"
+x_all "sudo mv /home/ubuntu/medusa.ini /etc/medusa"  >> medusa.log 2>&1
+if [[ $STORAGE_PROVIDER == s3* ]];
+then
+  x_all "sudo mv /home/ubuntu/credentials /etc/medusa" >> medusa.log 2>&1
+else
+  # Setup NFS server on the first Cassandra node
+  echo "Setting up NFS server..."
+  c0 "sudo apt install nfs-kernel-server -y"  >> medusa.log 2>&1
+  servers_private_ips=($(c0 "nodetool status|grep UN|cut -d' ' -f3"))
+  rm exports
+  touch exports
+  for node in "${servers_private_ips[@]}"
+  do
+    echo "/mnt/cassandra-backups      ${node}(rw,sync,root_squash,subtree_check)" >> exports
+  done
+  scp ./exports cassandra0:/home/ubuntu/exports  >> medusa.log 2>&1
+  c0 "sudo mv /home/ubuntu/exports /etc/exports" >> medusa.log 2>&1
+  c0 "sudo mkdir /mnt/cassandra-backups" >> medusa.log 2>&1
+  c0 "sudo chmod 777 -R /mnt/cassandra-backups" >> medusa.log 2>&1
+  c0 "sudo service nfs-kernel-server start" >> medusa.log 2>&1
+  nfs_server_ip=$(c0 "hostname -I" | xargs)
+
+  # Setup the NFS clients and mounts on the other nodes
+  echo "Setting up NFS mounts..."
+  x_all "sudo apt install nfs-common -y" >> medusa.log 2>&1
+  for i in "${SERVERS[@]:1}"
+  do
+    ssh $i "echo '${nfs_server_ip}:/mnt/cassandra-backups    /mnt/cassandra-backups      nfs       rw,soft,intr,noatime,x-gvfs-show'| sudo tee –a /etc/fstab" >> medusa.log 2>&1
+    ssh $i "sudo mkdir /mnt/cassandra-backups" >> medusa.log 2>&1
+    x_all "sudo chmod 777 -R /mnt/cassandra-backups" >> medusa.log 2>&1
+    ssh $i "sudo mount -a" >> medusa.log 2>&1
+  done
+  echo "NFS setup done!"
+fi
 
 echo "Medusa was successfully installed on all nodes!"
