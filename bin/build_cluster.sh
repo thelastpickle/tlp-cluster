@@ -28,6 +28,7 @@ while test $# -gt 0; do
       echo "-d, --extra-deb-package=EXTRA_DEB           optional deb package to install on the nodes"
       echo "-c, --cassandra-nodes=3                     number of Cassandra nodes to start (default: 3)"
       echo "-i, --instance-type=r3.2xlarge              Instance type for Cassandra nodes (default: m3.xlarge)"
+      echo "-t, --stress-instance-type=r3.2xlarge       Instance type for Stress nodes (default: c3.2xlarge)"
       echo "--gc=G1                                     GC algorithm to use. Possible values: G1, Shenandoah, CMS, ZGC"
       echo "--heap=8                                    Heap size in GB (8, 16, 32, ...)"
       echo "--jdk=11                                    OpenJDK version to use (8, 11, 14)"
@@ -131,6 +132,20 @@ while test $# -gt 0; do
       export INSTANCE_TYPE=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
+    -t)
+      shift
+      if test $# -gt 0; then
+        export STRESS_INSTANCE_TYPE=$1
+      else
+        echo "no stress instance type specified"
+        exit 1
+      fi
+      shift
+      ;;
+    --stress-instance-type*)
+      export STRESS_INSTANCE_TYPE=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
     --cores*)
       export GC_CORES=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
@@ -148,8 +163,16 @@ done
 mkdir -p $CLUSTER_NAME
 pushd $CLUSTER_NAME
 tlp-cluster clean
-tlp-cluster init $USER $USER-${CLUSTER_NAME} "Test cluster built by $USER: ${CLUSTER_NAME}" --stress $STRESS_NODES \
-            -c $INSTANCES --instance $INSTANCE_TYPE --az a
+tlp-cluster init \
+  $USER \
+  $USER-${CLUSTER_NAME} \
+  "Test cluster built by $USER: ${CLUSTER_NAME}" \
+    --stress $STRESS_NODES \
+    --instance-stress $STRESS_INSTANCE_TYPE \
+    --cassandra $INSTANCES \
+    --instance $INSTANCE_TYPE \
+    --az a
+
 tlp-cluster up --auto-approve
 tlp-cluster use $CASSANDRA_VERSION
 
