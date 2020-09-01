@@ -41,6 +41,9 @@ class Init(val context: Context) : ICommand {
     @Parameter(description = "Instance Type", names = ["--instance"])
     var instanceType =  "r3.2xlarge"
 
+    @Parameter(description = "Stress instance Type", names = ["--instance-stress"])
+    var stressInstanceType =  "c3.2xlarge"
+
     @Parameter(description = "Limit to specified availability zones", names = ["--azs", "--az", "-z"], listConverter = AZConverter::class)
     var azs: List<String> = listOf()
 
@@ -85,6 +88,7 @@ class Init(val context: Context) : ICommand {
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
         config.cassandraInstanceType = instanceType
+        config.stressInstanceType = stressInstanceType
 
         config.setVariable("client", client)
         config.setVariable("ticket", ticket)
