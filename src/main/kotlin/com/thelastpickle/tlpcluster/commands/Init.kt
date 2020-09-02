@@ -32,14 +32,20 @@ class Init(val context: Context) : ICommand {
     @Parameter(description = "Number of Cassandra instances", names = ["--cassandra", "-c"])
     var cassandraInstances = 3
 
+    @Parameter(description = "Number of Stargate instances", names = ["--stargate", "-g"])
+    var stargateInstances = 1
+
     @Parameter(description = "Number of stress instances", names = ["--stress", "-s"])
     var stressInstances = 0
 
     @Parameter(description = "Start instances automatically", names = ["--up"])
     var start = false
 
-    @Parameter(description = "Instance Type", names = ["--instance"])
-    var instanceType =  "r3.2xlarge"
+    @Parameter(description = "Cassandra instance Type", names = ["--instance"])
+    var cassandraInstanceType =  "r3.2xlarge"
+
+    @Parameter(description = "Stargate instance Type", names = ["--instance-sg"])
+    var stargateInstanceType =  "c3.2xlarge"
 
     @Parameter(description = "Stress instance Type", names = ["--instance-stress"])
     var stressInstanceType =  "c3.2xlarge"
@@ -66,11 +72,11 @@ class Init(val context: Context) : ICommand {
         if(System.getenv("TLP_CLUSTER_SKIP_INSTANCE_CHECK") == "") {
             var found = false
             for (x in allowedTypes) {
-                if (instanceType.startsWith(x))
+                if (cassandraInstanceType.startsWith(x))
                     found = true
             }
             if (!found) {
-                throw Exception("You requested the instance type $instanceType, but unfortunately it isn't supported in EC2 Classic.  We currently only support the following classes: $allowedTypes")
+                throw Exception("You requested the instance type $cassandraInstanceType, but unfortunately it isn't supported in EC2 Classic.  We currently only support the following classes: $allowedTypes")
             }
         }
 
@@ -84,11 +90,12 @@ class Init(val context: Context) : ICommand {
 
         var config = initializeDirectory(client, ticket, purpose, until)
 
-
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
-        config.cassandraInstanceType = instanceType
+        config.numStargateInstances = stargateInstances
+        config.cassandraInstanceType = cassandraInstanceType
         config.stressInstanceType = stressInstanceType
+        config.stargateInstanceType = stargateInstanceType
 
         config.setVariable("client", client)
         config.setVariable("ticket", ticket)
