@@ -23,7 +23,7 @@ class CassandraUnpack(val context: Context,
     var log = logger()
 
     fun download() {
-        // example http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/cassandra_2.1.14_all.deb
+        // example https://downloads.apache.org/cassandra/debian/pool/main/c/cassandra/cassandra_2.1.14_all.deb
         // if using a cache, check for the version
         var found = false
         val destination = File(dest.toFile(), getFileName())
@@ -64,6 +64,6 @@ class CassandraUnpack(val context: Context,
         )
     }
 
-    fun getURL() = "http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/" + getFileName()
+    fun getURL() = "https://downloads.apache.org/cassandra/debian/pool/main/c/cassandra/" + getFileName()
     fun getFileName() = "cassandra_${version}_all.deb"
 }

@@ -21,8 +21,6 @@ class TFState(val context: Context,
         }
     }
 
-
-
     fun getHosts(serverType: ServerType) : HostList {
         val nodes = tree.path("modules")
                         .first()
@@ -32,7 +30,7 @@ class TFState(val context: Context,
         val resources = context.json.convertValue(nodes, Map::class.java)
 
 
-        for((name, resource) in resources.entries) {
+        for ((name, resource) in resources.entries) {
             resource as Map<String, *>
 
             val attrs = (resource.get("primary") as LinkedHashMap<*, *>).get("attributes") as LinkedHashMap<String, String>
@@ -43,10 +41,10 @@ class TFState(val context: Context,
 
             val serverName = name as String?
 
-            if(public != null && private != null && serverName != null) {
+            if (public != null && private != null && serverName != null) {
 
-                if(serverName.contains(serverType.serverType)) {
-                    val host = Host.fromTerraformString(serverName as String, public, private, az as String)
+                if (serverName.contains(serverType.serverType)) {
+                    val host = Host.fromTerraformString(serverName, public, private, az as String)
                     log.info { "Adding host: $host" }
                     result.add(host)
                 }
@@ -75,6 +73,22 @@ class TFState(val context: Context,
         config.flush()
     }
 
+    fun writeEnvironmentFileServers(fp: BufferedWriter, serverType: ServerType) {
+        var i = 0
+        fp.append("${serverType.serverType.toUpperCase()}_SERVERS=(")
+        getHosts(serverType).forEach {
+            fp.append("${serverType.serverType.toLowerCase()}$i ")
+            i++
+        }
+        fp.appendln(")")
+
+        i=0
+        getHosts(serverType).forEach {
+            fp.appendln("alias ${serverType.shortServerType}${i}=\"ssh ${serverType.serverType.toLowerCase()}${i}\"")
+            i++
+        }
+    }
+
     fun writeEnvironmentFile(fp: BufferedWriter) {
 
         // write the initial SSH aliases
@@ -82,19 +96,8 @@ class TFState(val context: Context,
         fp.appendln("#!/bin/bash")
         fp.appendln()
 
-        var i = 0
-        fp.append("SERVERS=(")
-        getHosts(ServerType.Cassandra).forEach {
-            fp.append("cassandra$i ")
-            i++
-        }
-        fp.appendln(")")
-
-        i=0
-        getHosts(ServerType.Cassandra).forEach {
-            fp.appendln("alias c${i}=\"ssh cassandra${i}\"")
-            i++
-        }
+        writeEnvironmentFileServers(fp, ServerType.Cassandra)
+        writeEnvironmentFileServers(fp, ServerType.Stargate)
 
         fp.appendln()
 

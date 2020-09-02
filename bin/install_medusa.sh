@@ -123,17 +123,13 @@ echo "transfer_max_bandwidth = 50MB/s" >> ./medusa.ini
 echo "concurrent_transfers = 1" >> ./medusa.ini
 echo "multi_part_upload_threshold = 104857600" >> ./medusa.ini
 x_all "sudo mkdir /etc/medusa"
-
-for i in "${SERVERS[@]}"
-do
-    echo "Uploading medusa.ini to $i"
-    scp ./medusa.ini $i:/home/ubuntu/medusa.ini
-    if [[ $STORAGE_PROVIDER == s3* ]];
-    then
-      echo "Uploading credentials to $i"
-      scp $CREDENTIALS $i:/home/ubuntu/credentials  >> medusa.log 2>&1
-    fi
-done
+echo "Uploading medusa.ini to the Cassandra nodes"
+scp_all ./medusa.ini /home/ubuntu/medusa.ini >> medusa.log 2>&1
+if [[ $STORAGE_PROVIDER == s3* ]];
+then
+  echo "Uploading credentials to $i"
+  scp_all $CREDENTIALS /home/ubuntu/credentials  >> medusa.log 2>&1
+fi
 
 x_all "sudo mv /home/ubuntu/medusa.ini /etc/medusa"  >> medusa.log 2>&1
 if [[ $STORAGE_PROVIDER == s3* ]];
@@ -160,7 +156,7 @@ else
   # Setup the NFS clients and mounts on the other nodes
   echo "Setting up NFS mounts..."
   x_all "sudo apt install nfs-common -y" >> medusa.log 2>&1
-  for i in "${SERVERS[@]:1}"
+  for i in "${CASSANDRA_SERVERS[@]:1}"
   do
     ssh $i "echo '${nfs_server_ip}:/mnt/cassandra-backups    /mnt/cassandra-backups      nfs       rw,soft,intr,noatime,x-gvfs-show'| sudo tee –a /etc/fstab" >> medusa.log 2>&1
     ssh $i "sudo mkdir /mnt/cassandra-backups" >> medusa.log 2>&1
