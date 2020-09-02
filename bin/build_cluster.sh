@@ -7,11 +7,13 @@ shopt -s expand_aliases || setopt aliases
 
 export STRESS_NODES=0
 export CASSANDRA_VERSION=3.11.8
+export STARGATE_NODES=0
 export CLUSTER_NAME=test_cluster
 export GC=CMS
 export HEAP=8
 export INSTANCES=3
 export INSTANCE_TYPE=m3.xlarge
+export STARGATE_INSTANCE_TYPE=c3.2xlarge
 export JDK=8
 export BYPASS_PAUSE=n
 while test $# -gt 0; do
@@ -24,11 +26,13 @@ while test $# -gt 0; do
       echo "-h, --help                                  show brief help"
       echo "-n, --name=CLUSTER_NAME                     Cluster name"
       echo "-s, --stress=STRESS_NODES                   specify the number of stress nodes"
+      echo "-g, --stargate=STARGATE_NODES               specify the number of stargate nodes"
       echo "-v, --cassandra-version=CASSANDRA_VERSION   specify the version of Cassandra to install"
       echo "-d, --extra-deb-package=EXTRA_DEB           optional deb package to install on the nodes"
       echo "-c, --cassandra-nodes=3                     number of Cassandra nodes to start (default: 3)"
-      echo "-i, --instance-type=r3.2xlarge              Instance type for Cassandra nodes (default: m3.xlarge)"
-      echo "-t, --stress-instance-type=r3.2xlarge       Instance type for Stress nodes (default: c3.2xlarge)"
+      echo "-i, --instance-type=m3.xlarge               Instance type for Cassandra nodes (default: m3.xlarge)"
+      echo "-t, --st-instance-type=c3.2xlarge           Instance type for Stress nodes (default: c3.2xlarge)"
+      echo "--sg-instance-type=c3.2xlarge               Instance type for Stargate nodes (default: c3.2xlarge)"
       echo "--gc=G1                                     GC algorithm to use. Possible values: G1, Shenandoah, CMS, ZGC"
       echo "--heap=8                                    Heap size in GB (8, 16, 32, ...)"
       echo "--jdk=11                                    OpenJDK version to use (8, 11, 14)"
@@ -62,6 +66,20 @@ while test $# -gt 0; do
       ;;
     --stress*)
       export STRESS_NODES=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+    -g)
+      shift
+      if test $# -gt 0; then
+        export STARGATE_NODES=$1
+      else
+        echo "no stargate nodes specified"
+        exit 1
+      fi
+      shift
+      ;;
+    --stargate*)
+      export STARGATE_NODES=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
     -v)
@@ -142,8 +160,12 @@ while test $# -gt 0; do
       fi
       shift
       ;;
-    --stress-instance-type*)
+    --st-instance-type*)
       export STRESS_INSTANCE_TYPE=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+    --sg-instance-type*)
+      export STARGATE_INSTANCE_TYPE=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
     --cores*)
@@ -163,8 +185,11 @@ done
 mkdir -p $CLUSTER_NAME
 pushd $CLUSTER_NAME
 tlp-cluster clean
+set -x
 tlp-cluster init $USER $USER-${CLUSTER_NAME} "Test cluster built by $USER: ${CLUSTER_NAME}" --stress $STRESS_NODES \
-            -c $INSTANCES --instance $INSTANCE_TYPE --az a
+            -c $INSTANCES --instance $INSTANCE_TYPE --az a \
+            --stargate  $STARGATE_NODES --instance-sg $STARGATE_INSTANCE_TYPE
+set +x
 if [ -n "$STRESS_INSTANCE_TYPE" ];
 then
   echo "Using $STRESS_INSTANCE_TYPE instances for stress nodes"

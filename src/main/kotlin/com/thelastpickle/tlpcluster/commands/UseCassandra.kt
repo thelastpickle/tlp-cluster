@@ -143,6 +143,16 @@ class UseCassandra(val context: Context) : ICommand {
         val env = File(cassandraEnvLocation)
         env.appendText("\nJVM_OPTS=\"\$JVM_OPTS -Dcassandra.consistent.rangemovement=false\"\n")
 
+        // Write out the AWS credentials to provision the Stargate nodes
+        val stargateCassVersionFile = File("provisioning/stargate/cassandra_version").bufferedWriter()
+        if (name.startsWith("3.11")) {
+            stargateCassVersionFile.write("3.11")
+        } else {
+            stargateCassVersionFile.write("4.0")
+        }
+        stargateCassVersionFile.flush()
+        stargateCassVersionFile.close()
+
         with(TermColors()) {
             println("Cassandra deb and config copied to provisioning/.  Config files are located in provisioning/cassandra. \n Use ${green("tlp-cluster install")} to push the artifacts to the nodes.")
         }

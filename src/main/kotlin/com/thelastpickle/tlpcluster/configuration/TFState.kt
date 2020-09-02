@@ -75,6 +75,22 @@ class TFState(val context: Context,
         config.flush()
     }
 
+    fun writeEnvironmentFileServers(fp: BufferedWriter, serverType: ServerType) {
+        var i = 0
+        fp.append("${serverType.serverType.toUpperCase()}_SERVERS=(")
+        getHosts(serverType).forEach {
+            fp.append("${serverType.serverType.toLowerCase()}$i ")
+            i++
+        }
+        fp.appendln(")")
+
+        i=0
+        getHosts(serverType).forEach {
+            fp.appendln("alias ${serverType.shortServerType}${i}=\"ssh ${serverType.serverType.toLowerCase()}${i}\"")
+            i++
+        }
+    }
+
     fun writeEnvironmentFile(fp: BufferedWriter) {
 
         // write the initial SSH aliases
@@ -82,19 +98,8 @@ class TFState(val context: Context,
         fp.appendln("#!/bin/bash")
         fp.appendln()
 
-        var i = 0
-        fp.append("SERVERS=(")
-        getHosts(ServerType.Cassandra).forEach {
-            fp.append("cassandra$i ")
-            i++
-        }
-        fp.appendln(")")
-
-        i=0
-        getHosts(ServerType.Cassandra).forEach {
-            fp.appendln("alias c${i}=\"ssh cassandra${i}\"")
-            i++
-        }
+        writeEnvironmentFileServers(fp, ServerType.Cassandra)
+        writeEnvironmentFileServers(fp, ServerType.Stargate)
 
         fp.appendln()
 

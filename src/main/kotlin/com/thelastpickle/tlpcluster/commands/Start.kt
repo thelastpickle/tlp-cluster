@@ -3,6 +3,7 @@ package com.thelastpickle.tlpcluster.commands
 import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Context
+import com.thelastpickle.tlpcluster.configuration.NodeFilter
 import com.thelastpickle.tlpcluster.containers.Pssh
 import com.thelastpickle.tlpcluster.configuration.ServerType
 import java.io.File
@@ -26,23 +27,42 @@ class Start(val context: Context) : ICommand {
         val failureMessage = "service failed to started"
 
         var serviceName = "cassandra"
-        parallelSsh.startService(ServerType.Cassandra, serviceName).fold({
+        parallelSsh.startService(ServerType.Cassandra, serviceName, NodeFilter.ALL).fold({
             println("$serviceName $successMessage")}, {
             println("$serviceName $failureMessage. ${it.message}")
             return
         })
 
         val monitoringHost = context.tfstate.getHosts(ServerType.Monitoring)
-        val cassandraHosts = context.tfstate.getHosts(ServerType.Cassandra)
+        val stargateHost = context.tfstate.getHosts(ServerType.Stargate)
+
+        serviceName = "stargate_first"
+        if (stargateHost.count() > 0) {
+            // Start the first target node
+            parallelSsh.startStargateService(NodeFilter.FIRST).fold({
+                println("$serviceName $successMessage")}, {
+                println("$serviceName $failureMessage. ${it.message}")
+                return
+            })
+        }
+
+        serviceName = "stargate_all"
+        if (stargateHost.count() > 1) {
+            parallelSsh.startStargateService(NodeFilter.ALL_BUT_FIRST).fold({
+                println("$serviceName $successMessage")}, {
+                println("$serviceName $failureMessage. ${it.message}")
+                return
+            })
+        }
 
         if (monitoringHost.count() > 0) {
 
             serviceName = "prometheus"
-            parallelSsh.startService(ServerType.Monitoring, serviceName).fold({
+            parallelSsh.startService(ServerType.Monitoring, serviceName, NodeFilter.ALL).fold({
                 println("$serviceName $successMessage")
 
                 serviceName = "grafana-server"
-                parallelSsh.startService(ServerType.Monitoring, serviceName).fold({
+                parallelSsh.startService(ServerType.Monitoring, serviceName, NodeFilter.ALL).fold({
                     println("Grafana started")
 
                     println("$serviceName $successMessage")

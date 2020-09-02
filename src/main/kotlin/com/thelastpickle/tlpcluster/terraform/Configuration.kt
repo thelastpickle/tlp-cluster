@@ -30,17 +30,16 @@ class Configuration(val ticket: String,
 
     var cassandraInstanceType = "m5d.xlarge"
 
+    // stargate
+    var numStargateInstances = 1
+    var stargateInstanceType = "c3.2xlarge"
+
     // stress
     var numStressInstances = 0
-
     var stressInstanceType = "c3.2xlarge"
 
     //monitoring
     var monitoringInstanceType = "c3.2xlarge"
-
-    var regionObj = regionLookup.get(region)!!
-
-    var monitoringAMI = regionObj.getAmi(monitoringInstanceType)
 
     private val config  = TerraformConfig(region, context.userConfig.awsAccessKey, context.userConfig.awsSecret)
 
@@ -95,7 +94,9 @@ class Configuration(val ticket: String,
         val regionObj = regionLookup.get(region)!!
 
         var cassandraAMI = regionObj.getAmi(cassandraInstanceType)
+        var stargateAMI = regionObj.getAmi(stargateInstanceType)
         val stressAMI = regionObj.getAmi(stressInstanceType)
+        var monitoringAMI = regionObj.getAmi(monitoringInstanceType)
 
         setVariable("email", email)
         setVariable("key_name", context.userConfig.keyName)
@@ -131,6 +132,13 @@ class Configuration(val ticket: String,
             numCassandraInstances,
             listOf(instanceSg.name),
             setTagName(tags, ServerType.Cassandra))
+        setInstanceResource(
+            "stargate",
+            stargateAMI,
+            stargateInstanceType,
+            numStargateInstances,
+            listOf(instanceSg.name),
+            setTagName(tags, ServerType.Stargate))
         setInstanceResource(
             "stress",
             stressAMI,
