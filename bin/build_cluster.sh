@@ -6,7 +6,7 @@ BASE_CLUSTER_DIR="$(dirname "$dir")"
 shopt -s expand_aliases || setopt aliases
 
 export STRESS_NODES=0
-export CASSANDRA_VERSION=3.11.5
+export CASSANDRA_VERSION=3.11.8
 export CLUSTER_NAME=test_cluster
 export GC=CMS
 export HEAP=8
@@ -284,8 +284,8 @@ do
     echo "Installing packages (attempt $attempts)"
     tlp-cluster install > install.log 2>&1 || echo "meh... install phase seem to have failed"
     grep "try rerunning the install" install.log > /dev/null 2>&1
-    success=$? # 0 means we found errors in the logs, so we need to try again 
-    attempts=$((attempts+1))    
+    success=$? # 0 means we found errors in the logs, so we need to try again
+    attempts=$((attempts+1))
 done
 
 if [ $success -eq  0 ]

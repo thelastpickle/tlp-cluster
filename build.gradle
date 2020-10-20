@@ -99,14 +99,11 @@ dependencies {
 
     testCompile "io.mockk:mockk:1.9.3"
 
-    implementation project(":dashboards")
     implementation project(":core")
     implementation project(":aws-import")
 }
 
 build.dependsOn(":docker-pssh:buildDocker")
-build.dependsOn(":docker-grafonnet:buildDocker")
-build.dependsOn(":dashboards:generateDashboards")
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
@@ -249,8 +246,6 @@ compileKotlin.dependsOn(copyRegion)
 
 build {
     dependsOn(":docker-cassandra-build:buildDocker")
-    dependsOn(":docker-grafonnet:buildDocker")
     dependsOn(":docker-pssh:buildDocker")
 
 }
-

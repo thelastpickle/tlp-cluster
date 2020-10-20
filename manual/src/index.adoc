@@ -212,33 +212,6 @@ Where:
 
 This will push the contents of the `provisioning/cassandra` directory up to each of the instances you have created and install Cassandra on them.
 
-
-== Dashboards
-
-WARNING: This documentation is _very_ rough, and needs improvment before the 1.0 release.
-
-The dashboards are built using a tool called jsonnet, with a library called grafonnet.  The jsonnet files are here: `src/dashboards/dashboards`
-
-NOTE: if you want to do anything in the dashboards, you’d need to run `./gradlew buildJsonnet` to build the container
-
-You can regenerate the dashboards using the following:
-
-```
-./gradlew generateDashboards
-```
-
-Optionally you can add the `-t` flag and Gradle will watch for changes, and rebuild the dashboards when it detects changes.
-
-They get output here: `src/main/resources/com/thelastpickle/tlpcluster/commands/origin/provisioning/monitoring/config/grafana/dashboards`
-
-There's a docker-compose file, `docker-compose-monitoring-dev.yml`, which has all the necessary configuration to start a full environment designed to make editing dashboards easier.  You can start it with:
-
-```
-./gradlew previewDashboards
-```
-
-This will start Cassandra, tlp-stress, Prometheus and Grafana.
-
 The following ports are open:
 
 [options="header"]
@@ -248,7 +221,7 @@ The following ports are open:
 |9090|Prometheus Web Interface
 |9042|Cassandra Native Protocol (cql)
 |9500|tlp-stress prometheus port
-|9501|Cassandra prometheus port
+|9103|Cassandra prometheus port
 |===
 
 
@@ -319,4 +292,3 @@ options:
 
 The cluster name is not required if the script runs from within the cluster directory created by tlp-cluster.
 AWS credentials will get uploaded to the Cassandra nodes under `/etc/medusa/credentials`.
-

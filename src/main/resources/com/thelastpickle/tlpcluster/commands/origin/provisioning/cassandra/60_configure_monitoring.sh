@@ -1,49 +1,21 @@
 #!/usr/bin/env bash
 
+set +o pipefail
+set +e
+
 echo "Configuring Cassandra monitoring"
 
-EXPORTER_AGENT_VERSION="0.12.0"
-EXPORTER_AGENT_JAR="jmx_prometheus_javaagent-${EXPORTER_AGENT_VERSION}.jar"
-
+MCAC_VERSION="0.1.11"
+EXPORTER_AGENT_NAME="datastax-mcac-agent"
 CASSANDRA_LIB="/usr/share/cassandra/lib"
 
-curl -LO https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.12.0/jmx_prometheus_javaagent-${EXPORTER_AGENT_VERSION}.jar
 
-sudo mv ${EXPORTER_AGENT_JAR} ${CASSANDRA_LIB}/
-sudo cp config.yaml /etc/cassandra/
+cd /usr/share/
+curl -LO https://github.com/datastax/metric-collector-for-apache-cassandra/releases/download/v${MCAC_VERSION}/${EXPORTER_AGENT_NAME}-${MCAC_VERSION}.tar.gz
+tar -zxf ${EXPORTER_AGENT_NAME}-${MCAC_VERSION}.tar.gz
+rm -rf ${EXPORTER_AGENT_NAME}-${MCAC_VERSION}.tar.gz
 
 
-echo "JVM_OPTS=\"\$JVM_OPTS -javaagent:${CASSANDRA_LIB}/${EXPORTER_AGENT_JAR}=9501:/etc/cassandra/config.yaml\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
+echo "MCAC_ROOT=\"/usr/share/${EXPORTER_AGENT_NAME}-${MCAC_VERSION}\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
+echo "JVM_OPTS=\"\$JVM_OPTS -javaagent:\${MCAC_ROOT}/lib/${EXPORTER_AGENT_NAME}.jar\"" | sudo tee -a /etc/cassandra/cassandra-env.sh
 echo "Finished configuring Cassandra monitoring for the Cassandra process"
-
-echo "Grabbing the node exporter for system metrics"
-
-sudo useradd --no-create-home --shell /bin/false node_exporter
-
-wget https://github.com/prometheus/node_exporter/releases/download/v0.17.0/node_exporter-0.17.0.linux-amd64.tar.gz
-
-tar zxvf node_exporter*
-sudo cp node_exporter*/node_exporter /usr/local/bin/
-
-cat <<EOF | sudo tee /etc/systemd/system/node_exporter.service
-[Unit]
-Description=Node Exporter
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-User=node_exporter
-Group=node_exporter
-Type=simple
-ExecStart=/usr/local/bin/node_exporter
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl start node_exporter
-sudo systemctl status node_exporter
-
-echo "Finished setting up node exporter"
