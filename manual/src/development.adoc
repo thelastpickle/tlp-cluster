@@ -41,10 +41,6 @@ This container builds the DEB package that installs Cassandra on a node.
 
 This subproject provides tools to perform provisioning operations in parallel on nodes in the cluster.
 
-=== docker-grafonnet
-
-This container builds the JSON files that define the Grafana dashboards.
-
 
 == Publishing
 
@@ -58,7 +54,6 @@ This container builds the JSON files that define the Grafana dashboards.
 
 # optional, if docker containers have changed
 ./gradlew :docker-cassandra-build:push
-./gradlew :docker-grafonnet:push
 ./gradlew :docker-pssh:push
 # end of optional stuff
 

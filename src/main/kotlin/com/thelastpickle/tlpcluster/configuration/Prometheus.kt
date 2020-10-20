@@ -2,8 +2,13 @@ package com.thelastpickle.tlpcluster.configuration
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.thelastpickle.tlpcluster.core.YamlDelegate
+import com.thelastpickle.tlpcluster.ubuntu.Regions
+import com.thelastpickle.tlpcluster.ubuntu.UbuntuImporter.Companion.json
+import org.apache.commons.io.IOUtils
 import java.io.File
+import java.io.InputStream
 import java.io.OutputStream
 
 
@@ -15,7 +20,7 @@ import java.io.OutputStream
  *
  * The rest is simple classes that will get taken for you automatically
  */
-class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s", fileSdConfigs = listOf()),
+class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s", scrape_timeout = "10s", fileSdConfigs = listOf()),
                  var scrape_configs: MutableList<ScrapeConfig> = mutableListOf()
 ) {
 
@@ -28,6 +33,15 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
 
                        @JsonInclude(JsonInclude.Include.NON_NULL)
                        var scrape_interval: String? = null,
+
+                       @JsonInclude(JsonInclude.Include.NON_NULL)
+                       var scrape_timeout: String? = null,
+
+                       @JsonInclude(JsonInclude.Include.NON_NULL)
+                       var metrics_path: String? = null,
+
+                       @JsonInclude(JsonInclude.Include.NON_NULL)
+                       var scheme: String? = null,
 
                        @JsonProperty("static_configs")
                        @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -95,13 +109,17 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
                                stress: List<HostInfo>,
                                fileSdConfigBaseDir: String,
                                prometheusOut: OutputStream,
-                               cassandraLabelOut: OutputStream,
-                               cassandraOSLabelOut: OutputStream,
-                               stressLabelOut: OutputStream) {
+                               stressLabelOut: OutputStream,
+                               mcacTargetsJsonOutput: OutputStream) {
 
             val config = prometheus {
+
                 scrape_config {
                     job_name = "prometheus"
+                    scrape_interval = "15s"
+                    scrape_timeout = "15s"
+                    metrics_path = "/metrics"
+                    scheme = "http"
 
                     static_config {
                         targets = listOf("localhost:9090")
@@ -110,17 +128,6 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
                 }
 
                 scrape_config {
-                    job_name = "cassandra"
-
-                    fileSdConfigs[0]["files"]?.add(fileSdConfigBaseDir + "cassandra.yml")
-
-                }
-                scrape_config {
-                    job_name = "cassandra-os"
-                    scrape_interval = "5s"
-                    fileSdConfigs[0]["files"]?.add(fileSdConfigBaseDir + "cassandra-os.yml")
-                }
-                scrape_config {
                     job_name = "stress"
                     scrape_interval = "5s"
 
@@ -128,25 +135,27 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
                 }
 
 
+
             }
+
+            // Yaml file to merge and delete ideally - for now only
+            // appending mcac.yaml we got from 00_install_prometheus.sh to prometheus.yaml file
+            // var mcac_scrape_config = yaml.readValue<ScrapeConfig>(mcacInput)
+            // config.scrape_configs.add(mcac_scrape_config)
 
             yaml.writeValue(prometheusOut, config)
 
-            val cassandraLabels = cassandra.map {
-                HostLabel("${it.address}:9501", it)
+            val cassandraMCACLabels = cassandra.map {
+                HostLabel("${it.address}:9103", it)
             }
 
-
-            val cassandraOSLabels = cassandra.map {
-                HostLabel("${it.address}:9100", it)
-            }
 
             val stressLabels = stress.map {
                 HostLabel("${it.address}:9500", it)
             }
 
-            yaml.writeValue(cassandraLabelOut, cassandraLabels)
-            yaml.writeValue(cassandraOSLabelOut, cassandraOSLabels)
+            // Monitoring - MCAC)
+            json.writeValue(mcacTargetsJsonOutput, cassandraMCACLabels)
             yaml.writeValue(stressLabelOut, stressLabels)
         }
 
@@ -171,14 +180,12 @@ fun main() {
 
     val c = listOf(HostInfo("192.168.1.1", name = "test1"), HostInfo("192.168.1.2", name = "test2"))
     val s = listOf(HostInfo("192.168.2.1"), HostInfo("192.168.2.2"))
-    val out = File("prometheus.yml").outputStream()
-    val out2 = File("cassandra.yml").outputStream()
-    val out3 = File("cassandra-os.yml").outputStream()
-    val out4 = File("stress.yml").outputStream()
+    val out1 = File("prometheus.yml").outputStream()
+    val out2 = File("stress.yml").outputStream()
+    val out3 = File("tg_mcac.json").outputStream()
+    //val in1 = File("mcac.yml").inputStream()
 
 
-    Prometheus.writeConfiguration(c, s, "prometheus_labels.yml", out, out2, out3, out4)
+    Prometheus.writeConfiguration(c, s, "prometheus_labels.yml", out1, out2, out3)
 //    Prometheus.writeLabelFile(c, s, out2)
 }
-
-

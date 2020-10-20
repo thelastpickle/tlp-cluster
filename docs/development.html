@@ -453,7 +453,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_dashboards">dashboards</a></li>
 <li><a href="#_docker_cassandra_build">docker-cassandra-build</a></li>
 <li><a href="#_docker_pssh">docker-pssh</a></li>
-<li><a href="#_docker_grafonnet">docker-grafonnet</a></li>
 </ul>
 </li>
 <li><a href="#_publishing">Publishing</a></li>
@@ -510,12 +509,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_subprojects">Subprojects</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="_dashboards">dashboards</h3>
-<div class="paragraph">
-<p>This subproject provides tools to preview the dashboards and build them using the Grafonnet Docker container (from the docker-grafonnet subproject).</p>
-</div>
-</div>
-<div class="sect2">
 <h3 id="_docker_cassandra_build">docker-cassandra-build</h3>
 <div class="paragraph">
 <p>This container builds the DEB package that installs Cassandra on a node.</p>
@@ -525,12 +518,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h3 id="_docker_pssh">docker-pssh</h3>
 <div class="paragraph">
 <p>This subproject provides tools to perform provisioning operations in parallel on nodes in the cluster.</p>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_docker_grafonnet">docker-grafonnet</h3>
-<div class="paragraph">
-<p>This container builds the JSON files that define the Grafana dashboards.</p>
 </div>
 </div>
 </div>
@@ -557,7 +544,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 
 # optional, if docker containers have changed
 ./gradlew :docker-cassandra-build:push
-./gradlew :docker-grafonnet:push
 ./gradlew :docker-pssh:push
 # end of optional stuff
 

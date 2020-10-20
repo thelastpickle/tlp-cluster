@@ -15,10 +15,15 @@ internal class PrometheusTest {
     val config = prometheus {
         global {
             scrape_interval = "15s"
+            scrape_timeout = "10s"
         }
+
         scrape_config {
             job_name = "prometheus"
-            scrape_interval = "5s"
+            scrape_interval = "15s"
+            scrape_timeout = "15s"
+            metrics_path = "/metrics"
+            scheme = "http"
 
             static_config {
                 targets = listOf("127.0.0.1:8000", "192.168.1:8000")
@@ -30,7 +35,7 @@ internal class PrometheusTest {
             scrape_interval = "5s"
 
             static_config {
-                targets = listOf("127.0.0.1:9501")
+                targets = listOf("127.0.0.1:9103")
                 relabel_config {
                     source_labels = listOf("__meta_ec2_availability_zone")
                     regex = "(.+)"
@@ -85,9 +90,8 @@ internal class PrometheusTest {
         val out = stream()
         val out2 = stream()
         val out3 = stream()
-        val out4 = stream()
 
-        Prometheus.writeConfiguration(c, s, "prometheus_labels.yml", out, out2, out3, out4)
+        Prometheus.writeConfiguration(c, s, "prometheus_labels.yml", out, out2, out3)
     }
 
 }

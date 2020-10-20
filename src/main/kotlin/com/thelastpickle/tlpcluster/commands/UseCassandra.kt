@@ -12,6 +12,7 @@ import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.io.FileFilter
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.util.*
 
 @Parameters(commandDescription = "Use a Cassandra build")
@@ -119,20 +120,22 @@ class UseCassandra(val context: Context) : ICommand {
         // TODO: possibly move the prometheus file generation to Up command, i'm not sure if we need to wait before generating it
         // if using a monitoring instance, set the hosts to pull metrics from
         val prometheusYamlLocation = "provisioning/monitoring/config/prometheus/prometheus.yml"
-        val prometheusOutput = File(prometheusYamlLocation).outputStream()
+        val prometheusOutput = FileOutputStream(prometheusYamlLocation, true)
 
         val labelBaseLocation = "provisioning/monitoring/config/prometheus/"
 
-        val cassandraLabelOutput = File(labelBaseLocation, "cassandra.yml").outputStream()
-        val cassandraOSLabelOutput = File(labelBaseLocation, "cassandra-os.yml").outputStream()
         val stressLabelOutput = File(labelBaseLocation, "stress.yml").outputStream()
+
+        // Monitoring MCAC stuff:
+        // val mcacRelabelInput = File(labelBaseLocation, "mcac.yml").inputStream()
+        val mcacTargetsJsonOutput = File(labelBaseLocation, "tg_mcac.json").outputStream()
 
         Prometheus.writeConfiguration(cassandraHosts.map {
             HostInfo(it.private, it.alias, rack = it.availabilityZone)
         }, stressHosts.map {
             HostInfo(it.private, it.alias, rack = it.availabilityZone)
         },
-                "/etc/prometheus/", prometheusOutput, cassandraLabelOutput, cassandraOSLabelOutput, stressLabelOutput)
+                "/etc/prometheus/", prometheusOutput, stressLabelOutput, mcacTargetsJsonOutput)
         log.debug { "Writing Prometheus YAML to $prometheusYamlLocation" }
 
         // write out the sd file
