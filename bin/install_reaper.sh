@@ -13,11 +13,22 @@ while test $# -gt 0; do
       echo "options:"
       echo "-h, --help                                  show brief help"
       echo "-b                                          Install Reaper latest beta"
+      echo "-d                                          Debian package to install"
       echo "--cluster=CLUSTER_NAME                      Cluster on which Reaper should be installed"
       exit 0
       ;;
     -b)
       export BETA=yes
+      shift
+      ;;
+    -d)
+      shift
+      if test $# -gt 0; then
+        export DEBIAN=$1
+      else
+        echo "no debian package"
+        exit 1
+      fi
       shift
       ;;
     --cluster*)
@@ -40,15 +51,22 @@ source env.sh
 echo "Installing required dependencies..."
 x_all "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y jq" > reaper.log 2>&1
 
+set -x
 if [[ "$BETA" == "yes" ]];
 then
   # Install the latest beta
   echo "Installing Reaper beta from the repo..."
   x_all "cd provisioning && latest=$(curl https://api.bintray.com/packages/thelastpickle/reaper-deb-beta/cassandra-reaper-beta/versions/_latest|jq -r '.name') && wget https://bintray.com/thelastpickle/reaper-deb-beta/download_file?file_path=reaper_\${latest}_amd64.deb -O reaper_\${latest}_amd64.deb && sudo apt-get install ./reaper_\${latest}_amd64.deb" >> reaper.log 2>&1
 else
-  # Install the latest stable
-  echo "Installing Reaper stable from the repo..."
-  x_all "cd provisioning && latest=$(curl https://api.bintray.com/packages/thelastpickle/reaper-deb/cassandra-reaper/versions/_latest|jq -r '.name') && wget https://bintray.com/thelastpickle/reaper-deb/download_file?file_path=reaper_\${latest}_amd64.deb -O reaper_\${latest}_amd64.deb && sudo apt-get install ./reaper_\${latest}_amd64.deb"  >> reaper.log 2>&1
+  if [ -n "$DEBIAN" ];
+  then
+    # Install the provided debian package
+    echo "Installing Reaper from ${DEBIAN}..."
+    scp_all $DEBIAN /home/ubuntu
+    x_all "sudo apt-get install /home/ubuntu/${DEBIAN##*/}"
+  else
+    x_all "cd provisioning && latest=$(curl https://api.bintray.com/packages/thelastpickle/reaper-deb/cassandra-reaper/versions/_latest|jq -r '.name') && wget https://bintray.com/thelastpickle/reaper-deb/download_file?file_path=reaper_\${latest}_amd64.deb -O reaper_\${latest}_amd64.deb && sudo apt-get install ./reaper_\${latest}_amd64.deb"  >> reaper.log 2>&1
+  fi
 fi
 
 x_all "sudo cp /etc/cassandra-reaper/configs/cassandra-reaper-cassandra-sidecar.yaml /etc/cassandra-reaper/cassandra-reaper.yaml"  >> reaper.log 2>&1
