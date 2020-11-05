@@ -51,6 +51,13 @@ class Up(val context: Context) : ICommand {
 
         val envFile = File("env.sh").bufferedWriter()
         context.tfstate.writeEnvironmentFile(envFile)
+        var i = 0
+        context.tfstate.getHosts(ServerType.Cassandra).forEach {
+            envFile.write("export CLUSTER_CONTACT_POINT$i=${it.public}")
+            envFile.newLine()
+            i++
+        }
+        envFile.flush()
 
         val stressEnvironmentVars = File("provisioning/stress/environment.sh").bufferedWriter()
         stressEnvironmentVars.write("#!/usr/bin/env bash")

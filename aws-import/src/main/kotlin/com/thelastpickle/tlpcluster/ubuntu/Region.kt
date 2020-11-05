@@ -14,7 +14,7 @@ data class Region(val azs: List<String>,
      * c5d.2xlarge -> c5d
      */
     fun familyClass(instance_type: String) = instance_type.split(".").first()
-    fun isInstanceRoot(instance_type: String) = familyClass(instance_type) in setOf("i3", "m5d", "m5ad", "m5dn",  "r5d", "r5ad", "r5dn", "x1e", "x1", "z1d", "p3dn", "f1", "i3en")
+    fun isInstanceRoot(instance_type: String) = familyClass(instance_type) in setOf("m3", "c3", "g2", "m1",  "m2", "d2", "i2")
 
     fun getAmi(instance_type: String) = if (isInstanceRoot(instance_type)) instance_ami else ebs_ami
 
