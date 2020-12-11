@@ -18,7 +18,7 @@ echo "Adding plugins to Grafana"
 sudo grafana-cli plugins install grafana-polystat-panel
 
 echo "Getting and adding Dashboards to Grafana"
-MCAC_VERSION="0.1.11"
+source ./mcac-version
 DASHBOARDS_FOLDER_NAME="datastax-mcac-dashboards"
 GRAFANA_DASHBOARDS_PATH="/var/lib/grafana/dashboards"
 

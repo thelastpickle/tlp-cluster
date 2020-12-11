@@ -5,7 +5,7 @@ set +e
 
 echo "Configuring Cassandra monitoring"
 
-MCAC_VERSION="0.1.11"
+source ../monitoring/mcac-version
 EXPORTER_AGENT_NAME="datastax-mcac-agent"
 CASSANDRA_LIB="/usr/share/cassandra/lib"
 
