@@ -29,7 +29,7 @@ sudo cp -r ${PACKAGE_NAME}/console_libraries ${ETC_DIR}
 
 # all configs - including MCAC
 echo "Configuring Prometheus for MCAC"
-MCAC_VERSION="0.1.11"
+source ./mcac-version
 curl -o config/prometheus/mcac.yml -L https://raw.githubusercontent.com/datastax/metric-collector-for-apache-cassandra/v${MCAC_VERSION}/dashboards/prometheus/prometheus.yaml
 # pick lines relative to job_name, remove possible next "job_name" line that could have been included, then remove 2 white spaces
 sed -i -n '/job_name:.*mcac/,/job_name:.*/p' config/prometheus/mcac.yml
