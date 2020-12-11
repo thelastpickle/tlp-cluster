@@ -1,7 +1,6 @@
 #!/bin/bash
 
 shopt -s expand_aliases || setopt aliases
-
 export STORAGE_PROVIDER="s3_us_west_oregon"
 export CREDENTIALS="$HOME/.aws/credentials"
 export CLUSTER_NAME=${PWD##*/}
@@ -16,7 +15,7 @@ while test $# -gt 0; do
       echo "-h, --help                                  show brief help"
       echo "-b, --bucket=bucket-name                    S3 storage bucket name"
       echo "-c, --credentials=/path/to/credentials      AWS credentials file"
-      echo "-s, --storage-provider=CASSANDRA_VERSION    Libcloud storage provider (s3_us_west_oregon, ...)"
+      echo "-s, --storage-provider=STORAGE_PROVIDER     Libcloud storage provider (s3_us_west_oregon, ...)"
       echo "--cluster=CLUSTER_NAME                      Cluster on which Medusa should be installed"
       echo "-p, --prefix=bucket_prefix                  Prefix for multitenant buckets (defaults to cluster name)"
       echo "--branch=git_branch                         Branch to install from the GitHub repo"
@@ -107,7 +106,7 @@ then
 fi
 source env.sh
 echo "Installing pip3..."
-x_all "sudo apt-get install python3-pip -y" > medusa.log 2>&1
+x_all "sudo apt-get install python3-pip cmake openssl libssl-dev zlib1g-dev -y" > medusa.log 2>&1
 echo "Installing Medusa..."
 x_all "sudo pip3 install cassandra-medusa[s3] --upgrade" >> medusa.log 2>&1
 

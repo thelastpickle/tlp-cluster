@@ -165,6 +165,12 @@ buildRpm {
 
 ospackage {
     os = LINUX
+    from(projectDir.toString() + '/bin') {
+        into '/opt/tlp-cluster/bin'
+        exclude 'tlp-cluster'
+        fileMode = 0755
+    }
+
     link("/usr/local/bin/tlp-cluster", "/opt/tlp-cluster/bin/tlp-cluster" )
     link("/usr/local/bin/build_cluster.sh", "/opt/tlp-cluster/bin/build_cluster.sh" )
     link("/usr/local/bin/install_reaper.sh", "/opt/tlp-cluster/bin/install_reaper.sh" )
