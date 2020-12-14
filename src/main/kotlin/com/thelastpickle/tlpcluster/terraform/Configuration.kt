@@ -118,6 +118,8 @@ class Configuration(val ticket: String,
             .withInboundRule(9090, 9090, "tcp", externalCidr, "Prometheus GUI")
             .withInboundRule(3000, 3000, "tcp", externalCidr, "Grafana GUI")
             .withInboundRule(8080, 8080, "tcp", externalCidr, "Reaper GUI")
+            .withInboundRule(9042, 9042, "tcp", externalCidr, "Cassandra CQL")
+            .withInboundRule(7199, 7199, "tcp", externalCidr, "Cassandra JMX")
             .build()
 
         setSecurityGroupResource(instanceSg)
