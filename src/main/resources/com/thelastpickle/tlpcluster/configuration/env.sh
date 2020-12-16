@@ -19,7 +19,7 @@ alias scp="scp -F $SSH_CONFIG"
 alias rsync="rsync -ave 'ssh -F $SSH_CONFIG'"
 
 x_all () {
-  echo "${SERVERS[@]}" | xargs -n 1 -P 32 -I {} ssh -F $SSH_CONFIG -A -o StrictHostKeyChecking=no -t {} $@
+  echo "${SERVERS[@]}" | tr ' ' '\n' | xargs -n 1 -P 32 -I {} ssh -F $SSH_CONFIG -A -o StrictHostKeyChecking=no -t {} $@
 }
 
 # general purpose function for executing commands on all cassandra nodes
