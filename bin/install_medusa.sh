@@ -82,6 +82,7 @@ while test $# -gt 0; do
       shift
       ;;
     --branch*)
+      shift
       export BRANCH=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
