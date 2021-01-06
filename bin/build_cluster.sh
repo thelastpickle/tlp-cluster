@@ -149,7 +149,7 @@ mkdir -p $CLUSTER_NAME
 pushd $CLUSTER_NAME
 tlp-cluster clean
 tlp-cluster init $USER $USER-${CLUSTER_NAME} "Test cluster built by $USER: ${CLUSTER_NAME}" --stress $STRESS_NODES \
-            -c $INSTANCES --instance $INSTANCE_TYPE --az a,b,c
+            -c $INSTANCES --instance $INSTANCE_TYPE --az a
 tlp-cluster up --auto-approve
 tlp-cluster use $CASSANDRA_VERSION
 
