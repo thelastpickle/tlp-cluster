@@ -14,6 +14,9 @@ RUN apt update && apt-get install -y  \
    quilt \
    rsync \
    sudo \
+   dh-python \
+   python3-distutils \
+   python3-lib2to3 \
    equivs
 
 COPY excludes.txt /
