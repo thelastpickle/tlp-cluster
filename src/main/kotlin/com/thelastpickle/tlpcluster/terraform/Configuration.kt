@@ -1,6 +1,5 @@
 package com.thelastpickle.tlpcluster.terraform
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
@@ -41,7 +40,7 @@ class Configuration(val ticket: String,
     //monitoring
     var monitoringInstanceType = "c3.2xlarge"
 
-    private val config  = TerraformConfig(region, context.userConfig.awsAccessKey, context.userConfig.awsSecret)
+    private val config  = TerraformConfig()
 
     val mapper = ObjectMapper()
 
@@ -168,18 +167,10 @@ class Configuration(val ticket: String,
     }
 }
 
-class TerraformConfig(@JsonIgnore val region: String,
-                      @JsonIgnore val accessKey: String,
-                      @JsonIgnore val secret: String) {
-
+class TerraformConfig() {
     var variable = mutableMapOf<String, Variable>()
-    val provider = mutableMapOf("aws" to Provider(region, accessKey, secret))
     val resource = AWSResource()
 }
-
-data class Provider(val region: String,
-                    val access_key: String,
-                    val secret_key: String)
 
 data class Variable(val default: Any?, val type: String? = null)
 

@@ -10,8 +10,6 @@ import com.thelastpickle.tlpcluster.VolumeMapping
 class Terraform(val context: Context) {
     private val docker = Docker(context)
 
-    private var localDirectory = "/local"
-
     fun init() : Result<String> {
         return execute("init")
     }
@@ -41,6 +39,9 @@ class Terraform(val context: Context) {
                 .addVolume(VolumeMapping(context.cwdPath, "/local", AccessMode.rw))
                 .addVolume(VolumeMapping(context.terraformCacheDir.absolutePath, "/tcache", AccessMode.rw))
                 .addEnv("TF_PLUGIN_CACHE_DIR=/tcache")
-                .runContainer(Containers.TERRAFORM, args, localDirectory)
+                .addEnv("AWS_ACCESS_KEY_ID=${context.userConfig.awsAccessKey}")
+                .addEnv("AWS_SECRET_ACCESS_KEY=${context.userConfig.awsSecret}")
+                .addEnv("AWS_DEFAULT_REGION=${context.userConfig.region}")
+                .runContainer(Containers.TERRAFORM, args, "/local")
     }
 }
