@@ -74,18 +74,20 @@ class Up(val context: Context) : ICommand {
         stressEnvironmentVars.flush()
         stressEnvironmentVars.close()
 
-        // Write Stargate environment variables
-        val stargateEnvironmentVars = File("provisioning/stargate/environment.sh").bufferedWriter()
-        stargateEnvironmentVars.write("#!/usr/bin/env bash")
-        stargateEnvironmentVars.newLine()
+        if (context.tfstate.getHosts(ServerType.Stargate).size > 0) {
+            // Write Stargate environment variables
+            val stargateEnvironmentVars = File("provisioning/stargate/environment.sh").bufferedWriter()
+            stargateEnvironmentVars.write("#!/usr/bin/env bash")
+            stargateEnvironmentVars.newLine()
 
-        val cassandraHost = context.tfstate.getHosts(ServerType.Cassandra).first().private
-        stargateEnvironmentVars.write("export CASSANDRA_SEED=$cassandraHost")
-        stargateEnvironmentVars.newLine()
-        val stargateHost = context.tfstate.getHosts(ServerType.Stargate).first().private
-        stargateEnvironmentVars.write("export STARGATE_SEED=$stargateHost")
-        stargateEnvironmentVars.flush()
-        stargateEnvironmentVars.close()
+            val cassandraHost = context.tfstate.getHosts(ServerType.Cassandra).first().private
+            stargateEnvironmentVars.write("export CASSANDRA_SEED=$cassandraHost")
+            stargateEnvironmentVars.newLine()
+            val stargateHost = context.tfstate.getHosts(ServerType.Stargate).first().private
+            stargateEnvironmentVars.write("export STARGATE_SEED=$stargateHost")
+            stargateEnvironmentVars.flush()
+            stargateEnvironmentVars.close()
+        }
     }
 
 }
