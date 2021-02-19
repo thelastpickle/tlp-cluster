@@ -10,21 +10,20 @@ import com.thelastpickle.tlpcluster.ubuntu.Regions
 import java.io.File
 import java.net.URL
 
-class Configuration(val ticket: String,
-                    val client: String,
-                    val purpose: String,
-                    val until: String,
-                    var region: String,
-                    var context: Context) {
+class Configuration(val clusterName: String,
+                    description: String,
+                    until: String,
+                    val region: String,
+                    val context: Context) {
 
     val regionLookup = Regions.load()
 
     var numCassandraInstances = 3
     var email = context.userConfig.email
 
-    val tags = mutableMapOf("ticket" to ticket,
-        "client" to client,
-        "purpose" to purpose,
+    val tags = mutableMapOf(
+        "clusterName" to clusterName,
+        "description" to description,
         "email" to email,
         "NeededUntil" to until)
 
@@ -85,7 +84,7 @@ class Configuration(val ticket: String,
 
     private fun setTagName(tags: Map<String, String>, nodeType: ServerType) : MutableMap<String, String> {
         val newTags = HashMap<String, String>(tags).toMutableMap()
-        newTags["Name"] = "${ticket}_${nodeType.serverType}"
+        newTags["Name"] = "${clusterName}_${nodeType.serverType}"
         return newTags
     }
 
@@ -93,10 +92,10 @@ class Configuration(val ticket: String,
     private fun build() : Configuration {
         val regionObj = regionLookup.get(region)!!
 
-        var cassandraAMI = regionObj.getAmi(cassandraInstanceType)
-        var stargateAMI = regionObj.getAmi(stargateInstanceType)
+        val cassandraAMI = regionObj.getAmi(cassandraInstanceType)
+        val stargateAMI = regionObj.getAmi(stargateInstanceType)
         val stressAMI = regionObj.getAmi(stressInstanceType)
-        var monitoringAMI = regionObj.getAmi(monitoringInstanceType)
+        val monitoringAMI = regionObj.getAmi(monitoringInstanceType)
 
         setVariable("email", email)
         setVariable("key_name", context.userConfig.keyName)
@@ -112,7 +111,7 @@ class Configuration(val ticket: String,
         val unixTime = System.currentTimeMillis() / 1000L
 
         val instanceSg = SecurityGroupResource.Builder()
-            .newSecurityGroupResource("${ticket}_TlpClusterSG_$unixTime","tlp-cluster ${ticket} security group", tags)
+            .newSecurityGroupResource("${clusterName}_TlpClusterSG_$unixTime","tlp-cluster ${clusterName} security group", tags)
             .withOutboundRule(0, 65535, "tcp", listOf("0.0.0.0/0"), "All traffic")
             .withInboundRule(22, 22, "tcp", externalCidr, "SSH")
             .withInboundSelfRule(0, 65535, "tcp", "Intra node")

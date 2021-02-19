@@ -6,6 +6,7 @@ import com.github.ajalt.mordant.TermColors
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.commands.converters.AZConverter
 import com.thelastpickle.tlpcluster.configuration.Dashboards
+import com.thelastpickle.tlpcluster.configuration.ServerType
 import org.reflections.Reflections
 import org.reflections.scanners.ResourcesScanner
 import java.io.File
@@ -26,14 +27,14 @@ sealed class CopyResourceResult {
 class Init(val context: Context) : ICommand {
 
 
-    @Parameter(description = "Client, Ticket, Purpose", required = true, arity = 3)
+    @Parameter(description = "Cluster Name, Description", required = true, arity = 2)
     var tags = mutableListOf<String>()
 
     @Parameter(description = "Number of Cassandra instances", names = ["--cassandra", "-c"])
     var cassandraInstances = 3
 
     @Parameter(description = "Number of Stargate instances", names = ["--stargate", "-g"])
-    var stargateInstances = 1
+    var stargateInstances = 0
 
     @Parameter(description = "Number of stress instances", names = ["--stress", "-s"])
     var stressInstances = 0
@@ -59,13 +60,11 @@ class Init(val context: Context) : ICommand {
     override fun execute() {
         println("Initializing directory")
 
-        val client = tags[0]
-        val ticket = tags[1]
-        val purpose = tags[2]
+        val clusterName = tags[0]
+        val description = tags[1]
 
-        check(client.isNotBlank())
-        check(ticket.isNotBlank())
-        check(purpose.isNotBlank())
+        check(clusterName.isNotBlank())
+        check(description.isNotBlank())
 
         val allowedTypes = listOf("m1", "m3", "t1", "c1", "c3", "cc2", "cr1", "m2", "r3", "d2", "hs1", "i2", "c5", "m5", "t3")
 
@@ -88,7 +87,7 @@ class Init(val context: Context) : ICommand {
         println("Copying provisioning files")
 
 
-        var config = initializeDirectory(client, ticket, purpose, until)
+        val config = initializeDirectory(clusterName, description, until)
 
         config.numCassandraInstances = cassandraInstances
         config.numStressInstances = stressInstances
@@ -97,19 +96,23 @@ class Init(val context: Context) : ICommand {
         config.stressInstanceType = stressInstanceType
         config.stargateInstanceType = stargateInstanceType
 
-        config.setVariable("client", client)
-        config.setVariable("ticket", ticket)
-        config.setVariable("purpose", purpose)
+        config.setVariable("ClusterName", clusterName)
+        config.setVariable("Description", description)
         config.setVariable("NeededUntil", until)
 
-        if(azs.isNotEmpty()) {
+        if (azs.isNotEmpty()) {
             println("Overriding default az list with $azs")
             config.azs = expand(context.userConfig.region, azs)
         }
 
         writeTerraformConfig(config)
 
-        println("Your workspace has been initialized with $cassandraInstances Cassandra instances (${config.cassandraInstanceType}) and $stressInstances stress instances in ${context.userConfig.region}")
+        println(
+            "Your workspace has been initialized with " +
+            " ${generateInstanceMessage(cassandraInstances, cassandraInstanceType, ServerType.Cassandra)}," +
+            " ${generateInstanceMessage(stargateInstances, stargateInstanceType, ServerType.Stargate)}, and" +
+            " ${generateInstanceMessage(stressInstances, stressInstanceType, ServerType.Stress)}" +
+            " in ${context.userConfig.region}")
 
         if(start) {
             Up(context).execute()
@@ -120,8 +123,14 @@ class Init(val context: Context) : ICommand {
         }
     }
 
+    private fun generateInstanceMessage(numberInstances: Int, instanceType: String, serverType:ServerType) : String {
+        val instanceTypeInfo = if (numberInstances > 0) " ($instanceType)" else ""
+        val plural = if (numberInstances == 1) "" else "s"
 
-    fun initializeDirectory(client: String, ticket: String, purpose: String, until: String) : Configuration {
+        return "$numberInstances $serverType instance$plural$instanceTypeInfo"
+    }
+
+    fun initializeDirectory(clusterName: String, description: String, until: String) : Configuration {
         val reflections = Reflections("com.thelastpickle.tlpcluster.commands.origin", ResourcesScanner())
         val provisioning = reflections.getResources(".*".toPattern())
 
@@ -160,7 +169,7 @@ class Init(val context: Context) : ICommand {
         val dash = Dashboards(dashboardLocation)
         dash.copyDashboards()
 
-        return Configuration(ticket, client, purpose, until, context.userConfig.region , context = context)
+        return Configuration(clusterName, description, until, context.userConfig.region , context = context)
     }
 
 

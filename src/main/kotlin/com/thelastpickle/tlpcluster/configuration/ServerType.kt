@@ -6,7 +6,3 @@ enum class ServerType(val serverType: String, val shortServerType: String) {
     Stress("stress", "s"),
     Monitoring("monitoring", "m"),
 }
-
-enum class NodeFilter {
-    ALL, FIRST, ALL_BUT_FIRST
-}

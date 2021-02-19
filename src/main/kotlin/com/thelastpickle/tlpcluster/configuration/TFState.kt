@@ -21,8 +21,6 @@ class TFState(val context: Context,
         }
     }
 
-
-
     fun getHosts(serverType: ServerType) : HostList {
         val nodes = tree.path("modules")
                         .first()
@@ -32,7 +30,7 @@ class TFState(val context: Context,
         val resources = context.json.convertValue(nodes, Map::class.java)
 
 
-        for((name, resource) in resources.entries) {
+        for ((name, resource) in resources.entries) {
             resource as Map<String, *>
 
             val attrs = (resource.get("primary") as LinkedHashMap<*, *>).get("attributes") as LinkedHashMap<String, String>
@@ -43,10 +41,10 @@ class TFState(val context: Context,
 
             val serverName = name as String?
 
-            if(public != null && private != null && serverName != null) {
+            if (public != null && private != null && serverName != null) {
 
-                if(serverName.contains(serverType.serverType)) {
-                    val host = Host.fromTerraformString(serverName as String, public, private, az as String)
+                if (serverName.contains(serverType.serverType)) {
+                    val host = Host.fromTerraformString(serverName, public, private, az as String)
                     log.info { "Adding host: $host" }
                     result.add(host)
                 }

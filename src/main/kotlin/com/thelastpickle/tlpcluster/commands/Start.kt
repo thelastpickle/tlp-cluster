@@ -1,11 +1,9 @@
 package com.thelastpickle.tlpcluster.commands
 
-import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Context
-import com.thelastpickle.tlpcluster.configuration.NodeFilter
+import com.thelastpickle.tlpcluster.configuration.*
 import com.thelastpickle.tlpcluster.containers.Pssh
-import com.thelastpickle.tlpcluster.configuration.ServerType
 import java.io.File
 
 @Parameters(commandDescription = "Start cassandra on all nodes via service command")
@@ -39,7 +37,8 @@ class Start(val context: Context) : ICommand {
         serviceName = "stargate_first"
         if (stargateHost.count() > 0) {
             // Start the first target node
-            parallelSsh.startStargateService(NodeFilter.FIRST).fold({
+//            parallelSsh.startStargateService(NodeFilter.FIRST).fold({
+            parallelSsh.startService(ServerType.Stargate, serviceName, NodeFilter.FIRST).fold({
                 println("$serviceName $successMessage")}, {
                 println("$serviceName $failureMessage. ${it.message}")
                 return
@@ -48,37 +47,35 @@ class Start(val context: Context) : ICommand {
 
         serviceName = "stargate_all"
         if (stargateHost.count() > 1) {
-            parallelSsh.startStargateService(NodeFilter.ALL_BUT_FIRST).fold({
+//            parallelSsh.startStargateService(NodeFilter.ALL_BUT_FIRST).fold({
+            parallelSsh.startService(ServerType.Stargate, serviceName, NodeFilter.ALL_BUT_FIRST).fold({
                 println("$serviceName $successMessage")}, {
                 println("$serviceName $failureMessage. ${it.message}")
                 return
             })
         }
 
-        if (monitoringHost.count() > 0) {
+        serviceName = "prometheus"
+        parallelSsh.startService(ServerType.Monitoring, serviceName, NodeFilter.ALL).fold({
+            println("$serviceName $successMessage")
 
-            serviceName = "prometheus"
+            serviceName = "grafana-server"
             parallelSsh.startService(ServerType.Monitoring, serviceName, NodeFilter.ALL).fold({
+                println("Grafana started")
+
                 println("$serviceName $successMessage")
-
-                serviceName = "grafana-server"
-                parallelSsh.startService(ServerType.Monitoring, serviceName, NodeFilter.ALL).fold({
-                    println("Grafana started")
-
-                    println("$serviceName $successMessage")
-                    println("""
+                println("""
 You can access the monitoring UI using the following URLs:
- - Prometheus: http://${monitoringHost.first().public}:9090
- - Grafana:    http://${monitoringHost.first().public}:3000
-                        """)
-                }, {
-                    // error starting grafana
-                    println("$serviceName $failureMessage. ${it.message}")
-                })
+- Prometheus: http://${monitoringHost.first().public}:9090
+- Grafana:    http://${monitoringHost.first().public}:3000
+                    """)
             }, {
-                // error starting prometheus
+                // error starting grafana
                 println("$serviceName $failureMessage. ${it.message}")
             })
-        }
+        }, {
+            // error starting prometheus
+            println("$serviceName $failureMessage. ${it.message}")
+        })
     }
 }
