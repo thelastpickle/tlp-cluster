@@ -200,7 +200,6 @@ pushd $CLUSTER_NAME
 tlp-cluster clean
 set -x
 tlp-cluster init \
-  $USER \
   $USER-${CLUSTER_NAME} \
   "Test cluster built by $USER: ${CLUSTER_NAME}" \
     --stress $STRESS_NODES \
