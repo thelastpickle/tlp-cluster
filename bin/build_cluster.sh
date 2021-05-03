@@ -14,6 +14,7 @@ export HEAP=8
 export INSTANCES=3
 export INSTANCE_TYPE=m3.xlarge
 export STARGATE_INSTANCE_TYPE=c3.2xlarge
+export STRESS_INSTANCE_TYPE=c3.2xlarge
 export JDK=8
 export BYPASS_PAUSE=n
 
@@ -189,6 +190,11 @@ while test $# -gt 0; do
   esac
 done
 
+if [[ $INSTANCE_TYPE == *".large" ]]
+then
+  HEAP=4
+fi
+
 mkdir -p $CLUSTER_NAME
 pushd $CLUSTER_NAME
 tlp-cluster clean
@@ -224,13 +230,15 @@ cp $BASE_CLUSTER_DIR/bin/build-cluster/jvm11-server.options.template ./provision
 export JVM_OPTIONS_FILE="jvm.options"
 if [[ $CASSANDRA_VERSION == "4."* ]]
 then
-  JVM_OPTIONS_FILE="jvm11-server.options"
+  JVM_OPTIONS_FILE="jvm8-server.options"
   if [[ $JDK == "11"* ]]
   then
+    JVM_OPTIONS_FILE="jvm11-server.options"
     cp $BASE_CLUSTER_DIR/bin/build-cluster/20_java_11.sh ./provisioning/cassandra/20_java.sh
   fi
   if [[ $JDK == "14"* ]]
   then
+    JVM_OPTIONS_FILE="jvm11-server.options"
     cp $BASE_CLUSTER_DIR/bin/build-cluster/20_java_14.sh ./provisioning/cassandra/20_java.sh
   fi
 fi
