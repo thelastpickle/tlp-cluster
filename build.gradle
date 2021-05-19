@@ -33,7 +33,7 @@ apply plugin: "nebula.ospackage"
 apply plugin: 'nebula.ospackage-application'
 
 group 'com.thelastpickle'
-version '0.7-SNAPSHOT'
+version '0.7'
 sourceCompatibility = 1.8
 
 ext {
@@ -189,6 +189,16 @@ buildDeb {
     requires("openjdk-8-jre")
 }
 
+def buildDir = project.projectDir.toString() + '/build/distributions'
+
+def cloudsmithApi = [
+        'docker',
+        'run',
+        '-e', 'CLOUDSMITH_API_KEY=' + System.getenv("CLOUDSMITH_API_KEY"),
+        '-v', buildDir + ":/build",
+        'luigidifraia/cloudsmithcli:v1.0.4'
+]
+
 task uploadDeb(type: Exec) {
     group = "Publish"
     workingDir 'build/distributions'
@@ -198,8 +208,14 @@ task uploadDeb(type: Exec) {
     // get the deb package
 
     logger.info("Uploading DEB $debPackage")
-    commandLine "curl", "-T", debPackage, "-u", System.getenv("BINTRAY_USER") + ":" + System.getenv("BINTRAY_KEY"), "https://api.bintray.com/content/thelastpickle/tlp-tools-deb/tlp-cluster/${version}/$debPackage;deb_distribution=weezy,bionic,jessie,xenial;deb_component=main;deb_architecture=amd64;publish=1"
 
+    def pushDeb = cloudsmithApi + [
+            'push',
+            'deb',
+            'thelastpickle/tlp-cluster/any-distro/any-version',
+            '/build/' + debPackage
+    ]
+    commandLine(pushDeb)
 }
 
 task uploadRpm(type: Exec) {
@@ -208,8 +224,15 @@ task uploadRpm(type: Exec) {
 
     def rpmPackage = "tlp-cluster-${version}.noarch.rpm"
 
+    def pushRpm = cloudsmithApi + [
+            'push',
+            'rpm',
+            'thelastpickle/tlp-cluster/any-distro/any-version',
+            '/build/' + rpmPackage
+    ]
+
     logger.info("Uploading RPM $rpmPackage")
-    commandLine "curl", "-T", rpmPackage, "-u", System.getenv("BINTRAY_USER") + ":" + System.getenv("BINTRAY_KEY"), "https://api.bintray.com/content/thelastpickle/tlp-tools-rpm/tlp-cluster/${version}/$rpmPackage;publish=1"
+    commandLine(pushRpm)
 }
 
 task uploadTar(type:Exec) {
@@ -217,8 +240,15 @@ task uploadTar(type:Exec) {
     workingDir 'build/distributions'
     def tarball = "tlp-cluster-${version}.tar"
 
+    def pushTar = cloudsmithApi + [
+            'push',
+            'raw',
+            'thelastpickle/tlp-cluster',
+            '/build/' + tarball
+    ]
+
     logger.info("Uploading Tar $tarball")
-    commandLine "curl", "-T", tarball, "-u", System.getenv("BINTRAY_USER") + ":" + System.getenv("BINTRAY_KEY"), "https://api.bintray.com/content/thelastpickle/tlp-tools-tarball/tlp-cluster/${version}/$tarball;publish=1"
+    commandLine(pushTar)
 }
 
 task buildAll {
