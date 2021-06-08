@@ -20,9 +20,14 @@ class Stop(val context: Context) : ICommand {
             return
         }
 
-        println("Stopping cassandra service on all nodes.")
         val parallelSsh = Pssh(context, sshKeyPath)
 
+        if (context.tfstate.getHosts(ServerType.Stargate).count() > 0) {
+            println("Stopping Stargate service on all nodes.")
+            parallelSsh.stopService(ServerType.Stargate, "stargate")
+        }
+
+        println("Stopping Cassandra service on all nodes.")
         parallelSsh.stopService(ServerType.Cassandra, "cassandra")
 
         if (context.tfstate.getHosts(ServerType.Monitoring).count() > 0) {

@@ -8,7 +8,7 @@ RUN apt update && apt-get install -y  \
    git \
    openjdk-8-jdk \
    debhelper \
-   python-dev \
+   python3-dev \
    dpatch \
    bash-completion \
    quilt \

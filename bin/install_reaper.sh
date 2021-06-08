@@ -56,7 +56,7 @@ if [[ "$BETA" == "yes" ]];
 then
   # Install the latest beta
   echo "Installing Reaper beta from the repo..."
-  x_all "cd provisioning && latest=$(curl https://api.bintray.com/packages/thelastpickle/reaper-deb-beta/cassandra-reaper-beta/versions/_latest|jq -r '.name') && wget https://bintray.com/thelastpickle/reaper-deb-beta/download_file?file_path=reaper_\${latest}_amd64.deb -O reaper_\${latest}_amd64.deb && sudo apt-get install ./reaper_\${latest}_amd64.deb" >> reaper.log 2>&1
+  x_all "cd provisioning && wget https://dl.cloudsmith.io/public/thelastpickle/reaper/deb/any-distro/pool/any-version/main/r/re/reaper_2.2.5_amd64.deb -O reaper_2.2.5_amd64.deb && sudo apt-get install ./reaper_2.2.5_amd64.deb" >> reaper.log 2>&1
 else
   if [ -n "$DEBIAN" ];
   then

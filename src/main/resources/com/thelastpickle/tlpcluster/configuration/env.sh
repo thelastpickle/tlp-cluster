@@ -19,12 +19,24 @@ alias scp="scp -F $SSH_CONFIG"
 alias rsync="rsync -ave 'ssh -F $SSH_CONFIG'"
 
 x_all () {
-  echo "${SERVERS[@]}" | tr ' ' '\n' | xargs -n 1 -P 32 -I {} ssh -F $SSH_CONFIG -A -o StrictHostKeyChecking=no -t {} $@
+  echo "${CASSANDRA_SERVERS[@]}" | tr ' ' '\n' | xargs -n 1 -P 32 -I {} ssh -F $SSH_CONFIG -A -o StrictHostKeyChecking=no -t {} $@
+}
+
+sg_x_all () {
+  echo "${STARGATE_SERVERS[@]}" | tr ' ' '\n' | xargs -n 1 -P 32 -I {} ssh -F $SSH_CONFIG -A -o StrictHostKeyChecking=no -t {} $@
 }
 
 # general purpose function for executing commands on all cassandra nodes
 c_all () {
-    for i in "${SERVERS[@]}"
+    for i in "${CASSANDRA_SERVERS[@]}"
+    do
+        ssh $i $@
+    done
+}
+
+# general purpose function for executing commands on all stargate nodes
+sg_all () {
+    for i in "${STARGATE_SERVERS[@]}"
     do
         ssh $i $@
     done
@@ -32,7 +44,15 @@ c_all () {
 
 # general purpose function for uploading files on all cassandra nodes
 scp_all () {
-    for i in "${SERVERS[@]}"
+    for i in "${CASSANDRA_SERVERS[@]}"
+    do
+        scp $1 $i:$2
+    done
+}
+
+# general purpose function for uploading files on all stargate nodes
+sg_scp_all () {
+    for i in "${STARGATE_SERVERS[@]}"
     do
         scp $1 $i:$2
     done
@@ -55,7 +75,7 @@ c_collect_artifacts() {
     
     echo $NAME > $ARTIFACT_DIR/issue.txt
 
-    for i in "${SERVERS[@]}"
+    for i in "${CASSANDRA_SERVERS[@]}"
     do
         echo "Collecting $i"
         NODE_ARTIFACT_DIR=$ARTIFACT_DIR/extracted/$i

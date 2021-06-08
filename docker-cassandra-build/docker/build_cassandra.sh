@@ -24,3 +24,4 @@ dpkg-buildpackage -uc -us
 cp ../cassandra*all.deb /builds/deb/
 cp -R debian/cassandra/etc/cassandra/* /builds/conf/
 
+grep "name=\"base.version\"" build.xml | cut -d'"' -f4 > /builds/cassandra.version

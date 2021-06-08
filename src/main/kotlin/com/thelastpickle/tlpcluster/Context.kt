@@ -8,6 +8,7 @@ import com.github.dockerjava.netty.NettyDockerCmdExecFactory
 import com.thelastpickle.tlpcluster.configuration.TFState
 import com.thelastpickle.tlpcluster.configuration.User
 import com.thelastpickle.tlpcluster.core.YamlDelegate
+import com.thelastpickle.tlpcluster.terraform.TFJson
 import org.apache.logging.log4j.kotlin.logger
 import java.io.File
 import java.nio.file.Files
@@ -90,6 +91,7 @@ data class Context(val tlpclusterUserDirectory: File) {
     val cwdPath = System.getProperty("user.dir")
 
     val tfstate by lazy { TFState.parse(this, File(cwdPath, "terraform.tfstate")) }
+    val tfjson by lazy { TFJson.parse(this, File(cwdPath, "terraform.tf.json")) }
     val home = File(System.getProperty("user.home"))
     
 

@@ -47,7 +47,7 @@ internal class CassandraUnpackTest {
 
     @Test
     fun getURL() {
-        val expected = "http://dl.bintray.com/apache/cassandra/pool/main/c/cassandra/cassandra_2.1.14_all.deb"
+        val expected = "https://downloads.apache.org/cassandra/debian/pool/main/c/cassandra/cassandra_2.1.14_all.deb"
         assertThat(unpacker.getURL()).isEqualTo(expected)
     }
 
