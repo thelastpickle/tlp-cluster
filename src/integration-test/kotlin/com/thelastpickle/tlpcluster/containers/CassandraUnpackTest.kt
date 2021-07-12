@@ -15,7 +15,7 @@ class CassandraUnpackTest {
     @Test
     fun testCache() {
         val cache = Files.createTempDirectory("cache")
-        unpacker = CassandraUnpack(context, "2.1.14", downloadDir, Optional.of(cache))
+        unpacker = CassandraUnpack(context, "3.11.10", downloadDir, Optional.of(cache))
         unpacker.download()
         Assertions.assertThat(unpacker.cacheHits).isEqualTo(0)
         Assertions.assertThat(unpacker.cacheChecks).isEqualTo(1)
@@ -46,7 +46,7 @@ class CassandraUnpackTest {
         }
 
         downloadDir = Files.createTempDirectory(downloadLocation.toPath(),  "test")
-        unpacker = CassandraUnpack(context, "2.1.14", downloadDir)
+        unpacker = CassandraUnpack(context, "3.11.10", downloadDir)
     }
 
     @AfterEach
@@ -58,7 +58,7 @@ class CassandraUnpackTest {
     fun ensureDownloadCreatesDebPackageAndConfFiles() {
         unpacker.download()
 
-        Assertions.assertThat(File(downloadDir.toFile(), "cassandra_2.1.14_all.deb")).isFile()
+        Assertions.assertThat(File(downloadDir.toFile(), "cassandra_3.11.10_all.deb")).isFile()
         Assertions.assertThat(File(downloadDir.toFile(), "conf")).exists()
 
         unpacker.extractConf()

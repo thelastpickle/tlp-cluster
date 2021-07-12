@@ -64,6 +64,6 @@ class CassandraUnpack(val context: Context,
         )
     }
 
-    fun getURL() = "https://archive.apache.org/dist/cassandra/3.11.7/debian/" + getFileName()
+    fun getURL() = "https://archive.apache.org/dist/cassandra/${version}/debian/" + getFileName()
     fun getFileName() = "cassandra_${version}_all.deb"
 }

@@ -34,7 +34,7 @@ internal class CassandraUnpackTest {
         }
 
         downloadDir = Files.createTempDirectory(downloadLocation.toPath(),  "test")
-        unpacker = CassandraUnpack(context, "2.1.14", downloadDir)
+        unpacker = CassandraUnpack(context, "3.11.10", downloadDir)
     }
 
     @AfterEach
@@ -47,7 +47,7 @@ internal class CassandraUnpackTest {
 
     @Test
     fun getURL() {
-        val expected = "https://archive.apache.org/dist/cassandra/3.11.7/debian/cassandra_2.1.14_all.deb"
+        val expected = "https://archive.apache.org/dist/cassandra/3.11.10/debian/cassandra_3.11.10_all.deb"
         assertThat(unpacker.getURL()).isEqualTo(expected)
     }
 
