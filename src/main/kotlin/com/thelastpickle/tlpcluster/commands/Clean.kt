@@ -13,7 +13,8 @@ class Clean : ICommand {
                 "hosts.txt",
                 "terraform.tf.json",
                 "terraform.tfvars",
-                "sshConfig"
+                "sshConfig",
+                "env.sh"
         )
 
         for(f in toDelete) {
@@ -21,6 +22,7 @@ class Clean : ICommand {
         }
         File(".terraform").deleteRecursively()
         File("provisioning").deleteRecursively()
+        File("scripts").deleteRecursively()
     }
 
 }
