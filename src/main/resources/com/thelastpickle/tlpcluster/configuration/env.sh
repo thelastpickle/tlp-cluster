@@ -38,9 +38,9 @@ scp_all () {
     done
 }
 
-alias c_restart="c-all sudo systemctl restart cassandra.service"
+alias c_restart="c_all sudo systemctl restart cassandra.service"
 alias c_status="c0 nodetool status"
-alias c_tpstats="x-all nodetool tpstats"
+alias c_tpstats="x_all nodetool tpstats"
 
 c_collect_artifacts() {
     NAME="$1"
@@ -95,8 +95,8 @@ c_collect_artifacts() {
     done
 }
 
-alias c_start="c-all sudo systemctl start cassandra.service"
-alias c_df="x-all df -h | grep -E 'cassandra|Filesystem'"
+alias c_start="c_all sudo systemctl start cassandra.service"
+alias c_df="x_all df -h | grep -E 'cassandra|Filesystem'"
 
 c_flame() {
   HOST=$1
