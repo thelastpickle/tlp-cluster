@@ -42,8 +42,8 @@ class Docker(val context: Context) {
     }
 
     fun exists(name: String, tag: String) : Boolean {
-        val result = context.docker.listImagesCmd().withImageNameFilter("$name:$tag").exec()
-        return result.size > 0
+        val result = context.docker.listImagesCmd().exec().filter { it.repoTags.contains("$name:$tag") }
+        return result.isNotEmpty()
     }
 
     internal fun pullImage(container: Containers) {
