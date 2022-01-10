@@ -16,6 +16,9 @@ class Configuration(val clusterName: String,
                     val region: String,
                     val context: Context) {
 
+    // @TODO: Make Terraform create VPC and subnets
+    val vpcId = "vpc-02111b05674725453"
+
     val regionLookup = Regions.load()
 
     var numCassandraInstances = 3
@@ -101,9 +104,6 @@ class Configuration(val clusterName: String,
         setVariable("key_name", context.userConfig.keyName)
         setVariable("key_path", context.userConfig.sshKeyPath)
         setVariable("region", region)
-
-
-
         setVariable("zones", Variable(azs))
 
         val externalCidr = listOf("${getExternalIpAddress()}/32")
@@ -111,7 +111,11 @@ class Configuration(val clusterName: String,
         val unixTime = System.currentTimeMillis() / 1000L
 
         val instanceSg = SecurityGroupResource.Builder()
-            .newSecurityGroupResource("${clusterName}_TlpClusterSG_$unixTime","tlp-cluster ${clusterName} security group", tags)
+//            .newSecurityGroupResource("${clusterName}_TlpClusterSG_$unixTime","tlp-cluster ${clusterName} security group", tags)
+            .withName("${clusterName}_TlpClusterSG_$unixTime")
+            .withDescription("tlp-cluster ${clusterName} security group")
+            .withVpcId(vpcId)
+            .withTags(tags)
             .withOutboundRule(0, 65535, "tcp", listOf("0.0.0.0/0"), "All traffic")
             .withInboundRule(22, 22, "tcp", externalCidr, "SSH")
             .withInboundSelfRule(0, 65535, "tcp", "Intra node")
@@ -204,6 +208,7 @@ data class SecurityGroupRule(
 data class SecurityGroupResource(
     val name: String,
     val description : String,
+    val vpc_id: String,
     val tags: Map<String, String>,
     val ingress: List<SecurityGroupRule>,
     val egress: List<SecurityGroupRule>
@@ -211,9 +216,34 @@ data class SecurityGroupResource(
     class Builder {
         private var name: String = ""
         private var description: String = ""
+        private var vpc_id: String = ""
         private var tags: Map<String, String> = mutableMapOf()
         private var ingress: MutableList<SecurityGroupRule> = mutableListOf()
         private var egress: MutableList<SecurityGroupRule> = mutableListOf()
+
+        fun withName(name: String) : Builder {
+            this.name = name
+
+            return this
+        }
+
+        fun withDescription(description: String) : Builder {
+            this.description = description
+
+            return this
+        }
+
+        fun withVpcId(vpc_id: String) : Builder {
+            this.vpc_id = vpc_id
+
+            return this
+        }
+
+        fun withTags(tags: Map<String, String>) : Builder {
+            this.tags = tags
+
+            return this
+        }
 
         fun newSecurityGroupResource(name: String, description: String, tags: Map<String, String>) : Builder {
             this.name = name
@@ -250,7 +280,7 @@ data class SecurityGroupResource(
             return this
         }
 
-        fun build () = SecurityGroupResource(name, description, tags, ingress, egress)
+        fun build () = SecurityGroupResource(name, description, vpc_id, tags, ingress, egress)
     }
 }
 
