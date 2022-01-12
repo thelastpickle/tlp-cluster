@@ -7,32 +7,45 @@ shopt -s expand_aliases || setopt aliases
 
 export STRESS_NODES=0
 export CASSANDRA_VERSION=3.11.8
+export STARGATE_NODES=0
 export CLUSTER_NAME=test_cluster
 export GC=CMS
 export HEAP=8
 export INSTANCES=3
 export INSTANCE_TYPE=m3.xlarge
+export STARGATE_INSTANCE_TYPE=c3.2xlarge
+export STRESS_INSTANCE_TYPE=c3.2xlarge
 export JDK=8
 export BYPASS_PAUSE=n
+
+function usage {
+    cat << EOF
+build-cluster: automation script for tlp-cluster
+
+options:
+-h, --help                                  show brief help
+-n, --name=CLUSTER_NAME                     Cluster name
+-s, --stress=STRESS_NODES                   specify the number of stress nodes
+-g, --stargate=STARGATE_NODES               specify the number of stargate nodes
+-v, --cassandra-version=CASSANDRA_VERSION   specify the version of Cassandra to install
+-d, --extra-deb-package=EXTRA_DEB           optional deb package to install on the nodes
+-c, --cassandra-nodes=3                     number of Cassandra nodes to start (default: 3)
+-i, --instance-type=m3.xlarge               Instance type for Cassandra nodes (default: m3.xlarge)
+-t, --st-instance-type=c3.2xlarge           Instance type for Stress nodes (default: c3.2xlarge)
+--sg-instance-type=c3.2xlarge               Instance type for Stargate nodes (default: c3.2xlarge)
+--gc=G1                                     GC algorithm to use. Possible values: G1, Shenandoah, CMS, ZGC
+--heap=8                                    Heap size in GB (8, 16, 32, ...)
+--jdk=11                                    OpenJDK version to use (8, 11, 14)
+--cores=<number of cores>                   Number of cores for ConcGCThreads and ParallelGCThreads
+-y                                          Bypass the pause before running the install phase
+
+EOF
+}
+
 while test $# -gt 0; do
   case "$1" in
     -h|--help)
-      echo "build-cluster: automation script for tlp-cluster"
-      echo " "
-      echo " "
-      echo "options:"
-      echo "-h, --help                                  show brief help"
-      echo "-n, --name=CLUSTER_NAME                     Cluster name"
-      echo "-s, --stress=STRESS_NODES                   specify the number of stress nodes"
-      echo "-v, --cassandra-version=CASSANDRA_VERSION   specify the version of Cassandra to install"
-      echo "-d, --extra-deb-package=EXTRA_DEB           optional deb package to install on the nodes"
-      echo "-c, --cassandra-nodes=3                     number of Cassandra nodes to start (default: 3)"
-      echo "-i, --instance-type=r3.2xlarge              Instance type for Cassandra nodes (default: m3.xlarge)"
-      echo "--gc=G1                                     GC algorithm to use. Possible values: G1, Shenandoah, CMS, ZGC"
-      echo "--heap=8                                    Heap size in GB (8, 16, 32, ...)"
-      echo "--jdk=11                                    OpenJDK version to use (8, 11, 14)"
-      echo "--cores=<number of cores>                   Number of cores for ConcGCThreads and ParallelGCThreads"
-      echo "-y                                          Bypass the pause before running the install phase"
+      usage
       exit 0
       ;;
     -n)
@@ -61,6 +74,20 @@ while test $# -gt 0; do
       ;;
     --stress*)
       export STRESS_NODES=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+    -g)
+      shift
+      if test $# -gt 0; then
+        export STARGATE_NODES=$1
+      else
+        echo "no stargate nodes specified"
+        exit 1
+      fi
+      shift
+      ;;
+    --stargate*)
+      export STARGATE_NODES=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
     -v)
@@ -131,6 +158,24 @@ while test $# -gt 0; do
       export INSTANCE_TYPE=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
+    -t)
+      shift
+      if test $# -gt 0; then
+        export STRESS_INSTANCE_TYPE=$1
+      else
+        echo "no stress instance type specified"
+        exit 1
+      fi
+      shift
+      ;;
+    --st-instance-type*)
+      export STRESS_INSTANCE_TYPE=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
+    --sg-instance-type*)
+      export STARGATE_INSTANCE_TYPE=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
     --cores*)
       export GC_CORES=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
@@ -145,11 +190,27 @@ while test $# -gt 0; do
   esac
 done
 
+if [[ $INSTANCE_TYPE == *".large" ]]
+then
+  HEAP=4
+fi
+
 mkdir -p $CLUSTER_NAME
 pushd $CLUSTER_NAME
 tlp-cluster clean
-tlp-cluster init $USER $USER-${CLUSTER_NAME} "Test cluster built by $USER: ${CLUSTER_NAME}" --stress $STRESS_NODES \
-            -c $INSTANCES --instance $INSTANCE_TYPE --az a
+set -x
+tlp-cluster init \
+  $USER-${CLUSTER_NAME} \
+  "Test cluster built by $USER: ${CLUSTER_NAME}" \
+    --stress $STRESS_NODES \
+    --instance-stress $STRESS_INSTANCE_TYPE \
+    --cassandra $INSTANCES \
+    --instance $INSTANCE_TYPE \
+    --stargate  $STARGATE_NODES \
+    --instance-sg $STARGATE_INSTANCE_TYPE \
+    --az a
+set +x
+
 tlp-cluster up --auto-approve
 tlp-cluster use $CASSANDRA_VERSION
 
@@ -168,13 +229,15 @@ cp $BASE_CLUSTER_DIR/bin/build-cluster/jvm11-server.options.template ./provision
 export JVM_OPTIONS_FILE="jvm.options"
 if [[ $CASSANDRA_VERSION == "4."* ]]
 then
-  JVM_OPTIONS_FILE="jvm11-server.options"
+  JVM_OPTIONS_FILE="jvm8-server.options"
   if [[ $JDK == "11"* ]]
   then
+    JVM_OPTIONS_FILE="jvm11-server.options"
     cp $BASE_CLUSTER_DIR/bin/build-cluster/20_java_11.sh ./provisioning/cassandra/20_java.sh
   fi
   if [[ $JDK == "14"* ]]
   then
+    JVM_OPTIONS_FILE="jvm11-server.options"
     cp $BASE_CLUSTER_DIR/bin/build-cluster/20_java_14.sh ./provisioning/cassandra/20_java.sh
   fi
 fi
