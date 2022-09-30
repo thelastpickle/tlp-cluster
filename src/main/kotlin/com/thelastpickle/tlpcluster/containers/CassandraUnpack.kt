@@ -64,6 +64,18 @@ class CassandraUnpack(val context: Context,
         )
     }
 
-    fun getURL() = "https://downloads.apache.org/cassandra/debian/pool/main/c/cassandra/" + getFileName()
-    fun getFileName() = "cassandra_${version}_all.deb"
+    fun getURL() : String {
+        return if (version.contains("dse")) {
+            "https://debian.datastax.com/enterprise/pool/${getFileName()}"
+        } else {
+            "https://downloads.apache.org/cassandra/debian/pool/main/c/cassandra/${getFileName()}"
+        }
+    }
+    private fun getFileName() : String {
+        return if (version.contains("dse")) {
+            "${version}-1_all.deb"
+        } else {
+            "cassandra_${version}_all.deb"
+        }
+    }
 }

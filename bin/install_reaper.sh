@@ -65,7 +65,9 @@ else
     scp_all $DEBIAN /home/ubuntu
     x_all "sudo apt-get install /home/ubuntu/${DEBIAN##*/}"
   else
-    x_all "cd provisioning && latest=$(curl https://api.bintray.com/packages/thelastpickle/reaper-deb/cassandra-reaper/versions/_latest|jq -r '.name') && wget https://bintray.com/thelastpickle/reaper-deb/download_file?file_path=reaper_\${latest}_amd64.deb -O reaper_\${latest}_amd64.deb && sudo apt-get install ./reaper_\${latest}_amd64.deb"  >> reaper.log 2>&1
+    x_all "curl -1sLf 'https://dl.cloudsmith.io/public/thelastpickle/reaper/setup.deb.sh'| sudo -E bash" >> reaper.log 2>&1
+    x_all "sudo apt-get update"
+    x_all "sudo apt-get install reaper"
   fi
 fi
 

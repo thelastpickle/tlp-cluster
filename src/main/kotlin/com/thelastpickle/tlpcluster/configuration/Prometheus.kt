@@ -139,7 +139,7 @@ class Prometheus(var global: ScrapeConfig = ScrapeConfig(scrape_interval = "15s"
             }
 
             // Yaml file to merge and delete ideally - for now only
-            // appending mcac.yaml we got from 00_install_prometheus.sh to prometheus.yaml file
+            // appending mcac.yaml we got from 01_install_prometheus.sh to prometheus.yaml file
             // var mcac_scrape_config = yaml.readValue<ScrapeConfig>(mcacInput)
             // config.scrape_configs.add(mcac_scrape_config)
 

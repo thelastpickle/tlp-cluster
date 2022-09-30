@@ -13,9 +13,8 @@ for TARGET_DEVICE in "${DEVICES[@]}"; do
     if [[ -b "$TARGET_DEVICE" ]]
     then
 	    echo "Creating volume from $TARGET_DEVICE"
-      sudo mkfs.xfs -s size=4096 -f $TARGET_DEVICE
-      sudo mkdir -p ${MOUNT_POINT}/cassandra
-      sudo mount $TARGET_DEVICE /mnt
+	    sudo mkfs.xfs -s size=4096 -f $TARGET_DEVICE
+      sudo mkdir -p ${MOUNT_POINT}
       sudo rsync -aulvXpogtr /var/lib/* /mnt
       sudo umount -f $TARGET_DEVICE
 	    sudo mount $TARGET_DEVICE $MOUNT_POINT

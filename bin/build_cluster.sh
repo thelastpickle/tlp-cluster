@@ -6,7 +6,7 @@ BASE_CLUSTER_DIR="$(dirname "$dir")"
 shopt -s expand_aliases || setopt aliases
 
 export STRESS_NODES=0
-export CASSANDRA_VERSION=3.11.8
+export CASSANDRA_VERSION=4.0.6
 export STARGATE_NODES=0
 export CLUSTER_NAME=test_cluster
 export GC=CMS
@@ -16,6 +16,7 @@ export INSTANCE_TYPE=m3.xlarge
 export STARGATE_INSTANCE_TYPE=c3.2xlarge
 export STRESS_INSTANCE_TYPE=c3.2xlarge
 export JDK=8
+export NUM_TOKENS=16
 export BYPASS_PAUSE=n
 
 function usage {
@@ -37,6 +38,7 @@ options:
 --heap=8                                    Heap size in GB (8, 16, 32, ...)
 --jdk=11                                    OpenJDK version to use (8, 11, 14)
 --cores=<number of cores>                   Number of cores for ConcGCThreads and ParallelGCThreads
+--tokens=16                                 Number of tokens per node
 -y                                          Bypass the pause before running the install phase
 
 EOF
@@ -130,6 +132,10 @@ while test $# -gt 0; do
       export JDK=`echo $1 | sed -e 's/^[^=]*=//g'`
       shift
       ;;
+    --tokens*)
+      export NUM_TOKENS=`echo $1 | sed -e 's/^[^=]*=//g'`
+      shift
+      ;;
     -c)
       shift
       if test $# -gt 0; then
@@ -211,8 +217,18 @@ tlp-cluster init \
     #--az a
 set +x
 
-tlp-cluster up --auto-approve
-tlp-cluster use $CASSANDRA_VERSION
+success=0
+attempts=1
+while [ $success -eq  0 ] && [ $attempts -lt 5 ];
+do
+    echo "Creating instances (attempt $attempts)"
+    tlp-cluster up --auto-approve > up.log 2>&1 || echo "meh... up phase seem to have failed"
+    grep "try rerunning" up.log > /dev/null 2>&1
+    success=$? # 0 means we found errors in the logs, so we need to try again
+    attempts=$((attempts+1))
+done
+
+tlp-cluster use $CASSANDRA_VERSION --config num_tokens:$NUM_TOKENS
 
 if [ -z "$EXTRA_DEB" ]
 then
@@ -363,7 +379,11 @@ attempts=1
 while [ $success -eq  0 ]  && [ $attempts -lt 5 ];
 do
     echo "Starting Cassandra (attempt $attempts)"
-    tlp-cluster start > start.log 2>&1 || echo "meh... start phase seem to have failed"
+    start_arg=""
+    if [[ "$CASSANDRA_VERSION" == *"dse"* ]]; then
+      start_arg="--dse"
+    fi
+    tlp-cluster start $start_arg > start.log 2>&1 || echo "meh... start phase seem to have failed"
     tail -3 start.log | grep "Non zero response returned" > /dev/null 2>&1
     success=$?
     attempts=$((attempts+1))

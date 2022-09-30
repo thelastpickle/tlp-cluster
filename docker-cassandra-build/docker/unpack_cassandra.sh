@@ -2,7 +2,7 @@
 
 mkdir /out
 dpkg-deb -xv $1 /out
-cp /out/etc/cassandra/* conf/
+cp /out/etc/cassandra/* conf/ || cp /out/usr/share/dse/templates/cassandra/* conf/
 
 echo "Changing ownership to $HOST_USER_ID"
 

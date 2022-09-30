@@ -1,5 +1,6 @@
 package com.thelastpickle.tlpcluster.commands
 
+import com.beust.jcommander.Parameter
 import com.beust.jcommander.Parameters
 import com.thelastpickle.tlpcluster.Context
 import com.thelastpickle.tlpcluster.configuration.*
@@ -8,6 +9,8 @@ import java.io.File
 
 @Parameters(commandDescription = "Start cassandra on all nodes via service command")
 class Start(val context: Context) : ICommand {
+    @Parameter(description = "Start the DSE service", names = ["--dse"])
+    var dse = false
 
     override fun execute() {
         val sshKeyPath = context.userConfig.sshKeyPath
@@ -25,6 +28,9 @@ class Start(val context: Context) : ICommand {
         val failureMessage = "service failed to started"
 
         var serviceName = "cassandra"
+        if (dse) {
+            serviceName = "dse"
+        }
         parallelSsh.startService(ServerType.Cassandra, serviceName, NodeFilter.ALL).fold({
             println("$serviceName $successMessage")}, {
             println("$serviceName $failureMessage. ${it.message}")
